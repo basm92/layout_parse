@@ -1,6 +1,6 @@
 \input{preamble}
 
-\title{Reunification and Innovation\footnote{We are grateful to XXXX for insightful comments and suggestions.}}
+\title{Unification and Innovation\footnote{We are grateful to XXXX for insightful comments and suggestions.}}
 \author{Giacomo Domini \and Bas Machielsen\footnote{Both Utrecht University School of Economics, Utrecht University, Kriekenpitplein 21-22, 3584 EC Utrecht, the Netherlands; e--mail: \href{mailto:a.h.machielsen@uu.nl}{a.h.machielsen@uu.nl}}}
 \date{\today}
 
@@ -14,7 +14,7 @@
 
 \begin{center} \textbf{Abstract:} \end{center}
 
-\noindent Under Austro-Hungarian rule, the Lombardy and Veneto regions were subject to centralized, autocratic administration. After annexation by the Kingdom of Italy, they became part of a constitutional monarchy, where citizens had greater political participation and representation. We exploit these natural experiments arising from the reunification of Lombardy (1859) and Venetia (1866) with the rest of Italy to study the impact of the accompanying democratization and national reintegration on economic activity through the innovation channel. We combine a spatial regression discontinuity-design with panel data on world industrial expositions to study the impact of reunification on product complexity and innovative activity at the city-level, comparing increases in innovative activity of towns that remained in the Austro-Hungarian empire with towns that were incorporated in Italy. Our results show that [XXX]. 
+\noindent Under Austro-Hungarian rule, the Lombardy and Veneto regions were subject to centralized, autocratic administration. After annexation by the Kingdom of Italy, they became part of a constitutional monarchy, where citizens had greater political participation and representation. We exploit natural experiments arising from the reunification of Lombardy (1859) and Venetia (1866) with the rest of Italy to study the impact of the accompanying democratization and national reintegration on economic activity through the innovation channel. We combine a spatial regression discontinuity-design with panel data on world industrial expositions to study the impact of reunification on product complexity and innovative activity at the city-level, comparing increases in innovative activity of towns that remained in the Austro-Hungarian empire with towns that were incorporated in Italy. Our results show that [XXX]. 
 
 \textbf{JEL Classifications:} N14, D72, H71
 
@@ -22,17 +22,21 @@
 
 \section{Introduction}
 
+% Complementary framing: periphery vs. central part 
 The effect of democratization on economic activity has been debated in many disciplines. Despite some evidence to the contrary, the consensus now seems to be that there likely is a positive influence of democracy on economic activity. Various empirical studies have shown that, in a cross-country context, democratization causally influence economic growth. Theoretically, there are many possible channels through which democratization can lead to economic growth. % Mention some stuff
 
-Empirically, however, there is a lack of evidence on the specific mechanisms at work. In this paper, we propose to investigate one specific mechanism: economic growth through innovative activity. To investigate this channel, we look at the case of Italian reunification, involving the successive integration of the Lombardy (1859) and Veneto (1866) regions into the Kingdom of Italy. Under Austrian rule, Lombardy and Veneto were subject to a centralized, autocratic administration. After annexation by the Kingdom of Italy, they became part of a constitutional monarchy, where its citizens had greater political participation and representation. Local administrations and governance structures were overhauled to align with the new Italian government, which introduced a more centralized and unified system.
+Empirically, however, there is a lack of evidence on the specific mechanisms at work. In this paper, we propose to investigate one specific mechanism: economic growth through innovative activity. To investigate this channel, we look at the case of Italian unification, involving the successive integration of the Lombardy (1859) and Veneto (1866) regions into the Kingdom of Italy. Under Austrian rule, Lombardy and Veneto were subject to a centralized, autocratic administration. After annexation by the Kingdom of Italy, they became part of a constitutional monarchy, where its citizens had greater political participation and representation. Local administrations and governance structures were overhauled to align with the new Italian government, which introduced a more centralized and unified system.
 
 Additionally, the Austrian Empire had implemented a policy of Germanization in some areas of Lombardy and Veneto, which affected local language and culture, and with Italian unification, there was a renewed emphasis on the Italian language and culture. The legal system also underwent many changes: after incorporation, the legal and judicial systems in both Lombardy and Veneto shifted from Austrian law to Italian law. This change included the adoption of the Italian legal code and legal practices.
+% Make these legal practices and patent law specifically more precise
 
 Finally, the Italian government explicitly aimed to modernize and develop the economy of these regions. Investments in infrastructure, transportation, and industry were made to promote economic growth and integration into the wider Italian economy. The adoption of the Italian lira as the official currency replaced the Austrian currency.
 
 We leverage two arguably exogenous border changes involving the incorporation of Lombardy (1859) and Veneto (1866) into Italy to identify the influence of all aforementioned impetuses on economic and innovative activity. Our first treatment, the incorporation of Lombardy, resulted from the termination of the Franco-Austrian War, or the \textit{Second War of Independence} (1859), when the Kingdom of Sardinia-Piedmont, the driving force behind Italian unification, allied with France and went to war against the Austrian Empire. The war ended with the Treaty of Villafranca, in which the French Emperor Napoleon III brokered peace between the warring parties, which led to the annexation of Lombardy, including its capital, Milan, by the Kingdom of Sardinia-Piedmont.
 
 Our second treatment, the incorporation of Veneto, revolves around the termination of the \text{Third War of Independence}, in 1866. This war, waged in parallel to the larger Prussian--Austro-Hungarian war, was terminated by the peace of Prague, which stipulated the Austrian cession of the Veneto region. The Peace of Prague was followed up by the Austrian-Italian Treaty of Vienna, which confirmed the cession of the territory to Italy. However, the peace treaty stated that the annexation of Venetia and Mantua would have become effective only after a referendum, which was held on 21 and 22 October, and the result was an overwhelming success. 
+
+% How did the war go and where was it fought? No confounding factor?
 
 Our identification strategy leverages the randomness involved in the exact determination of the border and the comparability between cities located at similar distances to the new border. 
 
@@ -46,10 +50,56 @@ The data employed in this paper are retrieved from the official catalogues of th
 
 \subsection{Geographical Data}
 
+\subsection{Data Pipeline}
+
+% also incorporate with geographical data, we can include 0 observations to the dataset
+
+% mention the packages I use in here 
+
+Our pipeline starts from the digitized exposition data from an exposition at time $t$. Using a layout detection deep learning algorithm, we identify (i) the particular class of products being exhibited, and for each class, we then identify the observations represented by row entries. 
+
+Observations are defined as meaning an exhibitor $g$ (identified by a name) from town $i$, exhibiting a product from class $j$ at time of the exhibition $t$. Initially, we end up with raw strings containing this information. We use a rule-based approach to extract the town $i$ from the string, and then match it using a pre-trained language model-based approach to a predetermined list of city names, allowing us to geo-code our observations according to the city of origin. 
+
+Our baseline analyses involve aggregating this data to the city-class-year level $ijt$: we thus end up with a count variable for number of exhibitors in each class $j$ in exhibition year $t$. We augment this dataset by all towns in the affected areas that had no exhibitors in clas $j$ in exhibition year $t$. 
 
 
 \subsection{Methods}
 
+% think about: construct a complexity measure from the verbal descriptions of the product
+
+% complexity is a exhibitor-region-class level variable, but innovative activity or something is a region-class level variable
+
+Our point of reference encompasses a cross-sectional design around municipalities $i$:
+
+\begin{equation*}
+    Y_{i, 1867} = \alpha + \beta D_i + \epsilon_i 
+\end{equation*}
+
+where $D_i$ is a treatment indicator, equal to 1 if city $i$ has become part of Italy in 1859 and 1866 respectively. We might also consider a local regression discontinuity design, where $D_i$ is defined as \textit{distance to the border}, multiplied by -1 if the city is located in the Austro-Hungarian Empire in 1867. \footnote{We can compare for before-treatment similarity by running $Y_{i, 1855} = \alpha_0 + \alpha_1 D_i + u_i$}
+
+A second approach might be leveraging the panel data from different expositions at times $t \in \{ 1855, 1867\}$. In that case, the model we can estimate for $Y$ in city $i$ at time $t$: Methods
+
+\begin{equation*}
+    Y_{it} = \alpha_i + \beta_1 \text{Post}_t + \beta_2 D_i \cdot \text{Post}_t + \epsilon_{it}\footnote{We could also replace the $\alpha_i$ by a "mean difference" $D_i$, making it a standard difference-in-difference. The model in the equation, is however more general.}
+\end{equation*}
+
+in which we control for level differences between cities $i$ by the $\alpha_i$'s, and we compare villages at the same distance from the border before and after the unification. Our coefficient of interest is $\beta_2$, the difference between the treatment and control groups after the treatment. $D_i$ 
+
+In this regression, we could add distance to the border as a control variable, and potentially we can also weight the observations by the inverse distance to the border. Then, it comes closer to a geographical RDD design. 
+
+Finally, we can also opt for an explicit geographical local regression discontinuity estimate combine with a difference in difference methodology: 
+
+\begin{equation*}
+    Y_{it} - Y_{it-1} = \alpha + \beta D_i + \epsilon_{it}
+\end{equation*}
+
+where in the geographical RDD design, we define $D_i$ as being the distance to the border. 
+
+
+% Take into account, super-city level of aggregation if we want
+% Also; city 
+
+% Patent data in the future
 
 \section{Results}
 
