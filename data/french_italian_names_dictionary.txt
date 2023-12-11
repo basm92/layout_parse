@@ -1,0 +1,100 @@
+    Rome - Rome
+    Milan - Milan
+    Venise - Venezia
+    Florence - Firenze
+    Naples - Napoli
+    Turin - Torino
+    Bologne - Bologna
+    Vérone - Verona
+    Gênes - Genova
+    Palerme - Palermo
+    Bari - Bari
+    Padoue - Padova
+    Trieste - Trieste
+    Parme - Parma
+    Pérouse - Perugia
+    Tarente - Taranto
+    Reggio de Calabre - Reggio Calabria
+    Modène - Modena
+    Reggio d'Émilie - Reggio Emilia
+    Messine - Messina
+    Livourne - Livorno
+    Cagliari - Cagliari
+    Foggia - Foggia
+    Ravenne - Ravenna
+    Rimini - Rimini
+    Salerne - Salerno
+    Ferrare - Ferrara
+    Sassari - Sassari
+    Syracuse - Siracusa
+    Monza - Monza
+    Pescara - Pescara
+    Bergame - Bergamo
+    Latium - Lazio
+    Trente - Trento
+    Novare - Novara
+    Plaisance - Piacenza
+    Ancône - Ancona
+    Lecce - Lecce
+    Bolzano - Bolzano
+    Udine - Udine
+    Arezzo - Arezzo
+    La Spezia - La Spezia
+    Césène - Cesena
+    Grosseto - Grosseto
+    Barletta - Barletta
+    Côme - Como
+    Varèse - Varese
+    Sienne - Siena
+    Frosinone - Frosinone
+    Vigevano - Vigevano
+    Matera - Matera
+    Potenza - Potenza
+    Imola - Imola
+    Crémone - Cremona
+    Viterbe - Viterbo
+    Nuoro - Nuoro
+    Lucques - Lucca
+    Carrare - Carrara
+    Grosseto - Grosseto
+    Massa - Massa
+    Viareggio - Viareggio
+    Sondrio - Sondrio
+    Civitavecchia - Civitavecchia
+    Fano - Fano
+    Sanremo - Sanremo
+    Pordenone - Pordenone
+    Coni - Cuneo
+    Verceil - Vercelli
+    Orvieto - Orvieto
+    Rieti - Rieti
+    San Severo - San Severo
+    Aoste - Aosta
+    Avellino - Avellino
+    Crotone - Crotone
+    Pistoia - Pistoia
+    Savigliano - Savigliano
+    Alba - Alba
+    Molfetta - Molfetta
+    Sora - Sora
+    Caserte - Caserta
+    Lodi - Lodi
+    Manfredonia - Manfredonia
+    Cava de' Tirreni - Cava de' Tirreni
+    Crémone - Crema
+    Cisterna di Latina - Cisterna di Latina
+    Sant'Angelo Romano - Sant'Angelo Romano
+    Ischia - Ischia
+    Acireale - Acireale
+    Moncalieri - Moncalieri
+    Sora - Sora
+    Nocera Superiore - Nocera Superiore
+    Frosinone - Frosinone
+    Montecatini Terme - Montecatini Terme
+    Mirandola - Mirandola
+    Rho - Rho
+    Cernusco sul Naviglio - Cernusco sul Naviglio
+    Macerata - Macerata
+    Rovigo - Rovigo
+    Civitanova Marche - Civitanova Marche
+    San Miniato - San Miniato

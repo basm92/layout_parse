@@ -126,3 +126,6 @@ step3 |>
   select(-c(candidate_exact, candidate_exact_filtered)) |>
   unnest_wider(candidate_match_step2, names_sep="_") |>
   write_csv2('./data/interim_matched_data.csv')
+
+municipality_names |>
+  write_csv2('./data/list_of_municipalities_italy.csv')

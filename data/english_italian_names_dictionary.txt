@@ -1,0 +1,100 @@
+    Rome - Roma
+    Milan - Milano
+    Venice - Venezia
+    Florence - Firenze
+    Naples - Napoli
+    Turin - Torino
+    Bologna - Bologna
+    Verona - Verona
+    Genoa - Genova
+    Palermo - Palermo
+    Bari - Bari
+    Padua - Padova
+    Trieste - Trieste
+    Parma - Parma
+    Perugia - Perugia
+    Taranto - Taranto
+    Reggio Calabria - Reggio Calabria
+    Modena - Modena
+    Reggio Emilia - Reggio Emilia
+    Messina - Messina
+    Livorno - Livorno
+    Cagliari - Cagliari
+    Foggia - Foggia
+    Ravenna - Ravenna
+    Rimini - Rimini
+    Salerno - Salerno
+    Ferrara - Ferrara
+    Sassari - Sassari
+    Syracuse - Siracusa
+    Monza - Monza
+    Pescara - Pescara
+    Bergamo - Bergamo
+    Latina - Latina
+    Terni - Terni
+    Vicenza - Vicenza
+    Forlì - Forlì
+    Tuscany - Toscana
+    Trento - Trento
+    Novara - Novara
+    Piacenza - Piacenza
+    Ancona - Ancona
+    Lecce - Lecce
+    Bolzano - Bolzano
+    Udine - Udine
+    Arezzo - Arezzo
+    La Spezia - La Spezia
+    Cesena - Cesena
+    Grosseto - Grosseto
+    Barletta - Barletta
+    Como - Como
+    Varese - Varese
+    Siena - Siena
+    Frosinone - Frosinone
+    Vigevano - Vigevano
+    Matera - Matera
+    Potenza - Potenza
+    Imola - Imola
+    Cremona - Cremona
+    Viterbo - Viterbo
+    Nuoro - Nuoro
+    Lucca - Lucca
+    Carrara - Carrara
+    Grosseto - Grosseto
+    Massa - Massa
+    Viareggio - Viareggio
+    Sondrio - Sondrio
+    Civitavecchia - Civitavecchia
+    Fano - Fano
+    Sanremo - Sanremo
+    Pordenone - Pordenone
+    Cuneo - Cuneo
+    Vercelli - Vercelli
+    Orvieto - Orvieto
+    Rieti - Rieti
+    San Severo - San Severo
+    Aosta - Aosta
+    Avellino - Avellino
+    Crotone - Crotone
+    Pistoia - Pistoia
+    Savigliano - Savigliano
+    Alba - Alba
+    Molfetta - Molfetta
+    Sora - Sora
+    Caserta - Caserta
+    Lodi - Lodi
+    Manfredonia - Manfredonia
+    Cava de' Tirreni - Cava de' Tirreni
+    Crema - Crema
+    Cisterna di Latina - Cisterna di Latina
+    Sant'Angelo Romano - Sant'Angelo Romano
+    Ischia - Ischia
+    Acireale - Acireale
+    Moncalieri - Moncalieri
+    Sora - Sora
+    Nocera Superiore - Nocera Superiore
+    Frosinone - Frosinone
+    Montecatini Terme - Montecatini Terme
+    Mirandola - Mirandola
+    Rho - Rho
+    Cernusco sul Naviglio - Cernusco sul Naviglio
