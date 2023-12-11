@@ -121,29 +121,8 @@ step3 <- step3 |>
 step3 <- step3 |> 
   mutate(LAU_ID = coalesce(LAU_ID, lau_id_step2))
   
-# Step 4: Fuzzy match based on String distance
-find_candidate_fuzzy_match <- function(row) {
-  
-  thing_to_match <- row$location
-  
-  # Initialize the name and scores for potential matches
-  names <- list()
-  scores <- list()
-  
-  for(i in thing_to_match){
-    sd_matrix <- stringdist::stringdist(i, municipality_names$LAU_NAME, method = "jw") 
-    index <- sd_matrix |> which.min()
-    if(length(index) > 1){
-      print("HELP!!!")
-    }
-    names <- append(names, municipality_names$LAU_NAME[index])
-    scores <- append(scores, sd_matrix |> min())
-  }
-  
-  return(names[[which.max(scores)]])
-  
-}
-
-test <- step3 |>
-  rowwise() |>
-  mutate(candidate_match_step3 = list(find_candidate_fuzzy_match(cur_data())))
+# Step 4: Go to Python and explore a couple of libraries in there
+step3 |>
+  select(-c(candidate_exact, candidate_exact_filtered)) |>
+  unnest_wider(candidate_match_step2, names_sep="_") |>
+  write_csv2('./data/interim_matched_data.csv')
