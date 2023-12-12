@@ -1,6 +1,6 @@
     french - italian
-    Rome - Rome
-    Milan - Milan
+    Rome - Roma
+    Milan - Milano
     Venise - Venezia
     Florence - Firenze
     Naples - Napoli

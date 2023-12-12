@@ -36,6 +36,10 @@ forbidden_words <- c("Italian",
                      "English",
                      "Sorry", 
                      "I", 
+                     "One",
+                     "Can",
+                     "Could",
+                     "A",
                      "It",
                      "In",
                      "An",
@@ -121,11 +125,96 @@ step3 <- step3 |>
 step3 <- step3 |> 
   mutate(LAU_ID = coalesce(LAU_ID, lau_id_step2))
   
-# Step 4: Go to Python and explore a couple of libraries in there
-step3 |>
-  select(-c(candidate_exact, candidate_exact_filtered)) |>
-  unnest_wider(candidate_match_step2, names_sep="_") |>
-  write_csv2('./data/interim_matched_data.csv')
+# Step 4: Make a translation-based exact match from French and then English
+french <- read_delim('./data/french_italian_names_dictionary.txt', delim=' - ', ) |> 
+  janitor::clean_names() |>
+  mutate(french = str_trim(french)) |>
+  distinct()
 
-municipality_names |>
-  write_csv2('./data/list_of_municipalities_italy.csv')
+english <- read_delim('./data/english_italian_names_dictionary.txt', delim=' - ') |>
+  janitor::clean_names() |>
+  mutate(english = str_trim(english)) |>
+  distinct()
+
+find_translation_match <- function(row){
+  # For multiple elements
+  candidates <- row$candidate_match_step2[[1]]
+  match <- NA_character_
+
+  for(i in candidates){
+    prelim_match <- french |>
+      filter(french == i) 
+      
+    if(nrow(prelim_match) > 0){
+      match <- prelim_match |>
+        select(italian) |> 
+        pull()
+      
+    } else{
+      prelim_match <- english |>
+        filter(english == i)
+      
+      if(nrow(prelim_match) > 0){
+        match <- prelim_match |>
+          select(italian) |> 
+          pull()
+      }
+    }
+    if(nrow(prelim_match) > 0){
+      break
+    }
+  }
+  
+  return(match)
+}
+
+step3 <- step3 |>
+  rowwise() |> 
+  mutate(candidate_match_step3 = find_translation_match(cur_data()))
+
+# Convert to the LAU numbers finally
+find_lau_no_again <- function(row) {
+  if(!is.na(row$candidate_match_step3)){
+    lau_id <- municipality_names |> 
+      filter(LAU_NAME == row$candidate_match_step3) |>
+      select(LAU_ID) |> 
+      pull()
+  } else{
+    lau_id <- NA_character_
+  }
+    return(lau_id)
+}
+
+step4 <- step3 |>
+  rowwise() |> 
+  mutate(temp_lau_id = find_lau_no_again(cur_data()))
+
+# Merge the LAU ID's and drop some variables
+step4 <- step4 |>
+  mutate(LAU_ID = coalesce(LAU_ID, temp_lau_id))
+
+step4 <- step4 |> 
+  select(c(text, source, class, location , LAU_ID, candidate_match_step2))
+
+# Step 4: Now use first candidate_match_step2 to put them together and fuzzy string match
+## If the score is too low, then go back to location and fuzzy string match
+fuzzy_match <- function(row){
+  
+  candidate_match <- NA
+  score <- NA
+  
+  if(is.na(row$LAU_ID)){
+  names <- row$candidate_match_step2[[1]]
+  together <- paste0(unique(names), collapse=' ')
+  matrix <- stringdist(together, municipality_names$LAU_NAME)
+  index <- which.min(matrix)
+  score <- min(matrix)
+  candidate_match <- municipality_names$LAU_NAME[index]
+  }
+  
+  return(c(candidate_match, score))
+}
+
+step4[1:100, ] |> 
+  rowwise() |> 
+  mutate(candidate_match_step4 = list(fuzzy_match(cur_data())))
