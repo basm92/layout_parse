@@ -39,6 +39,7 @@ forbidden_words <- c("Italian",
                      "One",
                      "Can",
                      "Could",
+                     "Based",
                      "A",
                      "It",
                      "In",
@@ -68,7 +69,7 @@ find_candidate_match <- function(row){
   match_vector <- row$candidate_exact_filtered
 
   if(rlang::is_empty(match_vector[[1]])){
-    outcome <- "NA"
+    outcome <- NA_character_
     return(outcome)
   } else {
   
@@ -206,7 +207,7 @@ fuzzy_match <- function(row){
   if(is.na(row$LAU_ID)){
   names <- row$candidate_match_step2[[1]]
   together <- paste0(unique(names), collapse=' ')
-  matrix <- stringdist(together, municipality_names$LAU_NAME)
+  matrix <- stringdist(together, municipality_names$LAU_NAME, method='jw')
   index <- which.min(matrix)
   score <- min(matrix)
   candidate_match <- municipality_names$LAU_NAME[index]
@@ -215,6 +216,7 @@ fuzzy_match <- function(row){
   return(c(candidate_match, score))
 }
 
-step4[1:100, ] |> 
+# 0.15 seems like a good threshold - implement this tomorrow
+test <- step4 |> 
   rowwise() |> 
   mutate(candidate_match_step4 = list(fuzzy_match(cur_data())))
