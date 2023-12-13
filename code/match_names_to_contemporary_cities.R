@@ -3,17 +3,12 @@ library(stringdist)
 library(giscoR)
 library(sf)
 source('./code/helper_matching_functions.R')
-# Load the dataset of candidate matches
-municipality_names <- giscoR::gisco_get_lau(country="Italy", year="2016") |>
-  st_drop_geometry() |> 
-  select(LAU_NAME, LAU_ID) |> 
-  as_tibble()
 
-geocode_data <- function(dataset, municipality_names){
-  
-  
+geocode_data <- function(directory, municipality_names){
+  # Inputs: directory of dataset with variable respones from chatgpt (respones) and hard-coded location (location)
+  # Municipality names should have column LAU_NAME
+  dataset <- read_csv(directory)
   # Load the dataset of to be matched observations and filter the parasite observations
-  raw_data <- read_csv('./data/1867_italy_chatgpt.csv')
   raw_data <- dataset |> 
     filter(!is.na(location))
   
@@ -91,7 +86,15 @@ geocode_data <- function(dataset, municipality_names){
     select(c(text, source, class, location, LAU_ID))
   
   # Finally, write to csv
-  name <- paste0(dataset, '_geomatched.csv', collapse='')
+  name <- paste0(str_remove(directory, "\\.csv"), "_geomatched.csv", collapse='')
   step6 |> write_csv2(name)
   
 }
+
+# Load the dataset of candidate matches
+municipality_names <- giscoR::gisco_get_lau(country="Italy", year="2016") |>
+  st_drop_geometry() |> 
+  select(LAU_NAME, LAU_ID) |> 
+  as_tibble()
+
+geocode_data('./data/1867_italy_chatgpt.csv', municipality_names)
