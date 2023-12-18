@@ -19,12 +19,12 @@ mask <- apply(filter_indication, 1, any)
 mask2 <- apply(filter_indication2, 1, any)
 final_mask <- map2_lgl(mask, mask2, ~ any(.x + .y))
 relevant_part <- italy_municipalities[final_mask,]
-.
+
 # Plot to check
 ggplot() + geom_sf(data=relevant_part) + geom_sf(data=border, color='blue')
 
+# Spatial join
 relevant_part <- st_join(relevant_part, italy_provinces, join=st_nearest_feature)
-
 # Calculate centroids of polygons in relevant_part
 relevant_centroids <- st_centroid(relevant_part)
 
@@ -65,6 +65,7 @@ innovations <- innovations |>
   mutate(abs_distance = st_distance(st_centroid(innovations$`_ogr_geometry_`), border)) |> 
   mutate(distance = as.numeric(if_else(group == "Lombardia", -abs_distance, abs_distance)))
 
+# Fixed effects
 innovations$depres <- feols(log(1+n) ~ NAME_LATN, data = innovations)$resid
 
 rdrobust::rdrobust(y=innovations$depres, x=innovations$distance, covs=innovations$AREA_KM2) |> summary()
