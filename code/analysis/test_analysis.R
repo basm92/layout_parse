@@ -1,4 +1,4 @@
-library(tidyverse); library(sf); library(rdrobust); library(fixest)
+library(tidyverse); library(sf); library(rdrobust); library(fixest); library(modelr)
 # Import the border
 border <- st_read('./shapefiles_images/old_province_borders_lines/shapefile_italy_1860.shp') |>
   filter(id == 5)
@@ -67,4 +67,5 @@ innovations <- innovations |>
 
 innovations$depres <- feols(log(1+n) ~ NAME_LATN, data = innovations)$resid
 
-rdrobust::rdrobust(y=innovations$depres, x=innovations$distance) |> summary()
+rdrobust::rdrobust(y=innovations$depres, x=innovations$distance, covs=innovations$AREA_KM2) |> summary()
+rdplot(y=innovations$depres, x=innovations$distance)
