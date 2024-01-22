@@ -67,7 +67,7 @@ innovations <- innovations |>
 
 
 
-##
+## Add elevation
 elevations <- geodata::elevation_30s("Italy", path='./')
 values <- terra::extract(elevations, innovations)
 
@@ -79,9 +79,30 @@ mean_elevation_per_comune <- values|> as_tibble() |>
 innovations <- innovations |> 
   mutate(mean_elevation = mean_elevation_per_comune)
 
+## Import 1855 data
+data_1855 <- readxl::read_xlsx('./data/Exhibitions_Lombardo_Veneto.xlsx') |> 
+  janitor::clean_names() |> 
+  group_by(location) |> 
+  count() |> 
+  rename(n_1855 = n)
+
+innovations <- innovations |> 
+  left_join(data_1855,
+            by=c('LAU_NAME' = 'location')) |> 
+  mutate(n_1855 = if_else(is.na(n_1855), 0, n_1855),
+         dn = n - n_1855)
+
+# Placebo test
+rdrobust(y=innovations$n_1855, x=innovations$distance,
+         covs=cbind(innovations$AREA_KM2,
+                    innovations$angle_to_line,
+                    innovations$mean_elevation)) |> summary()
 
 # Fixed effects
-innovations$depres <- feols(log(1+n) ~ NUTS_ID, data = innovations)$resid
+feols(n ~ n_1855 + group + n_1855*group | NUTS_ID, data=innovations)
+model <- feols(dn ~ NUTS_ID + prov_code, data = innovations) 
+innovations <- modelr::add_residuals(data = innovations, model = model) |>
+  rename(depres = resid)
 
 rdrobust::rdrobust(y=innovations$depres, x=innovations$distance, covs=cbind(innovations$AREA_KM2,
                                                                             innovations$angle_to_line,
