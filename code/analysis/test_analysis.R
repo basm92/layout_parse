@@ -1,4 +1,4 @@
-library(tidyverse); library(sf); library(rdrobust); library(fixest); library(modelr)
+library(tidyverse); library(sf); library(rdrobust); library(fixest); library(modelr); library(terra)
 # Import the border
 border <- st_read('./shapefiles_images/old_province_borders_lines/shapefile_italy_1860.shp') |>
   filter(id == 5)
@@ -65,8 +65,28 @@ innovations <- innovations |>
   mutate(abs_distance = st_distance(st_centroid(innovations$`_ogr_geometry_`), border)) |> 
   mutate(distance = as.numeric(if_else(group == "Lombardia", -abs_distance, abs_distance)))
 
-# Fixed effects
-innovations$depres <- feols(log(1+n) ~ NAME_LATN, data = innovations)$resid
 
-rdrobust::rdrobust(y=innovations$depres, x=innovations$distance, covs=innovations$AREA_KM2) |> summary()
+
+##
+elevations <- geodata::elevation_30s("Italy", path='./')
+values <- terra::extract(elevations, innovations)
+
+mean_elevation_per_comune <- values|> as_tibble() |>
+  group_by(ID) |> 
+  summarize(mean = mean(ITA_elv_msk, na.rm=T)) |> 
+  pull(mean)
+
+innovations <- innovations |> 
+  mutate(mean_elevation = mean_elevation_per_comune)
+
+
+# Fixed effects
+innovations$depres <- feols(log(1+n) ~ NUTS_ID, data = innovations)$resid
+
+rdrobust::rdrobust(y=innovations$depres, x=innovations$distance, covs=cbind(innovations$AREA_KM2,
+                                                                            innovations$angle_to_line,
+                                                                            innovations$mean_elevation)) |> summary()
+
 rdplot(y=innovations$depres, x=innovations$distance)
+
+
