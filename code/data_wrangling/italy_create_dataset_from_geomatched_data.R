@@ -109,6 +109,20 @@ dataset <- dataset |>
   mutate(share_in_group = number_of_innovations / total) |>
   select(-c(total))
 
+# Create longitude and latitude variables
+# Compute district centroids for Conley standard errors
+coords <- dataset |> 
+  st_centroid() |> 
+  mutate(longitude = st_coordinates(`_ogr_geometry_`)[,1],
+         latitude = st_coordinates(`_ogr_geometry_`)[,2]) |>
+  dplyr::select(LAU_NAME, year, longitude, latitude) |>
+  st_drop_geometry()
+
+# Integrate them in dataset
+# Standardize ratio for interpretability
+dataset <- dataset |> 
+  left_join(coords, by = c("LAU_NAME", "year"))
+
 # Write the dataset
 st_write(dataset, './data/final_datasets/italy.geojson', append=FALSE)
 
