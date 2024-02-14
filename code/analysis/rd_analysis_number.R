@@ -1,3 +1,5 @@
+# Regression Discontinuity Analysis
+library(tidyverse); library(rdrobust); library(fixest)
 dataset <- st_read('./data/final_datasets/italy.geojson') |>
   mutate(year = as.factor(year))
 
