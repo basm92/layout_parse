@@ -51,7 +51,7 @@ modelsummary(
   out = "kableExtra",
   output = "latex")   |>
   kableExtra::add_header_above(c(" " = 1, "OLS" = 1, "Poisson" = 1)) |>
-  kableExtra::kable_styling(latex_options = c("hold_position", "scale_down")) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"), font_size=9) |>
   kableExtra::footnote(general = notes, footnote_as_chunk = T, threeparttable = T, escape = F) |>
   kableExtra::save_kable(file="./tables/did_analysis_number.tex")
 
