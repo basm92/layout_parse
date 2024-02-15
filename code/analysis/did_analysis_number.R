@@ -17,12 +17,12 @@ dataset <- st_read('./data/final_datasets/italy.geojson') |>
 
 # Diff-in-diff analysis
 formula_did <- as.formula(
-  number_of_innovations ~ year + group + year*group + 
+  log(1+number_of_innovations) ~ year + group + year*group + 
     longitude + latitude + mean_elevation + AREA_KM2 + angle_to_line | NUTS_NAME 
   )
 
 formula_did_no_fe <- as.formula(
-  number_of_innovations ~ year + group + year*group + 
+  log(1+number_of_innovations) ~ year + group + year*group + 
     longitude + latitude + mean_elevation + AREA_KM2 + angle_to_line
 )
 
