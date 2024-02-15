@@ -4,25 +4,8 @@
 gm_did <- tibble::tribble(
   ~raw,        ~clean,          ~fmt,
   "nobs",      "N",             0,
-  "adj.r.squared","Adj. $R^2$", 2,
-  "F Test Treatment - Control", "F Stat. Treatment Effect", 2,
-  "p-value", "p-value", 3
+  "adj.r.squared","Adj. $R^2$", 2
   )
-
-glance_custom.fixest <- function(x) { # don't forget ...
-  treatment_test <- marginaleffects::hypotheses(
-    model=x,
-    hypothesis="b1=b6",
-    vcov=vcov_conley)
-  f <- treatment_test$statistic
-  p <- treatment_test$p.value
-  
-  out <- tibble(
-    "F Test Treatment - Control" = round(f, 2),
-    "p-value" = round(p, 3))
-  
-  return(out)
-}
 
 stars=c("*" = 0.1, "**"=0.05, "***"=0.01)
 
@@ -34,7 +17,9 @@ cm_did <- c(
   "year1867:groupLombardo" = "Year (1867) x Lombardo",
   "mean_elevation" = "Elevation",
   "longitude" = "Longitude",
-  "latitude" = "Latitude"
+  "latitude" = "Latitude",
+  "AREA_KM2" = "Area",
+  "angle_to_line" = "Angle to Border"
 )
 
 

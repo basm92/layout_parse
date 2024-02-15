@@ -10,29 +10,31 @@
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3}
   & (1) & (2)\\
 \midrule
-Year (1867) & \num{0.275}*** & \num{1.946}***\\
- & (\num{0.045}) & (\num{0.208})\\
-Veneto & \num{0.238} & \num{1.740}**\\
- & (\num{0.152}) & (\num{0.802})\\
+Year (1867) & \num{0.275}** & \num{1.946}***\\
+ & (\num{0.115}) & (\num{0.231})\\
+Veneto & \num{0.209} & \num{0.982}\\
+ & (\num{0.291}) & (\num{1.224})\\
 Year (1867) x Veneto & \num{0.110} & \num{-0.308}\\
- & (\num{0.172}) & (\num{0.295})\\
-Elevation & \num{0.000} & \num{-0.002}***\\
- & (\num{0.000}) & (\num{0.001})\\
-Longitude & \num{-0.109} & \num{-0.390}\\
- & (\num{0.230}) & (\num{0.781})\\
-Latitude & \num{-0.241} & \num{-0.454}\\
- & (\num{0.357}) & (\num{1.337})\\
+ & (\num{0.187}) & (\num{0.405})\\
+Elevation & \num{-0.001}*** & \num{-0.007}***\\
+ & (\num{0.001}) & (\num{0.001})\\
+Longitude & \num{-0.576}** & \num{-2.094}**\\
+ & (\num{0.289}) & (\num{1.041})\\
+Latitude & \num{0.621} & \num{3.808}**\\
+ & (\num{0.429}) & (\num{1.510})\\
+Area & \num{0.045}** & \num{0.068}***\\
+ & (\num{0.018}) & (\num{0.009})\\
+Angle to Border & \num{-0.001} & \num{-0.002}\\
+ & (\num{0.001}) & (\num{0.002})\\
 \midrule
 N & \num{4432} & \num{4432}\\
-F Stat. Treatment Effect & \num{0.87} & \num{4.84}\\
-p-value & \num{0.384} & \num{0.000}\\
 Province FE & \Checkmark & \Checkmark\\
 \bottomrule
 \multicolumn{3}{l}{\rule{0pt}{1em}* p $<$ 0.1, ** p $<$ 0.05, *** p $<$ 0.01}\\
 \end{tabular}
 \begin{tablenotes}[para]
 \item \textit{Note: } 
-\item Dependent variables: Number of innovations in municipality $i$. The coefficient of interest is the Year x Group{Veneto} variable. The control variables are latitude, longitude, elevation, and the analysis is conditional on provinde fixed-effects. Standard errors are estimated using Conley (1999). The F Statistic and p-value report the outcome of a test for the equality $beta_1=beta_6$.
+\item Dependent variables: Number of innovations in municipality $i$. The coefficient of interest is the Year x Group{Veneto} variable. The control variables are latitude, longitude, elevation, and the analysis is conditional on provinde fixed-effects. Standard errors are clustered at the municipality level. The F Statistic and p-value report the outcome of a test for the equality $beta_1=beta_6$.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

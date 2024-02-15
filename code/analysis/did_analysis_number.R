@@ -18,19 +18,19 @@ dataset <- st_read('./data/final_datasets/italy.geojson') |>
 # Diff-in-diff analysis
 formula_did <- as.formula(
   number_of_innovations ~ year + group + year*group + 
-    longitude + latitude + mean_elevation | NUTS_NAME + NUTS_ID
+    longitude + latitude + mean_elevation + AREA_KM2 + angle_to_line | NUTS_NAME 
   )
 
-model_lin <- feols(formula_did, data = dataset, vcov=vcov_conley)
-model_pois <- fepois(formula_did, data = dataset, vcov = vcov_conley)
+model_lin <- feols(formula_did, data = dataset, vcov=~id)
+model_pois <- fepois(formula_did, data = dataset, vcov =~id)
 
 
 # Table
 notes <- "Dependent variables: Number of innovations in municipality $i$. 
 The coefficient of interest is the Year x Group{Veneto} variable.
 The control variables are latitude, longitude, elevation, and the 
-analysis is conditional on provinde fixed-effects. Standard errors are 
-estimated using Conley (1999). The F Statistic and p-value report the outcome of
+analysis is conditional on provinde fixed-effects. Standard errors are clustered at 
+the municipality level. The F Statistic and p-value report the outcome of 
 a test for the equality $\\beta_1=\\beta_6$." 
 notes <- gsub('[\n]', ' ', notes) |> str_squish()
 
