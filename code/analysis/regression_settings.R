@@ -42,20 +42,12 @@ cm_did <- c(
 rdd <- function(data, 
                 control_variables=NULL,
                 fixed_effects=NULL,
-                preferred_margin='regular',
-                dep_var='log(1+nw0_deflated)',
-                cluster='naam',
+                running_var='distance',
+                dep_var='number_of_innovations',
+                cluster='NAME_LATN',
                 ...){
   
-  # Implement, Margin
-  if(preferred_margin == 'regular'){
-    data <- data |> 
-      mutate(effective_margin = margin)
-  } else {
-    data <- data |> 
-      mutate(effective_margin = broad_margin)
-  }
-  
+
   # Control variables filter
   if (!is.null(control_variables)) {
     data <- data |>
@@ -70,8 +62,8 @@ rdd <- function(data,
   
   # Implement dependent variable
   analysis <- data |> 
-    mutate(dv = eval(parse(text = dep_var))) |> 
-    filter(!is.na(dv))
+    mutate(dv = eval(parse(text = dep_var)), running_var = eval(parse(text = running_var))) |> 
+    filter(!is.na(dv), !is.na(running_var))
   
   # Implement control variables
   formula_base <- "dv ~ 1"
@@ -110,19 +102,22 @@ rdd <- function(data,
   }
   
   # Return the model estimates object and the used dataset
-  model_out <- rdrobust(y=dependent_var, x=analysis$effective_margin, cluster=cluster_data, ...)
-  data_out <- analysis |> select(dv, effective_margin, all_of(control_variables), all_of(fixed_effects))
+  model_out <- rdrobust(y=dependent_var, x=analysis$running_var, cluster=cluster_data, ...)
+  data_out <- analysis |> select(dv, running_var, all_of(control_variables), all_of(fixed_effects))
   
   return(list(data_out, model_out))
   
 }
 
 sround <- function(number, decimals) { format(base::round(number, decimals), nsmall = decimals) }
+ihs <- function(x) { log(x + sqrt(x^2+1))}
 # Next: create a thing that puts that output to table column
-make_table_column <- function(rdd_object, margin_dv = 0.05, extra_rows = NULL) {
+make_table_column <- function(rdd_object, margin_dv = 5e4, extra_rows = NULL) {
   
   estimates <- rdd_object[[2]]
-  dataset <- rdd_object[[1]]
+  dataset <- rdd_object[[1]] |> st_drop_geometry()
+  
+  iv <- as.character(estimates$call$x) |> pluck(3)
   # Extract Treatment Effect Estimate
   est <- estimates$Estimate[1] |> sround(3)
   # Extract SE
@@ -135,13 +130,13 @@ make_table_column <- function(rdd_object, margin_dv = 0.05, extra_rows = NULL) {
                     TRUE ~ "")
   # Mean DV Treated and Control
   mean_dv_treated <- dataset |>
-    filter(between(effective_margin, 0, margin_dv)) |>
+    filter(between(eval(parse(text=iv)), 0, margin_dv)) |>
     summarise(mean_dv = mean(dv, na.rm=TRUE)) |>
     pull() |>
     sround(3)
   
   mean_dv_control <- dataset |>
-    filter(between(effective_margin, -margin_dv, 0)) |>
+    filter(between(eval(parse(text=iv)), -margin_dv, 0)) |>
     summarise(mean_dv = mean(dv, na.rm=TRUE)) |>
     pull() |>
     sround(3)
@@ -170,10 +165,10 @@ make_table <- function(list_of_columns,
                        ...){
   # Get the first row with information
   if(is.null(row_names)){
-    row_names <- c("Coefficient (ITT)",
+    row_names <- c("Estimate",
                    "SE (BC)",
-                   "Mean DV Treated",
-                   "Mean DV Control",
+                   "Mean DV Treated 50km",
+                   "Mean DV Control 50km",
                    "N (Treated)",
                    "N (Control)",
                    "Bandwidth")
