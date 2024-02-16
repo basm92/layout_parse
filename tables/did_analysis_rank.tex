@@ -1,0 +1,40 @@
+\begin{table}[!h]
+
+\caption{\label{tab:did_analysis_rank}Difference-in-difference Estimates of Unification on Innovation (Ranking)}
+\centering
+\fontsize{9}{11}\selectfont
+\begin{threeparttable}
+\begin{tabular}[t]{lcccc}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{2}{c}{OLS} & \multicolumn{2}{c}{Poisson} \\
+\cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-5}
+  & (1) & (2) & (3) & (4)\\
+\midrule
+Year (1867) & \num{131.938}*** & \num{131.938}*** & \num{1.352}*** & \num{1.352}***\\
+ & (\num{21.298}) & (\num{21.342}) & (\num{0.237}) & (\num{0.237})\\
+Veneto & \num{-111.120}** & \num{176.963}** & \num{-1.302}** & \num{1.049}*\\
+ & (\num{49.439}) & (\num{85.169}) & (\num{0.590}) & (\num{0.589})\\
+Year (1867) x Veneto & \num{-39.857} & \num{-39.857} & \num{-0.349} & \num{-0.349}\\
+ & (\num{34.806}) & (\num{34.877}) & (\num{0.393}) & (\num{0.394})\\
+Elevation & \num{-0.283}*** & \num{-0.332}*** & \num{-0.002}*** & \num{-0.003}***\\
+ & (\num{0.052}) & (\num{0.058}) & (\num{0.000}) & (\num{0.001})\\
+Longitude & \num{-5.918} & \num{-33.508} & \num{0.251} & \num{0.154}\\
+ & (\num{21.974}) & (\num{49.318}) & (\num{0.164}) & (\num{0.469})\\
+Latitude & \num{171.749}*** & \num{245.251}*** & \num{1.563}*** & \num{2.552}***\\
+ & (\num{51.876}) & (\num{85.851}) & (\num{0.518}) & (\num{0.824})\\
+Area & \num{6.111}*** & \num{6.599}*** & \num{0.017}*** & \num{0.027}***\\
+ & (\num{1.192}) & (\num{1.254}) & (\num{0.002}) & (\num{0.004})\\
+Angle to Border & \num{-0.200} & \num{-0.225} & \num{-0.004}** & \num{-0.003}*\\
+ & (\num{0.127}) & (\num{0.141}) & (\num{0.002}) & (\num{0.002})\\
+\midrule
+N & \num{4432} & \num{4432} & \num{4432} & \num{4432}\\
+Province FE & No & Yes & No & Yes\\
+\bottomrule
+\multicolumn{5}{l}{\rule{0pt}{1em}* p $<$ 0.1, ** p $<$ 0.05, *** p $<$ 0.01}\\
+\end{tabular}
+\begin{tablenotes}[para]
+\item \textit{Note: } 
+\item Dependent variables: Rank(number of innovations) in municipality $i$, where higher is more innovative. The coefficient of interest is the Year x Group{Veneto} variable. The control variables are latitude, longitude, elevation, and the analysis is conditional on provinde fixed-effects. Standard errors are clustered at the municipality level.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
