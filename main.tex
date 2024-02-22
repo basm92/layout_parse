@@ -58,6 +58,8 @@ The data employed in this paper are retrieved from the official catalogues of th
 
 \subsection{Geographical Data}
 
+We start off with a shapefile of Italian municipalities. Then, we superimpose a hand-made digitization of the border between Veneto and Lombardo in 1859. The shapefiles are available on [repository]. We then name match the exhibition data to the names of the municipality using a firstly a rule-based approach based on exact, then fuzzy string matching with a relatively strict criterion. If still no match has been found, we use a LLM (OpenAI 2023) to find a match. The specific query we use is described in [repository]. 
+
 \subsection{Data Pipeline}
 
 % also incorporate with geographical data, we can include 0 observations to the dataset
