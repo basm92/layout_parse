@@ -2,7 +2,7 @@ library(tidyverse)
 library(stringdist)
 library(giscoR)
 library(sf)
-source('./code/helper_matching_functions.R')
+source('./code/data_wrangling/helper_matching_functions.R')
 
 geocode_data <- function(directory, municipality_names){
   # Inputs: directory of dataset with variable respones from chatgpt (respones) and hard-coded location (location)
@@ -97,4 +97,6 @@ municipality_names <- giscoR::gisco_get_lau(country="Italy", year="2016") |>
   select(LAU_NAME, LAU_ID) |> 
   as_tibble()
 
-geocode_data('./data/1867_italy_chatgpt.csv', municipality_names)
+#geocode_data('./data/1867_italy_chatgpt.csv', municipality_names)
+
+geocode_data('./data/1878_italy_chatgpt.csv', municipality_names)

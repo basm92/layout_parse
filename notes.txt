@@ -1,0 +1,27 @@
+Control variables:
+    Temperature
+    Precipitation
+    Land Suitability
+    Elevation
+    Latitude
+    Longitude
+    Area
+    Distance to Coast / Harbor
+    Population / Population Density at t0
+
+Dependent variables:
+    Count
+    Dummy > 0
+    Ranking
+    Diversification and Complexity
+
+Placebo Test:
+    Need Austrian Patent Data - Should see a drop in patents after independence Veneto/Lombardy
+    Complementary: Piedmont Patent Data
+
+Summarize Observations by Class: 
+    See if this matches Giacomo's Table as an approximation
+    If this doesn't work - construct a page-class mapping
+
+Misc:
+    Innovation or Development? What is a good framing? Perhaps both
