@@ -42,7 +42,7 @@ make_table(models,
            output = "latex",
            title = "Estimates of Italian Unification on Innovative Activity") |>
   add_header_above(c(" " = 1, "No FE" = 1, "FE" = 1)) |>
-  kableExtra::kable_styling(latex_options = c("hold_position", "scale_down")) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"), font_size=8) |>
   kableExtra::footnote(general = notes, footnote_as_chunk = T, threeparttable = T, escape = F) |>
   kableExtra::save_kable("./tables/rd_analysis_dummy.tex")
 
