@@ -9,3 +9,5 @@ To do:
 	+ Match the names with French names
 	+ Combine with the spatial data
 	+ Do a trial run
+
+- Add references to bibliography and insert \cite in slides
