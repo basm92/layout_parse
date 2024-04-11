@@ -1,0 +1,77 @@
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.40\paperwidth,ht=2.5ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertshortauthor
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.50\paperwidth,ht=2.5ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.10\paperwidth,ht=2.5ex,dp=1ex,center]{date in head/foot}%
+    \insertframenumber{} /\inserttotalframenumber\hspace*{1ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\makeatletter
+
+\usepackage[T1]{fontenc}
+%\usepackage[utf8]{inputenc}
+%\usepacage[italian]{babel}
+\usepackage{amsmath} % allows to use \text in arrays
+\usepackage{afterpage} % Execute command after the next page break
+\usepackage{syntonly}
+%\syntaxonly
+\usepackage{changepage}
+\usepackage{comment}
+
+%Tables and figures
+\usepackage{tabularx} % introduces column type X
+\usepackage{array}
+\usepackage{rotating} % per ruotare tabelle grandi
+\usepackage{longtable}
+\usepackage{siunitx} % gestisce in modo molto potente e flessibile anche la resa tipografica dei numeri nelle tabelle, definendo un nuovo tipo di colonna S specifica per dati numerici
+\sisetup{output-decimal-marker={.},input-symbols = ()} % "(" and ")" are ordinary inputs
+\setbeamertemplate{caption}[numbered]
+\setbeamerfont{framesubtitle}{size=\large}
+\usepackage[compatibility=false]{caption}
+\captionsetup{tableposition=top,figureposition=bottom,font=scriptsize}
+\usepackage{subcaption}
+\captionsetup[sub]{font=scriptsize,labelfont={bf,sf}}
+\usepackage{booktabs} % per tabelle
+\usepackage{graphicx} % per figure
+\usepackage{pgfplots}
+\pgfplotsset{width=\textwidth,compat=1.11}
+\usepackage{adjustbox}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\graphicspath{{../paper/}{../figures/}{../}}
+\usepackage{threeparttable}
+
+%New command for captions below the table (in addition to those above)
+\newcommand\fnote[1]{\captionsetup{format=plain,font=footnotesize,justification=justified}\caption*{#1}}
+\newcommand{\B}[1]{{\color{blue} #1}}
+\newcommand{\G}[1]{{\color{gray} #1}}
+\hypersetup{colorlinks=true, breaklinks=false, linkcolor=gray, menucolor=gray, urlcolor=blue, citecolor=gray}
+
+%Symbols
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+%% Referencing
+\usepackage{hyperref}
+%\usepackage{breqn}
+%\usepackage{amsmath}
+
+%% Citations
+%\usepackage[authoryear]{natbib}
+%\usepackage{hyperref}
+%\citestyle{apacite}
+%\def\bibfont{\small}
+
+%Biblio
+\usepackage[style=authoryear-comp,backend=bibtex,uniquename=init,firstinits,maxcitenames=2,natbib=true,url=false,doi=false,eprint=false]{biblatex}
+\bibliography{bibliography}

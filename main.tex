@@ -1,6 +1,6 @@
 \input{preamble}
 
-\title{Unification and Innovation\footnote{We are grateful to XXXX for insightful comments and suggestions.}}
+\title{Institutions and Innovation: \\ Evidence from the Italian Unification\footnote{We are grateful to XXXX for insightful comments and suggestions.}}
 \author{Giacomo Domini \and Bas Machielsen\footnote{Both Utrecht University School of Economics, Utrecht University, Kriekenpitplein 21-22, 3584 EC Utrecht, the Netherlands; e--mail: \href{mailto:a.h.machielsen@uu.nl}{a.h.machielsen@uu.nl}}}
 \date{\today}
 
@@ -50,6 +50,11 @@ Our identification strategy leverages the randomness involved in the exact deter
 
 We also contribute to the democratization literature by providing a data-driven approach to democratization questions on the micro level. Most empirical evidence comes from variation at the country-year level, whereas this study explicitly focuses on the more granular city-level. 
 
+\section{Historical background}
+We focus on one important historical episode, namely Italy’s unification process in the 1850s and 1860s. After being the richest part of the Western world until the Middle Ages, the Italian peninsula underwent a steady decline throughout the modern era. Lacking political unity since the fall of the Western Roman Empire and missing direct access to ocean routes, the country suffered in an age characterised by the development of strong nation-states and by the redirection of trade routes from the Mediterranean to the Atlantic. From the end of the 15th century onwards, the country fell prey of foreign powers such as France, Spain, and Austria, which occupied large parts of it. After the French revolution and the Napoleonic era, a sentiment in favour of the independence and unification of the country grew and became prominent among the country's intellectual elites. This found political and military guidance in the ambitious and (relatively) liberal North-Western Italian state of Piedmont (formally the Kingdom of Sardinia, although its political and economic centre was not on the island but on the continent). In 1848-1849, after uprisings against Austrian rule in the cities of Milan and Venice, this state led a coalition of volunteers from the entire peninsula in an unsuccessful war in the Austrian-occupied Lombardo-Venetian Kingdom, going under the name of First War of Independence in Italian historiography. 
+
+In 1859, after securing an alliance with France, Piedmont fought a new war against Austria, aimed at annexing the Lombardo-Venetian Kingdom, known as the Second War of Independence. This war was a partial success: while the Western provinces (Lombardy proper) were easily conquered, the French-Piedmontese expedition found resistance while trying to advance into the Eastern part of the Austrian domains (the Venetian provinces). This led the French emperor Napoleon III to seek an armistice with Austria. Lombardy was thus annexed by the Kingdom of Sardinia, together with some other Italian states (the Grand-Duchy of Tuscany, the Duchies of Parma and Modena, and the Northern part of Papal States), while Venetia remained under Austrian rule. In 1861, after the annexation of the Southern-Italian Kingdom of the Two Sicilies, the King of Sardinia, Vittorio Emanuele II, proclaimed himself King of Italy. Venetia was eventually taken from Austria in 1866 during the Third War of Independence, fought as Austria was engaged in the Austro-Prussian war. After the conquest of Rome in 1870, most of present-day Italy was unified under the new Kingdom of Italy, with the exception of some border regions in the North-East, which were eventually annexed after Italy's victory against Austria in the First World War.
+
 
 \section{Data \& Methods}
 
@@ -71,6 +76,7 @@ Our pipeline starts from the digitized exposition data from an exposition at tim
 Observations are defined as meaning an exhibitor $g$ (identified by a name) from town $i$, exhibiting a product from class $j$ at time of the exhibition $t$. Initially, we end up with raw strings containing this information. We use a rule-based approach to extract the town $i$ from the string, and then match it using a pre-trained language model-based approach to a predetermined list of city names, allowing us to geo-code our observations according to the city of origin. 
 
 Our baseline analyses involve aggregating this data to the city-class-year level $ijt$: we thus end up with a count variable for number of exhibitors in each class $j$ in exhibition year $t$. We augment this dataset by all towns in the affected areas that had no exhibitors in clas $j$ in exhibition year $t$. 
+
 
 
 \subsection{Methods}
