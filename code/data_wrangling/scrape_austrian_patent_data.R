@@ -17,6 +17,7 @@ output_page <- links_on_page |>
         html_text2())
 
 out <- c(out, output_page)
+Sys.sleep(2)
 # Switch page to the next if possible
 # If not terminate while loop
 switch <- try({
@@ -31,4 +32,32 @@ switch <- try({
   })
 }
 
+# Write raw data
+#write_rds(out, './data/austrian_patent_data_raw.RData')
 
+# Clean the data
+filtered_data <- map(out, ~ str_split(.x, pattern='\n\n')) |>
+  keep(~ length(.x) > 0) 
+
+split_and_convert <- function(x) {
+  data.frame(do.call(rbind, str_split(x, ":")))
+}
+
+# Applying the function using map
+data_frames <- map(filtered_data, ~ map_dfr(.x, split_and_convert))
+
+# Pivot the data and delete the \n characters
+pivoted_data_frames <- data_frames |>
+  map(~ .x |>
+        select(X1, X2) |>
+        pivot_wider(names_from=X1, values_from=X2))
+  
+# Bind the rows to make it 1 data.frame
+df <- pivoted_data_frames |>
+  reduce(bind_rows)
+
+final <- df |>
+  mutate(across(everything(), ~ str_remove_all(.x, "\n")))
+
+# Export to csv
+write_csv2(final, './data/austrian_patent_data_cleaned.csv')
