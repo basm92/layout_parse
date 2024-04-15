@@ -60,4 +60,39 @@ final <- df |>
   mutate(across(everything(), ~ str_remove_all(.x, "\n")))
 
 # Export to csv
-write_csv2(final, './data/austrian_patent_data_cleaned.csv')
+#write_csv2(final, './data/austrian_patent_data_cleaned.csv')
+
+# Read in and geocode
+library(osmdata)
+data <- read_csv2('./data/austrian_patent_data_cleaned.csv')
+
+get_point <- function(row){
+  place <- row$`Place of publication`
+  country <- row$Country
+  
+  x <- NA
+  y <- NA
+  
+  tryCatch({
+    if (place != "-") {
+      loc <- getbb(paste0(place, ", ", country))
+      x <- (loc[1, 1] + loc[1, 2]) / 2
+      y <- (loc[2, 1] + loc[2, 2]) / 2
+    }
+  }, error = function(e) {
+    x <- NA
+    y <- NA
+  })
+  
+  return(data.frame(x=x, y=y))
+  
+}
+
+data_geocoded <- data |>
+  rowwise() |>
+  mutate(coordinates = list(get_point(cur_data())))
+
+write_rds(data_geocoded, './data/austrian_patent_data_geocoded.RData')
+# Finish this
+library(sf)
+data_sf <- st_as_sf(data_geocoded |> unnest_wider(coordinates), coords=c("x", "y"), crs='wgs84')
