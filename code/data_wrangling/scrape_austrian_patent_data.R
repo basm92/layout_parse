@@ -1,4 +1,4 @@
-library(rvest); library(tidyverse); library(chromote)
+library(rvest); library(tidyverse); library(chromote); library(osmdata); library(sf)
 begin <- session('https://privilegien.patentamt.at/search/-/-/1/-/-/')
 condition <- TRUE
 out <- list()
@@ -63,7 +63,6 @@ final <- df |>
 #write_csv2(final, './data/austrian_patent_data_cleaned.csv')
 
 # Read in and geocode
-library(osmdata)
 data <- read_csv2('./data/austrian_patent_data_cleaned.csv')
 
 get_point <- function(row){
@@ -92,7 +91,17 @@ data_geocoded <- data |>
   rowwise() |>
   mutate(coordinates = list(get_point(cur_data())))
 
-write_rds(data_geocoded, './data/austrian_patent_data_geocoded.RData')
+#write_rds(data_geocoded, './data/austrian_patent_data_geocoded.RData')
 # Finish this
 library(sf)
-data_sf <- st_as_sf(data_geocoded |> unnest_wider(coordinates), coords=c("x", "y"), crs='wgs84')
+data_sf <- data_geocoded |> unnest_wider(coordinates)
+
+# Transform into sf data.frame
+data_sf <- st_as_sf(data_sf |> mutate(
+  x = if_else(is.na(x), 0, x),
+  y = if_else(is.na(y), 0, y),
+  not_available = if_else(x == 0 & y == 0, 1, 0)),
+  coords=c("x", "y"), crs='wgs84')
+
+# Write
+write_sf(data_sf, './data/austrian_patent_data_geocoded.geojson')
