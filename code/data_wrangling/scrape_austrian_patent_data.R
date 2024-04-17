@@ -108,42 +108,33 @@ write_sf(data_sf, './data/austrian_patent_data_geocoded.geojson')
 
 test <- read_sf("./data/austrian_patent_data_geocoded.geojson")
 # Also scrape the dates at which they were granted, and the names
-out <- list()
 pages <- paste0('https://privilegien.patentamt.at/search/-/-/', 1:9914, '/RELEVANCE/-/')
 
 scrape_page <- function(page){
   # Read all the entries on a page
-  html <- read_html(page)
-  elements_on_page <- html |>
-    html_elements('div.search-list__hit')
-  # Extract the data from these entries
-  out_page <- map(elements_on_page, 
-                  ~ {
-                    title <- html_element(.x, 'h3 a') |>
-                      html_attr('title')
-                    
-                    text <- html_elements(.x, 'div.search-list__hit-text') |>
-                      html_text2()
-                    
-                    return(c(title, text))
-                    
-                  })
-  return(out_page)
+  out <- tryCatch({
+    print(page)
+    html <- read_html(page)
+    elements_on_page <- html |>
+      html_elements('div.search-list__hit')
+    # Extract the data from these entries
+    out_page <- map(elements_on_page, 
+                    ~ {
+                      title <- html_element(.x, 'h3 a') |>
+                        html_attr('title')
+                      text <- html_elements(.x, 'div.search-list__hit-text') |>
+                        html_text2()
+                      return(c(title, text))
+                      })
+  }, error = function(e, page){
+    Sys.sleep(sample(10, 1) * 0.5)
+    print("Error Encountered")
+    out_page <- scrape_page(page)
+  })
+  return(out)
 }
 
-out <- map(pages[1:10], ~ {
-  data <- tryCatch({
-    scrape_page(.x)
-    Sys.sleep(sample(10, 1) * 0.5)
-    print(.x)
-  }, error = function(e){
-    Sys.sleep(10)
-    scrape_page(.x)
-    
-  })
-  return(data)
-  }
-)
+scraped_metadata <- pages |> map(scrape_page)
 
 
 
