@@ -25,3 +25,14 @@ Summarize Observations by Class:
 
 Misc:
     Innovation or Development? What is a good framing? Perhaps both
+
+
+# To do: 
+    - Integrate border in geocoded Austrian patent
+    - Clean Piedmontese Data
+    - Brainstorm about DiD vs RDD estimates
+    - Complexity as DV
+    - 1878 pipeline: data -> OCR -> GPT -> Manual Correction
+    - Reorganize data + scripts
+        - See if we can spacially interpolate some control variables
+
