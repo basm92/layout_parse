@@ -105,3 +105,34 @@ data_sf <- st_as_sf(data_sf |> mutate(
 
 # Write
 write_sf(data_sf, './data/austrian_patent_data_geocoded.geojson')
+
+test <- read_sf("./data/austrian_patent_data_geocoded.geojson")
+# Also scrape the dates at which they were granted, and the names
+out <- list()
+pages <- paste0('https://privilegien.patentamt.at/search/-/-/', 1:9914, '/RELEVANCE/-/')
+
+out <- map(pages, ~ {
+  # Read all the entries on a page
+  html <- read_html(.x)
+  elements_on_page <- html |>
+    html_elements('div.search-list__hit')
+  # Extract the data from these entries
+  out_page <- map(elements_on_page, 
+      ~ {
+        title <- html_element(.x, 'h3 a') |>
+          html_attr('title')
+        
+        text <- html_elements(.x, 'div.search-list__hit-text') |>
+          html_text2()
+        
+        return(c(title, text))
+        
+        })
+  Sys.sleep(sample(10, 1) * 0.2)
+  print(.x)
+  return(out_page)
+}
+)
+
+
+
