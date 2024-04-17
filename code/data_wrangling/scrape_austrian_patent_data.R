@@ -108,8 +108,10 @@ write_sf(data_sf, './data/austrian_patent_data_geocoded.geojson')
 
 test <- read_sf("./data/austrian_patent_data_geocoded.geojson")
 # Also scrape the dates at which they were granted, and the names
-pages <- paste0('https://privilegien.patentamt.at/search/-/-/', 1:9914, '/RELEVANCE/-/')
-i <- 0
+library(RSelenium)
+start <- paste0('https://privilegien.patentamt.at/search/-/-/', 1, '/RELEVANCE/-/')
+
+# Write a selenium script here
 scrape_page <- function(page){
   # Read all the entries on a page
   i <- i+1
