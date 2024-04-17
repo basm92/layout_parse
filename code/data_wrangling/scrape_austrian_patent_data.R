@@ -109,14 +109,21 @@ write_sf(data_sf, './data/austrian_patent_data_geocoded.geojson')
 test <- read_sf("./data/austrian_patent_data_geocoded.geojson")
 # Also scrape the dates at which they were granted, and the names
 pages <- paste0('https://privilegien.patentamt.at/search/-/-/', 1:9914, '/RELEVANCE/-/')
-
+i <- 0
 scrape_page <- function(page){
   # Read all the entries on a page
+  i <- i+1
   out <- tryCatch({
     print(page)
     html <- read_html(page)
     elements_on_page <- html |>
       html_elements('div.search-list__hit')
+    # Implement a break at every 10 pages
+    if(i %% 10 == 0){
+      Sys.sleep(10)
+    } else{
+    Sys.sleep(sample(10,1)*0.2)
+    }
     # Extract the data from these entries
     out_page <- map(elements_on_page, 
                     ~ {
