@@ -108,8 +108,37 @@ write_sf(data_sf, './data/austrian_patent_data_geocoded.geojson')
 
 test <- read_sf("./data/austrian_patent_data_geocoded.geojson")
 # Also scrape the dates at which they were granted, and the names
-library(RSelenium)
-start <- paste0('https://privilegien.patentamt.at/search/-/-/', 1, '/RELEVANCE/-/')
+out <- list()
+start <- read_html_live('https://privilegien.patentamt.at/search/-/-/1/-/-/')
+start$view()
+start$click('button[data-set="cookie-banner-accept"]')
+start$click(css='select#j_idt483\\:hitsPerPageSelect')
+start$press(css='select#j_idt483\\:hitsPerPageSelect', key_code="ArrowDown")
+start$press(css='select#j_idt483\\:hitsPerPageSelect', key_code="ArrowDown")
+start$press(css='select#j_idt483\\:hitsPerPageSelect', key_code="ArrowDown")
+while_condition <- TRUE
+while(while_condition){
+  nodes <- start |> html_elements('div.search-list__hit')
+  out_page <- map(nodes,
+                ~ {
+                  title <- html_element(.x, 'h3 a') |>
+                    html_attr('title')
+                  text <- html_elements(.x, 'div.search-list__hit-text') |>
+                    html_text2()
+                  return(c(title, text))
+                })
+  out <- c(out, out_page)
+  while_condition <- length(start$html_elements('nav[aria-label="Pagination below"] a[aria-label="more"]')) == 1
+  if(while_condition){
+    link <- start$html_elements('nav[aria-label="Pagination below"] li.numeric-paginator__navigate a') |>
+      html_attr('href')
+    start$session$close()
+    start <- read_html_live(link)
+  }
+  print("Next")
+  Sys.sleep(2)
+}
+
 
 # Write a selenium script here
 scrape_page <- function(page){
