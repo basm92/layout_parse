@@ -116,6 +116,9 @@ start$click(css='select#j_idt483\\:hitsPerPageSelect')
 start$press(css='select#j_idt483\\:hitsPerPageSelect', key_code="ArrowDown")
 start$press(css='select#j_idt483\\:hitsPerPageSelect', key_code="ArrowDown")
 start$press(css='select#j_idt483\\:hitsPerPageSelect', key_code="ArrowDown")
+
+# Probably use chromote
+start$session
 while_condition <- TRUE
 while(while_condition){
   nodes <- start |> html_elements('div.search-list__hit')
