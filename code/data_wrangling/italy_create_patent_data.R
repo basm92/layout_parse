@@ -88,5 +88,7 @@ pp <- polygon_panel |>
   rowwise() |> 
   mutate(patents = count_patents(cur_data(), patents))
 
+pp <- pp |> 
+  mutate(year = year(ds))
 # Write to csv
 pp |> write_csv2('./data/italy_austrian_patents.csv')
