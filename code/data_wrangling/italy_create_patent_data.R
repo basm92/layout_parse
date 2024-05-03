@@ -1,4 +1,5 @@
 # italy_create_1856_1900_patents
+library(sf); library(tidyverse)
 # Import the border
 border <- st_read('./data/shapefiles_images/old_province_borders_lines/shapefile_italy_1860.shp') |>
   filter(id == 5)
@@ -63,7 +64,23 @@ grid <- expand_grid(relevant_part$LAU_ID, tibble(ds=dates_start, de=dates_end)) 
   rename(LAU_ID = `relevant_part$LAU_ID`)
 
 # Merge this with the relevant_part data.frame to obtain the polygon panel
+polygon_panel <- grid |>
+  left_join(relevant_part, by = "LAU_ID")
 
 # Import the Austrian patent data
+patents <- read_sf("./data/austrian_patent_data_geocoded_matched.geojson")
 
 # Make a rowwise() function to extract the patents in location i in quarter t
+count_patents <- function(row, patents){
+  date_start <- row$ds
+  date_end <- row$de
+  polygon <- row$`_ogr_geometry_`
+  patents |> 
+    filter(between(granted_on, date_start, date_end)) |>
+    st_intersection(polygon) |>
+    nrow()
+}
+
+pp <- polygon_panel |>
+  rowwise() |> 
+  mutate(patents = count_patents(cur_data(), patents))
