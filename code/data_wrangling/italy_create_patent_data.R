@@ -74,12 +74,15 @@ patents <- read_sf("./data/austrian_patent_data_geocoded_matched.geojson")
 count_patents <- function(row, patents){
   date_start <- row$ds
   date_end <- row$de
-  polygon <- row$`_ogr_geometry_`
-  patents |> 
+  polygon <- row$`_ogr_geometry_` |> 
+    st_buffer(dist=1500)
+  found_patents <- patents |> 
     filter(between(granted_on, date_start, date_end)) |>
-    st_intersection(polygon) |>
-    nrow()
+    st_filter(polygon)
+  
+  return(nrow(found_patents))
 }
+
 
 pp <- polygon_panel |>
   rowwise() |> 
