@@ -1,4 +1,4 @@
-# Regression Discontinuity Analysis
+## Regression Discontinuity Analysis
 library(tidyverse)
 library(rdrobust)
 library(fixest)
@@ -11,7 +11,7 @@ source('code/analysis/regression_settings.R')
 
 dataset <- read_csv2('./data/final_datasets/italy.csv') |>
   mutate(year = as.factor(year)) |>
-  filter(year == 1878)
+  filter(year == 1855)
 
 controls <- c('AREA_KM2', 'angle_to_line', 'latitude', 'longitude', 'MOUNT_TYPE', 'COAST_TYPE', 'URBN_TYPE')
 
@@ -27,15 +27,15 @@ model2 <- rdd(data = dataset,
 model3 <- rdd(data = dataset, 
               control_variables = controls, 
               running_var = 'distance', 
-              dep_var = 'log(number_of_innovations)')
+              dep_var = 'log(1+number_of_innovations)')
 model4 <- rdd(data = dataset, 
               control_variables = controls, 
               fixed_effects = 'NAME_LATN',
               running_var = 'distance', 
-              dep_var = 'log(number_of_innovations)')
+              dep_var = 'log(1+number_of_innovations)')
 
 models <- list(model1, model2, model3, model4)
-knitr::opts_current$set(label = "rd_analysis_number_1878")
+knitr::opts_current$set(label = "rd_analysis_number_1855")
 notes <- "Table showing coefficient estimates and bias-corrected standard errors 
 of the impact of Italian Unification on innovative activity. The dependent variable 
 is log or ihs no. of innovations and the independent (running) variable is 
@@ -53,5 +53,5 @@ make_table(models,
   add_header_above(c(" " = 1, "Count Innovations" = 2, "Log Innovations" = 2)) |>
   kableExtra::kable_styling(latex_options = c("hold_position", "scale_down")) |>
   kableExtra::footnote(general = notes, footnote_as_chunk = T, threeparttable = T, escape = F) |>
-  kableExtra::save_kable("./tables/rd_analysis_number_1878.tex")
+  kableExtra::save_kable("./tables/rd_analysis_number_1855.tex")
 
