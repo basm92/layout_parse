@@ -56,6 +56,8 @@ innovations_per_municipality <- read_csv2("./data/1867_italy_chatgpt_geomatched_
   group_by(LAU_ID) |> 
   count()
 
+# Also include the 1878 data in the final dataset
+
 innovations <- relevant_part |> 
   left_join(innovations_per_municipality, by = "LAU_ID") |>
   mutate(n = if_else(is.na(n), 0, n))

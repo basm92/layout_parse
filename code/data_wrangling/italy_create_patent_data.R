@@ -92,3 +92,82 @@ pp <- pp |>
   mutate(year = year(ds))
 # Write to csv
 pp |> write_csv2('./data/italy_austrian_patents.csv')
+
+# Integrate the Piedmontese data
+pp <- read_csv2('./data/italy_austrian_patents.csv')
+pp_year <- pp |>
+  group_by(LAU_ID, group, year) |>
+  summarize(patents = sum(patents, na.rm=TRUE))
+
+# Import the Piedmontese Data
+piedmont <- readxl::read_xlsx('./data/Patents_Piedmont_1856_1862.xlsx') |>
+  group_by(Period, Location) |> 
+  count() |>
+  ungroup()
+
+# Geomatch it
+library(sf); library(osmdata)
+geocode_place <- function(row){
+  loc <- row$Location
+  out <- tryCatch({
+    box <- getbb(loc)
+    centroid <- data.frame(x=(box[1,1]+box[1,2])/2, y = (box[2,1]+box[2,2])/2)
+    out <- st_as_sf(centroid, coords = c('x', 'y'), crs='wgs84')
+    }, 
+    error=function(e){
+      centroid <- data.frame(x=0, y=0)
+      out <- st_as_sf(centroid, coords=c('x', 'y'), crs='wgs84')
+    })
+
+  return(out)
+}
+
+test <- piedmont |> 
+  rowwise() |> 
+  mutate(coordinate = geocode_place(cur_data()))
+
+test2 <- test |> 
+  unnest_wider(coordinate) |>
+  st_as_sf(crs='wgs84') |>
+  mutate(year = as.numeric(str_extract(Period, "\\d{4}")),
+         quarter = as.numeric(str_extract(Period, "\\d$")))
+
+grid <- expand_grid(relevant_part$LAU_ID, year=1856:1862,quarter=1:4) |>
+  rename(LAU_ID = `relevant_part$LAU_ID`)
+
+polygon_panel <- grid |> left_join(relevant_part, by = "LAU_ID")
+
+# Make a rowwise() function to extract the patents in location i in quarter t
+# patents argument pertains to test2 data.frame
+count_patents_piedmont <- function(row, patents){
+  yr <- row$year
+  qrt <- row$quarter
+  polygon <- row$`_ogr_geometry_` |> 
+    st_buffer(dist=1500)
+  found_patents <- patents |> 
+    filter(year == yr, quarter == qrt) |>
+    st_filter(polygon)
+  
+  out <- found_patents |>
+    summarize(total = sum(n, na.rm=T)) |>
+    pull(total)
+  return(out)
+}
+
+
+pp <- polygon_panel |>
+  rowwise() |> 
+  mutate(patents = count_patents_piedmont(cur_data(), test2))
+
+
+
+library(fixest)
+reg1 <- feols(patents ~ group*post | year, data = pp |> 
+                mutate(post = if_else(year > 1859 & ds > ymd("1859-06-01"), 1, 0),
+                       patents = patents*1000))
+
+reg2 <- feols(patents ~ as.factor(year)*group, data = pp_year |> 
+                mutate(patents = patents*1000))
+
+library(modelsummary)
+modelsummary(reg1, stars=T)
