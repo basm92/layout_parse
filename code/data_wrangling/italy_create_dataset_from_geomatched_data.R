@@ -1,5 +1,10 @@
 # italy_create_dataset_from_geomatched_data.R
-library(tidyverse); library(sf); library(rdrobust); library(fixest); library(modelr); library(terra)
+library(tidyverse)
+library(sf)
+library(rdrobust)
+library(fixest)
+library(modelr)
+library(terra)
 # Import the border
 border <- st_read('./data/shapefiles_images/old_province_borders_lines/shapefile_italy_1860.shp') |>
   filter(id == 5)
@@ -52,21 +57,30 @@ relevant_part$angle_to_line <- angles
 relevant_part$group <- if_else(abs(relevant_part$angle_to_line) > 90, "Veneto", "Lombardia")
 
 # Import the data and group by municipality
-innovations_per_municipality <- read_csv2("./data/1867_italy_chatgpt_geomatched_manually_edited.csv") |> 
+innovations_per_municipality_1867 <- read_csv2("./data/1867_italy_chatgpt_geomatched_manually_edited.csv") |> 
   group_by(LAU_ID) |> 
   count()
 
-# Also include the 1878 data in the final dataset
+# Also include the 1878 
+innovations_per_municipality_1878 <- read_csv2('./data/1878_italy_chatgpt_geomatched_manually_edited.csv') |>
+  group_by(LAU_ID) |>
+  count()
 
 innovations <- relevant_part |> 
-  left_join(innovations_per_municipality, by = "LAU_ID") |>
-  mutate(n = if_else(is.na(n), 0, n))
+  left_join(innovations_per_municipality_1867, by = "LAU_ID") |>
+  mutate(n_1867 = if_else(is.na(n), 0, n)) |>
+  select(-n)
+
+innovations <- innovations |>
+  left_join(innovations_per_municipality_1878, by = "LAU_ID") |>
+  mutate(n_1878 = if_else(is.na(n), 0, n)) |>
+  select(-n)
+
+dist <- st_distance(st_centroid(innovations$`_ogr_geometry_`), border) |> as.numeric()
 
 innovations <- innovations |> 
-  mutate(abs_distance = st_distance(st_centroid(innovations$`_ogr_geometry_`), border)) |> 
-  mutate(distance = as.numeric(if_else(group == "Lombardia", -abs_distance, abs_distance)))
-
-
+  mutate(abs_distance = dist) |> 
+  mutate(distance = as.numeric(if_else(group == "Lombardia", abs_distance, -abs_distance)))
 
 ## Add elevation
 elevations <- geodata::elevation_30s("Italy", path='./')
@@ -85,17 +99,17 @@ data_1855 <- readxl::read_xlsx('./data/Exhibitions_Lombardo_Veneto.xlsx') |>
   janitor::clean_names() |> 
   group_by(location) |> 
   count() |> 
-  rename(n_1855 = n)
+  rename(n_1855 = n) |>
+  ungroup()
 
 innovations <- innovations |> 
-  rename(n_1867 = n) |>
   left_join(data_1855,
             by=c('LAU_NAME' = 'location')) |> 
   mutate(n_1855 = if_else(is.na(n_1855), 0, n_1855))
 
 # Create the did dataset
 dataset <- innovations |> 
-  pivot_longer(cols=c(n_1855, n_1867), 
+  pivot_longer(cols=c(n_1855, n_1867, n_1878), 
                names_to = 'year',
                names_transform=~ as.numeric(str_extract(.x, "\\d{4}")), 
                values_to='number_of_innovations')
@@ -125,6 +139,14 @@ coords <- dataset |>
 dataset <- dataset |> 
   left_join(coords, by = c("LAU_NAME", "year"))
 
-# Write the dataset
-st_write(dataset, './data/final_datasets/italy.geojson', append=FALSE)
+# Drop a couple of irrelevant variables
+dataset <- dataset |> 
+  select(-c(FID.y, CNTR_CODE.y)) |>
+  rename(FID = FID.x, CNTR_CODE = CNTR_CODE.x)
+
+# Because this is a "panel" dataset, we can not incorporate geometry
+dataset <- dataset |>
+  st_drop_geometry()
+
+write_csv2(dataset, "./data/final_datasets/italy.csv")
 
