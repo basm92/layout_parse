@@ -27,12 +27,12 @@ model2 <- rdd(data = dataset,
 model3 <- rdd(data = dataset, 
               control_variables = controls, 
               running_var = 'distance', 
-              dep_var = 'number_of_innovations*1000')
+              dep_var = 'log(number_of_innovations)')
 model4 <- rdd(data = dataset, 
               control_variables = controls, 
               fixed_effects = 'NAME_LATN',
               running_var = 'distance', 
-              dep_var = 'number_of_innovations*1000')
+              dep_var = 'log(number_of_innovations)')
 
 models <- list(model1, model2, model3, model4)
 knitr::opts_current$set(label = "rd_analysis_number_1867")
@@ -50,7 +50,7 @@ make_table(models,
            output = "latex",
            title = "Estimates of Italian Unification on Innovative Activity") |>
   add_header_above(c(" " = 1, "No FE" = 1, "FE" = 1, "No FE" = 1, "FE" = 1)) |>
-  add_header_above(c(" " = 1, "Log Innovations" = 2, "Ihs Innovations" = 2)) |>
+  add_header_above(c(" " = 1, "Count Innovations" = 2, "Log Innovations" = 2)) |>
   kableExtra::kable_styling(latex_options = c("hold_position", "scale_down")) |>
   kableExtra::footnote(general = notes, footnote_as_chunk = T, threeparttable = T, escape = F) |>
   kableExtra::save_kable("./tables/rd_analysis_number_1867.tex")
