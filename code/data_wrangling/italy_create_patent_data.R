@@ -94,10 +94,7 @@ pp <- pp |>
 pp |> write_csv2('./data/italy_austrian_patents.csv')
 
 # Integrate the Piedmontese data
-pp <- read_csv2('./data/italy_austrian_patents.csv')
-pp_year <- pp |>
-  group_by(LAU_ID, group, year) |>
-  summarize(patents = sum(patents, na.rm=TRUE))
+pp_austria <- read_csv2('./data/italy_austrian_patents.csv')
 
 # Import the Piedmontese Data
 piedmont <- readxl::read_xlsx('./data/Patents_Piedmont_1856_1862.xlsx') |>
@@ -159,15 +156,44 @@ pp <- polygon_panel |>
   rowwise() |> 
   mutate(patents = count_patents_piedmont(cur_data(), test2))
 
+# Incorporate the Piedmontese patents and the Austrian patents together
+pp_austria_to_be_merged <- pp_austria |>
+  filter(is.element(year, 1856:1862)) |>
+  group_by(LAU_ID, year) |>
+  mutate(quarter = row_number()) |>
+  rename(patents_austria = patents) |>
+  ungroup()
 
+pp_piedmont_to_be_merged <- pp |>
+  rename(patents_piedmont = patents) |>
+  ungroup() |>
+  st_drop_geometry() |>
+  select(c(LAU_ID, year, quarter, patents_piedmont))
+
+# Merge them together
+together <- left_join(pp_austria_to_be_merged,  pp_piedmont_to_be_merged,
+          by=c("LAU_ID", "year", "quarter")) |>
+  mutate(patents = patents_austria + patents_piedmont)
 
 library(fixest)
-reg1 <- feols(patents ~ group*post | year, data = pp |> 
+reg1 <- feols(patents ~ group*post, data = together |> 
                 mutate(post = if_else(year > 1859 & ds > ymd("1859-06-01"), 1, 0),
                        patents = patents*1000))
 
-reg2 <- feols(patents ~ as.factor(year)*group, data = pp_year |> 
-                mutate(patents = patents*1000))
+reg2 <- feols(patents ~ as.factor(year)*group + MOUNT_TYPE + COAST_TYPE + URBN_TYPE, data = together |> 
+                mutate(patents = patents*1000), vcov='hc1')
 
-library(modelsummary)
-modelsummary(reg1, stars=T)
+# Export the together dataset
+# Assuming your tibble is named 'together'
+
+# Extract the coordinates from `_ogr_geometry_` column and convert to sf
+together_sf <- left_join(together |>
+            select(-`_ogr_geometry_`), 
+          italy_municipalities |>
+            select(LAU_ID), by= 'LAU_ID') |> 
+  st_as_sf() |>
+  select(-c(FID.y)) |>
+  rename(FID = FID.x)
+
+# Write this to geojson
+st_write(together_sf, "./data/italy_austrian_piedmontese_patents.geojson")
