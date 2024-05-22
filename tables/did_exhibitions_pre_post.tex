@@ -1,0 +1,30 @@
+\begin{table}[!h]
+
+\caption{\label{tab:did_exhibitions_pre_post}Difference-in-difference Estimates of Unification on Patents}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lcccc}
+\toprule
+  & (1) & (2) & (3) & (4)\\
+\midrule
+Post & \num{0.038}*** & \num{0.038}*** & \num{0.038}*** & \num{0.038}***\\
+ & (\num{0.012}) & (\num{0.012}) & (\num{0.012}) & (\num{0.012})\\
+Lombardia (Treated) & \num{-0.057}** & \num{-0.009} & \num{-0.057}** & \num{-0.061}**\\
+ & (\num{0.026}) & (\num{0.016}) & (\num{0.026}) & (\num{0.029})\\
+Post x Treated & \num{-0.012} & \num{-0.012} & \num{-0.012} & \num{-0.012}\\
+ & (\num{0.014}) & (\num{0.013}) & (\num{0.014}) & (\num{0.013})\\
+\midrule
+N & \num{6648} & \num{6639} & \num{6648} & \num{6639}\\
+Adj. R. sq. & \num{0.00} & \num{0.11} & \num{0.00} & \num{0.12}\\
+Region FE & No & No & Yes & Yes\\
+Controls & No & Yes & No & Yes\\
+\bottomrule
+\multicolumn{5}{l}{\rule{0pt}{1em}* p $<$ 0.1, ** p $<$ 0.05, *** p $<$ 0.01}\\
+\end{tabular}
+\begin{tablenotes}[para]
+\item \textit{Note: } 
+\item Dependent variables: Log (1 + Number of patents) in municipality $i$. The coefficient of interest is the Post x Treated variable. The control variables are latitude, longitude, elevation, ruggedness, area, distance to river, agricultural suitability (models 2 and 4) and regional-level coastal-type, urban-type and mountain-type (model 2). Heteroskedasticity-robust standard errors in parentheses.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}
