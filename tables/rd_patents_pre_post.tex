@@ -1,0 +1,29 @@
+\begin{table}[!h]
+
+\caption{\label{tab:rd_patents_pre_post}Estimates of Italian Unification on Innovative Activity}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lllll}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Count Innovations} & \multicolumn{2}{c}{Ihs Innovations} \\
+\cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-5}
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{No FE} & \multicolumn{1}{c}{FE} & \multicolumn{1}{c}{No FE} & \multicolumn{1}{c}{FE} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+  & (1) & (2) & (3) & (4)\\
+\midrule
+Estimate & 164.678** & 151.677** & 0.737* & 0.494\\
+SE (BC) & (61.627) & (65.842) & (0.372) & (0.372)\\
+Mean DV Treated 50km & 0.000 & 0.000 & 0.881 & 0.881\\
+Mean DV Control 50km & -22.727 & -22.727 & 0.689 & 0.689\\
+N (Treated) & 1578 & 1578 & 1578 & 1578\\
+N (Control) & 670 & 670 & 670 & 670\\
+Bandwidth & 36445.578 & 41980.301 & 70904.047 & 74179.077\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item \textit{Note: } 
+\item Table showing coefficient estimates and bias-corrected standard errors of the impact of Italian Unification on patents. The dependent variable is log or ihs no. of innovations and the independent (running) variable is distance to the border. The bandwidth is estimated using the MSE-optimal bandwidth from \cite{cattaneo2019practical}. The estimates control for area, angle to border and innovation. Models (2) and (4) are conditional on province fixed effects. *: p < 0.10, **: p < 0.05, ***: p < 0.01.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}

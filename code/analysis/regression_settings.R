@@ -4,22 +4,25 @@
 gm_did <- tibble::tribble(
   ~raw,        ~clean,          ~fmt,
   "nobs",      "N",             0,
-  "adj.r.squared","Adj. $R^2$", 2
+  "adj.r.squared","Adj. R. sq.", 2
   )
 
 stars=c("*" = 0.1, "**"=0.05, "***"=0.01)
 
 cm_did <- c(
   "year1867" = "Year (1867)",
-  "groupVeneto" = "Veneto",
-  "groupLombardo" = "Lombardo",
+  "post" = "Post",
+  "group::Veneto" = "Veneto",
+  "group::Lombardia" = "Lombardia (Treated)",
   "year1867:groupVeneto" = "Year (1867) x Veneto",
   "year1867:groupLombardo" = "Year (1867) x Lombardo",
-  "mean_elevation" = "Elevation",
-  "longitude" = "Longitude",
-  "latitude" = "Latitude",
-  "AREA_KM2" = "Area",
-  "angle_to_line" = "Angle to Border"
+  "post:group::Lombardia" = "Post x Treated",
+  "group::Lombardia:ename::-3" = "Treated x -3",   
+  "group::Lombardia:ename::-2" = "Treated x -2",
+  "group::Lombardia:ename::-1" = "Treated x -1",   
+  "group::Lombardia:ename::1" = "Treated x 1",  
+  "group::Lombardia:ename::2" = "Treated x 2",  
+  "group::Lombardia:ename::3" = "Treated x 3"
 )
 
 
