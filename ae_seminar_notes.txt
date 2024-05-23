@@ -24,14 +24,14 @@
     - E.g. Nice and Savoie to France?
 - Uli: war-related distruction
     - No artillery, likely neglible, but have to find out
-- Relatively short timeframe: surprising to find effects on the short-term
+- Jeroen: Relatively short timeframe: surprising to find effects on the short-term
     - Currently missing: why could that be? 
     - Which type of innovation and why? 
     - Distinguish between different inventors or maybe the same inventor!
     - More generally, look at individual-level information
     - Patents in German vs. in Italian 
-- Invention vs. protection of invention
-- Since when did the patent system exist in Italy vs. Austria? (Both 1848)
+- Jeroen: Invention vs. protection of invention
+- Maria: Since when did the patent system exist in Italy vs. Austria? (Both 1848)
     - Check graph of evolution
     - But DiD so check differential trends in patents
 - Uli: do we know for how long?
