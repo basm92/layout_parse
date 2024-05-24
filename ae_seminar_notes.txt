@@ -2,7 +2,7 @@
 
 - Emmanuel: proximate vs. fundamental causes of ec. growth
 - Maria: patent applications influenced by relative price difference. What are the explanations?
-- Uli: Why would Austro-Hungarians go to Paris? Prohibitive costs
+- Uli: Why would Austro-Hungarians go to Paris? Prohibitive costs + France was friendlier to Italy
     - Could potentially also look at London or "neutral" countries
     - Countries less likely to be directly involved
 - Empirical strategy slide: make clear that it is a municipal-level design
@@ -18,7 +18,7 @@
     - Aggregate to the region level or the distritto level
 - Uli: intensive vs. extensive margin
     - Weighted regressions
-- Paul: could this be a change in countries? You just lose your.. market access
+- Paul: could this be a change in countries? You just lose your old market access and need to compensate for that by innovating more
     - We should control for that in some way
     - How about studying an effect "the other way around"? 
     - E.g. Nice and Savoie to France?
@@ -30,10 +30,18 @@
     - Distinguish between different inventors or maybe the same inventor!
     - More generally, look at individual-level information
     - Patents in German vs. in Italian 
-- Jeroen: Invention vs. protection of invention
+- Jeroen: Invention vs. protection of invention (increase in patenting w/o increase in exhibiting may suggest it is about protection)
 - Maria: Since when did the patent system exist in Italy vs. Austria? (Both 1848)
     - Check graph of evolution
     - But DiD so check differential trends in patents
 - Uli: do we know for how long?
     - Not for Austrian, maybe for Italian via the Bolletino source
-
+    - Long-duration patents were cheaper in Italy
+- Uli: the Italian system might have been more accessible to Italians (language)
+- Samuele: different industrial specialization may drive patenting differences, given different propensity to patent across industries
+- Samuele: Lombardy's growth in patenting might be seen as catching up, given its lower level coefficient
+- Samuele: the House of Savoy was not so liberal as we say. The liberal constitution in Piedmont might have been necessary to attract other Italians, given large differences among regions. Instead, the core part of Austrian empire was formed by much more honogenous constituent parts (before embarking very different regions e.g. Hungary)
+- Samuele: Italian language was codified already in 15th c. (by a Venetian doge for legal/diplomatic purposes), not in 19th c. as commonly assumed. Inventors might have strictly preferred to file paplications in their own language.
+	
+# Seminar PPE
+- Jacob: what about migration? Could be a confounder
