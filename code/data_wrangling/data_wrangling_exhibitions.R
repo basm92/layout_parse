@@ -13,22 +13,8 @@ together <- list_rbind(imported_files) |>
   ungroup() |>
   select(-pdf)
 
-# Add the class information in this file
-# class_boundary identifies the observation (year, page, row_number, class) where a new class begins
-class_boundary <- tribble(~ year, ~ page, ~position_on_page, ~class,
-                          1867, 0, 1, 6,
-                          1867, 2, 1, 7,
-                          1867, 3, 15, 8,
-                          1867, 4, 17, 9,
-                          1867, 5, 24, 10,
-                          1867, 6, 22, 11,
-                          1867, 8, 1, 12,
-                          1867, 11, 1, 13,
-                          1867, 13, 1, 14,
-                          1867, 15, 10, 15,
-                          1867, 18, 30, 16,
-                          
-                          )
+# Load the class boundaries
+source('./data/dictionaries/class_boundaries.R')
 
 # And two separate exhibition data from 1855 and 1911
 # These are individual-level datasets but lack description of exhibition/name
