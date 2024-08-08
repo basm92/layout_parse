@@ -123,7 +123,7 @@ modelsummary(
   title = "Difference-in-difference Estimates of Unification on Patents",
   add_rows = rows,
   coef_omit = "Intercept",
-  out = "kableExtra",
+  out = "kableExtra")#,
   output = "latex")   |>
   kableExtra::kable_styling(latex_options = c("hold_position", "scale_down")) |>
   kableExtra::footnote(general = notes, footnote_as_chunk = T, threeparttable = T, escape = F) |>
