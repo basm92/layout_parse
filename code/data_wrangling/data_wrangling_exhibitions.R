@@ -55,7 +55,8 @@ individual_with_class <- final |>
 
 # Save this as an intermediate-level exhibition dataset
 write_csv2(individual_with_class, "./data/intermediate_exhibition_data/individual_level_exhibition_data.csv")
-
+# Import it again
+individual_with_class <- read_csv2('./data/intermediate_exhibition_data/individual_level_exhibition_data.csv')
 # Geocode this data
 
 
