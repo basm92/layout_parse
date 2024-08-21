@@ -68,12 +68,12 @@ find_lau_number <- function(row) {
 }
 
 # Step 4:
-french <- read_delim('./data/french_italian_names_dictionary.txt', delim=' - ', ) |> 
+french <- read_delim('./data/dictionaries/french_italian_names_dictionary.txt', delim=' - ', ) |> 
   janitor::clean_names() |>
   mutate(french = str_trim(french)) |>
   distinct()
 
-english <- read_delim('./data/english_italian_names_dictionary.txt', delim=' - ') |>
+english <- read_delim('./data/dictionaries/english_italian_names_dictionary.txt', delim=' - ') |>
   janitor::clean_names() |>
   mutate(english = str_trim(english)) |>
   distinct()
