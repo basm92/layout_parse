@@ -7,7 +7,10 @@
     Turin - Torino
     Bologne - Bologna
     Vérone - Verona
+    Verone - Verona
+    Pise - Pisa
     Gênes - Genova
+    Gènes - Genova
     Palerme - Palermo
     Bari - Bari
     Padoue - Padova
@@ -45,6 +48,7 @@
     Grosseto - Grosseto
     Barletta - Barletta
     Côme - Como
+    Còme - Como
     Varèse - Varese
     Sienne - Siena
     Frosinone - Frosinone
@@ -53,6 +57,7 @@
     Potenza - Potenza
     Imola - Imola
     Crémone - Cremona
+    Crémoné - Cremona
     Viterbe - Viterbo
     Nuoro - Nuoro
     Lucques - Lucca
@@ -82,7 +87,6 @@
     Lodi - Lodi
     Manfredonia - Manfredonia
     Cava de' Tirreni - Cava de' Tirreni
-    Crémone - Crema
     Cisterna di Latina - Cisterna di Latina
     Sant'Angelo Romano - Sant'Angelo Romano
     Ischia - Ischia
@@ -100,3 +104,20 @@
     Civitanova Marche - Civitanova Marche
     San Miniato - San Miniato
     Alexandrie - Alessandria
+    Sainte-Marguerite-Ligure - Santa Margherita Ligure
+    Mantoue - Mantua
+    Forli - Forli'
+    Forlí - Forli'
+    Vicence - Vicenza
+    Saint-Jean-in-Persiceto - San Giovanni in Persiceto
+    Téramo - Teramo
+    Trévise - Treviso
+    Trevisé - Treviso
+    Reggio - Reggio nell'Emilia
+    Pistoie - Pistoia
+    Savone - Savona
+    Crème - Crema
+    Crême - Crema
+    Ancône - Ancona
+    Fuligno - Foligno
+    
