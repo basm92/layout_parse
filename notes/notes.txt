@@ -36,3 +36,10 @@ Misc:
     - Reorganize data + scripts
         - See if we can spacially interpolate some control variables
 
+
+- Market access: one way is just an empirical approach:
+    - we collect city/municipality level data on the change in market access over time based on population counts of cities and distances
+    - and use the railway network maybe
+    - And based on diplomatic relationships to France/Switserland
+    - If market access is so important, we compare East Lombardy vs West Lombardy. If the story about effort is correct, we should expect a higher increase in patenting on the east side.
+    - What if we observe a negative effect? Local Market Access

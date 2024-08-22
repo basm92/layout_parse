@@ -79,8 +79,11 @@
     Avellino - Avellino
     Crotone - Crotone
     Pistoia - Pistoia
+    Caltanissette - Caltanissetta
+    Caltanisette - Caltanissetta
     Savigliano - Savigliano
     Alba - Alba
+    Brindes - Brindisi
     Molfetta - Molfetta
     Sora - Sora
     Caserte - Caserta
@@ -101,6 +104,7 @@
     Cernusco sul Naviglio - Cernusco sul Naviglio
     Macerata - Macerata
     Rovigo - Rovigo
+    Letto-Manoppello - Lettomanoppello
     Civitanova Marche - Civitanova Marche
     San Miniato - San Miniato
     Alexandrie - Alessandria
@@ -118,6 +122,14 @@
     Savone - Savona
     Crème - Crema
     Crême - Crema
-    Ancône - Ancona
+    Ancone - Ancona
     Fuligno - Foligno
+    Cantù - Cantu'
+    Catane - Catania
+    Girgenti - Agrigento
+    Suvone - Savona
+    Volterre - Volterra
+    Catané - Catania
+    Fabiano - Fabriano
+    
     
