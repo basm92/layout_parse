@@ -68,7 +68,28 @@ municipalities_with_compartimenti <- st_intersection(municipalities, compartimen
   group_by(PRO_COM_T) |>
   filter(overlap == max(overlap) | is.na(overlap)) |>
   select(PRO_COM_T, COMUNE, COD_COMP, DEN_COMP) |>
-  st_drop_geometry()
+  st_drop_geometry() |>
+  mutate(score = NA)
+
+# Define a function to replace accented characters
+replace_accents <- function(text) {
+  # Define a named vector for replacement
+  replacements <- c(
+    "à" = "a'", "è" = "e'", "ì" = "i'", "ò" = "o'", "ù" = "u'",
+    "À" = "A'", "È" = "E'", "Ì" = "I'", "Ò" = "O'", "Ù" = "U'",
+    "á" = "a'", "é" = "e'", "í" = "i'", "ó" = "o'", "ú" = "u'",
+    "Á" = "A'", "É" = "E'", "Í" = "I'", "Ó" = "O'", "Ú" = "U'",
+    "â" = "a'", "ê" = "e'", "î" = "i'", "ô" = "o'", "û" = "u'",
+    "Â" = "A'", "Ê" = "E'", "Î" = "I'", "Ô" = "O'", "Û" = "U'",
+    "ä" = "a'", "ë" = "e'", "ï" = "i'", "ö" = "o'", "ü" = "u'",
+    "Ä" = "A'", "Ë" = "E'", "Ï" = "I'", "Ö" = "O'", "Ü" = "U'"
+  )
+  
+  # Replace accented characters with their corresponding replacements
+  text <- str_replace_all(text, replacements)
+  
+  return(text)
+}
 
 ## Add customized databases of translations
 french <- read_delim('./data/dictionaries/french_italian_names_dictionary.txt', delim=' - ', ) |> 
@@ -83,36 +104,45 @@ english <- read_delim('./data/dictionaries/english_italian_names_dictionary.txt'
 
 
 geocode_row <- function(row){
-  exact_match <- tibble(PRO_COM_T = NA, COMUNE = NA)
+  exact_match <- tibble(PRO_COM_T = NA, COMUNE = NA, score=NA)
   # 1. Exact Match Raw
   place_raw <- row$place
   exact_match <- municipalities_with_compartimenti |>
     filter(COMUNE == place_raw) |>
-    select(PRO_COM_T, COMUNE)
+    select(PRO_COM_T, COMUNE, score)
   
   if(nrow(exact_match)>0){
     return(exact_match)
   }
   # 2. Exact Match Clean 
+  ## 2.1 Remove Spaces
   place_clean <- row$place |>
     str_remove_all("à |\\.|\\((.+)\\)|-") |>
-    str_squish()
+    str_trim()
   exact_match <- municipalities_with_compartimenti |>
       filter(COMUNE == place_clean) |>
-      select(PRO_COM_T, COMUNE)
+      select(PRO_COM_T, COMUNE, score)
     
     if(nrow(exact_match)>0){
       return(exact_match)
     }
+
   # 3. Exact Match Under Translation
   ## 3.1 French
+  place_clean <- row$place |>
+    str_remove_all("à |\\.|\\((.+)\\)") |>
+    str_trim()
+  
   match <- french |>
     filter(french == place_clean) |>
     select(italian) |>
     rename(COMUNE = italian)
   
   if(nrow(match)>0){
-    return(match)
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
   }
   ## 3.2 English
   match <- english |>
@@ -120,7 +150,10 @@ geocode_row <- function(row){
     select(italian) |>
     rename(COMUNE = italian)
   if(nrow(match)>0){
-    return(match)
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
   }
   
   # 4. Exact Match without spaces and capitals in both lists
@@ -130,7 +163,8 @@ geocode_row <- function(row){
   
   exact_match <- municipalities_with_compartimenti |>
     mutate(COMUNE = tolower(COMUNE)) |>
-    filter(COMUNE == place_lowercase)
+    filter(COMUNE == place_lowercase) |>
+    select(PRO_COM_T, COMUNE, score)
   if(nrow(exact_match)>0){
     return(exact_match)
   }
@@ -142,40 +176,173 @@ geocode_row <- function(row){
   
   exact_match <- municipalities_with_compartimenti |>
     mutate(COMUNE = tolower(str_remove_all(COMUNE, "[^A-Za-z]"))) |>
-    filter(COMUNE == place_lowercase)
+    filter(COMUNE == place_alphabetic) |>
+    select(PRO_COM_T, COMUNE, score)
+  
   if(nrow(exact_match)>0){
     return(exact_match)
   }
   
-  # 6. Exact Match Proceeding from Raw - In Brackets
-  ## 6.1 Very raw
+  # 6. Exact Match For Partial String in Place
+  match <- place_raw |> 
+    str_extract("(?:à |de |d' )(\\b\\w+\\b)") |>
+    str_remove("de |à ")
+  
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == match) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
+  
+  # 7. Replace all accents by <character>'
+  place_noaccents <- place_clean |> 
+    replace_accents()
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == place_noaccents) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
+  
+  # Name String
+  ## 7.1 Name String - Look for Last Word Match
+  last_word <- row$name |>
+    str_extract("\\s\\S+$")
+  
+  clean_last_word <- last_word |>
+    str_remove_all("à |\\.|\\((.+)\\)|\\(|\\)|-|\\s")
+  
+  ### 7.1.1 Exact Match
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == clean_last_word) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
+  ### 7.1.2 Translation
+  match <- french |>
+    filter(french == clean_last_word) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  
+  ## 7.2 Name Identifier on the basis of d' or de
+  ### 7.2.1 Simple Case
+  name_raw <- row$name
+  match <- name_raw |> 
+    str_extract("(?:à |de ' )(\\b\\w+\\b)") |>
+    str_remove("de |à ")
+  
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == match) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
+  ### 7.2.2 Translation
+  match <- french |>
+    filter(french == match) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  
+  ### 7.3.3 Translation (for d')
+  match_updated <- name_raw |>
+    str_extract("d'[^ ]+") |>
+    str_remove("d'")
+  
+  match <- french |>
+    filter(french == match_updated) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  ### 7.3 Slight More Complicated with More Words
+  ## Regex for second word with capital: (?:\b[A-Z][a-z]*\b.*?){1}\b[A-Z][a-z]*\b
+  ## But many have Sous-commission de <city with 2 words>
+  match <- name_raw |> 
+    str_extract("(d'|de |à ).*") |>
+    str_remove("de |à |d'")
+  
+  match <- french |>
+    filter(french == match) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  
+  # 12. Bracket Stuff
+  # 12. Exact Match Proceeding from Raw - In Brackets
+  ## 12.1 Very raw
   brackets <- place_raw |>
     str_extract("\\((.+)\\)") |>
     str_remove_all("\\(|\\)")
   
   exact_match <- municipalities_with_compartimenti |>
     filter(COMUNE == brackets) |>
-    select(PRO_COM_T, COMUNE)
+    select(PRO_COM_T, COMUNE, score)
   
   if(nrow(exact_match)>0){
     return(exact_match)
   }
   
-  ## 6.2 Alphabetical
-  brackets <- place_raw |>
+  ## 12.2 Alphabetical
+  brackets_alphabet <- place_raw |>
     str_extract("\\([A-Za-z]+\\)") |>
     str_remove_all("\\(|\\)")
   
   exact_match <- municipalities_with_compartimenti |>
-    filter(COMUNE == brackets) |>
-    select(PRO_COM_T, COMUNE)
+    filter(COMUNE == brackets_alphabet) |>
+    select(PRO_COM_T, COMUNE, score)
   
   if(nrow(exact_match)>0){
     return(exact_match)
   }
   
-  # 7. Exact Match Brackets - Translation
-  ## 7.1 French
+  # 13. Exact Match Brackets - Translation
+  ## 13.1 French
+  brackets_clean <- brackets 
+  
+  match <- french |>
+    filter(french == brackets_clean) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  
+  ## Try again with cleaner string
   brackets_clean <- brackets |>
     str_remove_all("[^A-Za-z]")
   
@@ -185,55 +352,71 @@ geocode_row <- function(row){
     rename(COMUNE = italian)
   
   if(nrow(match)>0){
-    return(match)
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
   }
   
-  ## 7.2 English
+  ## 13.2 English
   match <- english |>
     filter(english == brackets_clean) |>
     select(italian) |>
     rename(COMUNE = italian)
   if(nrow(match)>0){
-    return(match)
-  }
-  
-  # 8. Exact Match For Partial String in Place
-  match <- place_clean |> 
-    str_extract("(?:à |de )(\\b\\w+\\b)") |>
-    str_remove("de |à ")
-  
-  exact_match <- municipalities_with_compartimenti |>
-    filter(COMUNE == match) |>
-    select(PRO_COM_T, COMUNE)
-  
-  if(nrow(exact_match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
     return(exact_match)
   }
   
-  # 9. Exact Match Proceeding from Name (Comite of City of X)
-  ## Regex for second word with capital: (?:\b[A-Z][a-z]*\b.*?){1}\b[A-Z][a-z]*\b
-  ## But many have Sous-commision de <city with 2 words>
+  # 11. Finally, Fuzzy Match with high threshold
+  ## First, Place without brackets
+  place_without_brackets <- str_remove_all(place_raw, "\\((.+)\\)") |>
+    str_squish()
   
-  # 10. Exact Match Proceeding from Description - Second word with capital
+  matrix <- stringdist(place_without_brackets,
+                       municipalities_with_compartimenti$COMUNE,
+                       method='jw')
+  index <- which.min(matrix)
+  score <- min(matrix)
+  match_name <- municipalities_with_compartimenti[index,]$COMUNE
+  match_PRO_COM_T <- municipalities_with_compartimenti[index,]$PRO_COM_T
+  exact_match <- tibble(PRO_COM_T = match_PRO_COM_T, COMUNE = match_name, score = score)
   
+  ## Then, Place focusing on the brackets
+  place_brackets <- str_extract(place_raw, "\\((.+)\\)") |>
+    str_remove_all("\\(|\\)")
   
-  # 11. Fuzzy Match with high threshold
+  matrix <- stringdist(place_without_brackets,
+                       municipalities_with_compartimenti$COMUNE,
+                       method='jw')
+  index <- which.min(matrix)
+  score_2 <- min(matrix)
   
+  if(score_2 < score & !is.na(place_brackets)) {
+    match_name <- municipalities_with_compartimenti[index,]$COMUNE
+    match_PRO_COM_T <- municipalities_with_compartimenti[index,]$PRO_COM_T
+    exact_match <- tibble(PRO_COM_T = match_PRO_COM_T, COMUNE = match_name, score = score_2)
+  }
   
   return(exact_match)
   
 }
 
-test <- individual_with_class[1001:2000,] |>
+test <- individual_with_class |>
   rowwise() |>
   mutate(geo = list(geocode_row(pick(everything()))))
 
 test <- test |>
   unnest_wider(geo)
+
 # Aggregate the data to the (year, city, count) level and use geocode
 aggregated_data <- individual_with_class |>
   group_by(year, place) |>
-  summarize(count = n(), average_complexity = mean(pci, na.rm=T), top_complexity = max(pci))
+  summarize(count = n(), 
+            average_complexity = mean(pci, na.rm=T),
+            top_complexity = max(pci))
 
 
 
