@@ -12,15 +12,28 @@
     Gênes - Genova
     Gènes - Genova
     Palerme - Palermo
+    Pavie - Pavia
+    Reggio-Emilia - Reggio nell'Emilia
+    Sampierdarena - Genova
+    Vintimille - Ventimiglia
+    Padou - Padova
+    Fiume - Fiume Veneto
     Bari - Bari
     Padoue - Padova
     Trieste - Trieste
     Parme - Parma
+    Naplès - Napoli
     Pérouse - Perugia
     Tarente - Taranto
     Reggio de Calabre - Reggio Calabria
     Modène - Modena
-    Reggio d'Émilie - Reggio Emilia
+    Modéne - Modena
+    Reggio d'Émilie - Reggio nell'Emilia
+    Porto Maurizio - Imperia
+    Porto-Maurizio - Imperia
+    Port Maurice - Imperia
+    Port-Maurice - Imperia
+    Génes - Genova
     Messine - Messina
     Livourne - Livorno
     Cagliari - Cagliari
@@ -81,6 +94,7 @@
     Pistoia - Pistoia
     Caltanissette - Caltanissetta
     Caltanisette - Caltanissetta
+    Caltanisetta - Caltanissetta
     Savigliano - Savigliano
     Alba - Alba
     Brindes - Brindisi
@@ -109,13 +123,14 @@
     San Miniato - San Miniato
     Alexandrie - Alessandria
     Sainte-Marguerite-Ligure - Santa Margherita Ligure
-    Mantoue - Mantua
+    Mantoue - Mantova
     Forli - Forli'
     Forlí - Forli'
     Vicence - Vicenza
     Saint-Jean-in-Persiceto - San Giovanni in Persiceto
     Téramo - Teramo
     Trévise - Treviso
+    Trevise - Treviso
     Trevisé - Treviso
     Reggio - Reggio nell'Emilia
     Pistoie - Pistoia
@@ -131,5 +146,13 @@
     Volterre - Volterra
     Catané - Catania
     Fabiano - Fabriano
+    Ascoli - Ascoli Piceno
+    Reggio Emilia - Reggio nell'Emilia
+    Forlì - Forli'
+    Luccques - Lucca
+    Luques - Lucca
+    Sestri Ponente - Genova
+    Sestri-Ponente - Genova
+    Paleme - Palermo
     
     
