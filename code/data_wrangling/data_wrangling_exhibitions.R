@@ -236,12 +236,12 @@ geocode_row <- function(row){
     return(exact_match)
   }
   
-  ## 7.2 Name Identifier on the basis of d' or de
+  ## 7.2 Name Identifier on the basis of a or de
   ### 7.2.1 Simple Case
   name_raw <- row$name
   match <- name_raw |> 
-    str_extract("(?:à |de ' )(\\b\\w+\\b)") |>
-    str_remove("de |à ")
+    str_extract("(?<=(de|à)\\s)\\S+") |>
+    str_remove_all("de |à ")
   
   exact_match <- municipalities_with_compartimenti |>
     filter(COMUNE == match) |>
@@ -263,10 +263,18 @@ geocode_row <- function(row){
     return(exact_match)
   }
   
-  ### 7.3.3 Translation (for d')
+  ### 7.3.3 Translation (for d') - Original and Translation
   match_updated <- name_raw |>
     str_extract("d'[^ ]+") |>
     str_remove("d'")
+  
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == match_updated) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
   
   match <- french |>
     filter(french == match_updated) |>
@@ -297,6 +305,59 @@ geocode_row <- function(row){
       select(PRO_COM_T, COMUNE, score)
     return(exact_match)
   }
+  
+  ## 7.4 Before the Comma - Original And Translation
+  # Original
+  match <- place_raw |>
+    str_extract("^[^,]+") |>
+    str_remove(",")
+  
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == match) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
+  
+  # Translation
+  match <- french |>
+    filter(french == match) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  
+  ## 7.5 First Word - Original And Translation
+  # Original
+  match <- place_raw |>
+    str_extract("\\b[A-Z][^\\s]*\\b")
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == match) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
+  
+  # Translation
+  match <- french |>
+    filter(french == match) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  
   
   # 12. Bracket Stuff
   # 12. Exact Match Proceeding from Raw - In Brackets
