@@ -9,6 +9,8 @@
     Vérone - Verona
     Verone - Verona
     Pise - Pisa
+    Piso - Pisa
+    Padoüe - Padova
     Gênes - Genova
     Gènes - Genova
     Palerme - Palermo
@@ -25,7 +27,6 @@
     Naplès - Napoli
     Pérouse - Perugia
     Tarente - Taranto
-    Reggio de Calabre - Reggio Calabria
     Modène - Modena
     Modéne - Modena
     Reggio d'Émilie - Reggio nell'Emilia
@@ -133,6 +134,7 @@
     Trevise - Treviso
     Trevisé - Treviso
     Reggio - Reggio nell'Emilia
+    Reggio Calabria - Reggio di Calabria
     Pistoie - Pistoia
     Savone - Savona
     Crème - Crema
@@ -154,5 +156,6 @@
     Sestri Ponente - Genova
     Sestri-Ponente - Genova
     Paleme - Palermo
+    Reggio de Calabre - Reggio di Calabria
     
     
