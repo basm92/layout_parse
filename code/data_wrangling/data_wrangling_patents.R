@@ -1,59 +1,102 @@
 # italy_create_1856_1900_patents
-library(sf); library(tidyverse)
-# Import the border
-border <- st_read('./data/shapefiles_images/old_province_borders_lines/shapefile_italy_1860.shp') |>
-  filter(id == 5)
+library(sf); library(tidyverse); library(selenider); library(rvest); library(osmdata)
 
-# Load the municipalities
-italy_municipalities <- giscoR::gisco_get_lau(country='Italy', year='2016')
+# Scrape Austrian Patents
+# Connect to a Chrome instance
+session <- selenider_session(
+  "selenium",
+  timeout = 15
+)
 
-# Load the provinces - to filter the relevant municipalities
-italy_provinces <- giscoR::gisco_get_nuts(country='Italy', nuts_level='3', year='2016') |> 
-  mutate(prov_code =  str_sub(NUTS_ID, 1, 4)) |> 
-  filter(is.element(prov_code, c('ITC4', 'ITH3')))
+# Open URL and Initialize empty data set
+open_url('https://privilegien.patentamt.at/search/-/-/1/-/-/')
+data <- tibble()
+session$driver$view()
+s(css='button[data-set="cookie-banner-accept"]') |>
+  elem_click()
+Sys.sleep(3)
 
-# Filter the relevant municipalities
-# Combine overlaps and within
-filter_indication <- st_within(italy_municipalities, italy_provinces, sparse=TRUE) 
-filter_indication2 <- st_overlaps(italy_municipalities, italy_provinces, sparse=TRUE) 
-mask <- apply(filter_indication, 1, any)
-mask2 <- apply(filter_indication2, 1, any)
-final_mask <- map2_lgl(mask, mask2, ~ any(.x + .y))
-relevant_part <- italy_municipalities[final_mask,]
-
-# Plot to check
-ggplot() + geom_sf(data=relevant_part) + geom_sf(data=border, color='blue')
-
-# Spatial join
-relevant_part <- st_join(relevant_part, italy_provinces, join=st_nearest_feature)
-# Calculate centroids of polygons in relevant_part
-relevant_centroids <- st_centroid(relevant_part)
-
-# Calculate nearest point on the line for each centroid
-nearest_points <- st_nearest_points(relevant_centroids, border)
-
-# Calculate the angle between the line connecting centroids and their nearest points on the border
-angles <- numeric(length(nearest_points))
-for (i in seq_along(nearest_points)) {
-  centroid_coords <- st_coordinates(relevant_centroids[i,])
-  nearest_coords <- st_coordinates(nearest_points[i])
+# For each page, do this (992 pages)
+for(i in 3:992){
+  # Select 100 entries per page
+  if(i==1){
+  for(j in 1:3){
+    s(xpath="//select[contains(@id, 'hitsPerPageSelect')]") |> 
+      elem_click() |>
+      elem_send_keys(keys$down)
+    Sys.sleep(3)
+    # Go to the bottom of the page
+    s(css='nav[aria-label="Pagination below"] a[aria-label="more"]') |>
+      elem_scroll_to()
+    Sys.sleep(2.5)
+  }
+  }
+  # Find the titles
+  titles <- session |> 
+    read_html() |>
+    html_elements('div.search-list__hit h3 a') |>
+    html_attr('title')
+  # Find the text
+  text <- session |>
+    read_html() |>
+    html_elements('div.search-list__hit div.search-list__hit-type') |>
+    html_text2()
   
-  # Calculate the X and Y differences (endpoint - origin)
-  delta_y <- nearest_coords[2, 2] - nearest_coords[1, 2]
-  delta_x <- nearest_coords[2, 1] - nearest_coords[1, 1]
-  
-  # Calculate the angle using atan2
-  angle_radians <- atan2(delta_y, delta_x)
-  angles[i] <- angle_radians * (180 / pi)
+  data_one_page <- tibble(title=titles, text=text)
+  # Save it
+  data <- bind_rows(data, data_one_page)
+  # Then, find the bottom next button
+  session |>
+    find_element('nav[aria-label="Pagination below"] li.numeric-paginator__navigate a[aria-label="more"]') |>
+    elem_click()
+  print(i)
+  Sys.sleep(5)
 }
 
-# Add angles to relevant_part
-relevant_part$angle_to_line <- angles
-relevant_part$group <- if_else(abs(relevant_part$angle_to_line) > 90, "Veneto", "Lombardia")
+data_ready <- data |>
+  mutate(inventor = str_remove(str_extract(text, "Inventor: (.+)\n"), "Inventor: "),
+         shelfmark = str_remove(str_extract(text, "Shelfmark: (.+)\n"), "Shelfmark: "),
+         granted_on = str_remove(str_extract(text, "granted on: (.+)"), "granted on: ")) |>
+  select(-text) |>
+  mutate(across(c(inventor, shelfmark, granted_on), ~ str_squish(.x))) |>
+  distinct()
 
-# Isolate only the relevant variables
-relevant_part <- relevant_part |>
-  select(-c(contains(c("CNTR_CODE", "NUTS_NAME", "2016", "YEAR", "GISCO_ID"))))
+# Geocode the Obtained Data Frame
+get_point <- function(row){
+  place <- row$`Place of publication`
+  country <- row$Country
+  
+  x <- NA
+  y <- NA
+  
+  tryCatch({
+    if (place != "-") {
+      loc <- getbb(paste0(place, ", ", country))
+      x <- (loc[1, 1] + loc[1, 2]) / 2
+      y <- (loc[2, 1] + loc[2, 2]) / 2
+    }
+  }, error = function(e) {
+    x <- NA
+    y <- NA
+  })
+  
+  return(data.frame(x=x, y=y))
+  
+}
+
+data_geocoded <- data_ready |>
+  rowwise() |>
+  mutate(coordinates = list(get_point(cur_data())))
+
+#write_rds(data_geocoded, './data/austrian_patent_data_geocoded.RData')
+data_sf <- data_geocoded |> unnest_wider(coordinates)
+
+# Transform into sf data.frame
+data_sf <- st_as_sf(data_sf |> mutate(
+  x = if_else(is.na(x), 0, x),
+  y = if_else(is.na(y), 0, y),
+  not_available = if_else(x == 0 & y == 0, 1, 0)),
+  coords=c("x", "y"), crs='wgs84')
 
 # Create variables for each quarter in the timeframe 1856-1900
 dates_start <- seq(as.Date("1856-01-01"), as.Date("1900-10-01"), by = "quarter")
@@ -70,7 +113,7 @@ polygon_panel <- grid |>
 # Import the Austrian patent data
 patents <- read_sf("./data/austrian_patent_data_geocoded_matched.geojson")
 
-# Make a rowwise() function to extract the patents in location i in quarter t
+# Make a rowwise() function to extract the already geocoded patents in location i in quarter t
 count_patents <- function(row, patents){
   date_start <- row$ds
   date_end <- row$de
@@ -83,18 +126,15 @@ count_patents <- function(row, patents){
   return(nrow(found_patents))
 }
 
-
 pp <- polygon_panel |>
   rowwise() |> 
   mutate(patents = count_patents(cur_data(), patents))
 
 pp <- pp |> 
   mutate(year = year(ds))
-# Write to csv
-pp |> write_csv2('./data/italy_austrian_patents.csv')
 
 # Integrate the Piedmontese data
-pp_austria <- read_csv2('./data/italy_austrian_patents.csv')
+pp_austria <- read_csv2('./data/patent_data/interim_patent_data/austrian_patent_data_cleaned.csv')
 
 # Import the Piedmontese Data
 piedmont <- readxl::read_xlsx('./data/Patents_Piedmont_1856_1862.xlsx') |>
@@ -102,8 +142,7 @@ piedmont <- readxl::read_xlsx('./data/Patents_Piedmont_1856_1862.xlsx') |>
   count() |>
   ungroup()
 
-# Geomatch it
-library(sf); library(osmdata)
+# Geomatch these data as well
 geocode_place <- function(row){
   loc <- row$Location
   out <- tryCatch({
@@ -150,7 +189,6 @@ count_patents_piedmont <- function(row, patents){
     pull(total)
   return(out)
 }
-
 
 pp <- polygon_panel |>
   rowwise() |> 
