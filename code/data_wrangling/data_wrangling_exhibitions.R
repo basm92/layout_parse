@@ -525,10 +525,28 @@ iwc_geocoded <- iwc_geocoded |>
 
 # Aggregate the data to the (year, city, count) level and use geocode
 aggregated_data <- iwc_geocoded |>
-  group_by(year, place) |>
+  group_by(year, PRO_COM_T) |>
   summarize(count = n(), 
             average_complexity = mean(pci, na.rm=T),
-            top_complexity = max(pci))
+            top_complexity = max(pci, na.rm=T))
 
+out <- aggregated_data |>
+  mutate(average_complexity = if_else(is.nan(average_complexity), NA, average_complexity),
+         top_complexity = if_else(top_complexity == -Inf, NA, top_complexity)) |>
+  ungroup()
 
+# Merge and write to csv
+years <- out$year |> unique()
+
+municipality_year <- municipalities_with_compartimenti |>
+  ungroup() |>
+  select(-score) |>
+  expand_grid(years) |>
+  rename(year = years)
+
+final <- municipality_year |>
+  left_join(out, by = c("PRO_COM_T", "year"))
+
+final |>
+  write_csv2('./data/exhibitions_final_dataset.csv')
 
