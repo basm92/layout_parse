@@ -17,7 +17,7 @@ s(css='button[data-set="cookie-banner-accept"]') |>
 Sys.sleep(3)
 
 # For each page, do this (992 pages)
-for(i in 3:992){
+for(i in 1:992){
   # Select 100 entries per page
   if(i==1){
   for(j in 1:3){
