@@ -53,6 +53,8 @@ for(i in 1:992){
   Sys.sleep(5)
 }
 
+# Afterwards, clean the data
+
 data_ready <- data |>
   mutate(inventor = str_remove(str_extract(text, "Inventor: (.+)\n"), "Inventor: "),
          shelfmark = str_remove(str_extract(text, "Shelfmark: (.+)\n"), "Shelfmark: "),
@@ -60,6 +62,30 @@ data_ready <- data |>
   select(-text) |>
   mutate(across(c(inventor, shelfmark, granted_on), ~ str_squish(.x))) |>
   distinct()
+
+# Save interim data
+write_csv2(data_ready, './data/patent_data/interim_patent_data/austrian_patent_data_cleaned.csv')
+
+# For geocoding, scrape each URL:
+all_urls <- map(1:992, ~ {
+  url <- paste0("https://privilegien.patentamt.at/search/-/-/",
+                .x,
+                "/RELEVANCE/-/")
+  links_on_page <- read_html(url) |>
+    html_elements("div.search-list__hit-title h3 a") |>
+    html_attr("href")
+  
+  return(links_on_page)
+})
+
+
+map(all_urls, ~ {
+  description <- read_html(.x) |>
+    html_elements("div#widgetMetadata dt, div#widgetMetadata dd") |>
+    html_text2()
+  
+  
+})
 
 # Geocode the Obtained Data Frame
 get_point <- function(row){
@@ -212,14 +238,6 @@ pp_piedmont_to_be_merged <- pp |>
 together <- left_join(pp_austria_to_be_merged,  pp_piedmont_to_be_merged,
                       by=c("LAU_ID", "year", "quarter")) |>
   mutate(patents = patents_austria + patents_piedmont)
-
-library(fixest)
-reg1 <- feols(patents ~ group*post, data = together |> 
-                mutate(post = if_else(year > 1859 & ds > ymd("1859-06-01"), 1, 0),
-                       patents = patents*1000))
-
-reg2 <- feols(patents ~ as.factor(year)*group + MOUNT_TYPE + COAST_TYPE + URBN_TYPE, data = together |> 
-                mutate(patents = patents*1000), vcov='hc1')
 
 # Export the together dataset
 # Assuming your tibble is named 'together'
