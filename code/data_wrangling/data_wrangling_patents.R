@@ -74,16 +74,16 @@ all_urls <- map(1:992, ~ {
   links_on_page <- read_html(url) |>
     html_elements("div.search-list__hit-title h3 a") |>
     html_attr("href")
-  
+  Sys.sleep(3)
   return(links_on_page)
 })
 
+all_urls <- all_urls |> list_c()
 
-map(all_urls, ~ {
+data_for_urls <- map(all_urls, ~ {
   description <- read_html(.x) |>
     html_elements("div#widgetMetadata dt, div#widgetMetadata dd") |>
     html_text2()
-  
   
 })
 
@@ -109,6 +109,8 @@ get_point <- function(row){
   return(data.frame(x=x, y=y))
   
 }
+
+# Merge data_ready with the location information and gecoded
 
 data_geocoded <- data_ready |>
   rowwise() |>
@@ -162,11 +164,38 @@ pp <- pp |>
 # Integrate the Piedmontese data
 pp_austria <- read_csv2('./data/patent_data/interim_patent_data/austrian_patent_data_cleaned.csv')
 
-# Import the Piedmontese Data
-piedmont <- readxl::read_xlsx('./data/Patents_Piedmont_1856_1862.xlsx') |>
-  group_by(Period, Location) |> 
+# Import the Piedmontese and Italian Data
+piedmont <- readxl::read_xlsx('./data/patent_data/raw_patent_data/Patents_Piedmont_1855_1862.xlsx') |>
+  janitor::clean_names() |>
+  mutate(year = as.numeric(str_extract(period, "\\d{4}"))) |>
+  group_by(year, location) |> 
   count() |>
   ungroup()
+italy1863_1867 <- readxl::read_xlsx("./data/patent_data/raw_patent_data/Patents_Italy_1863_1867.xlsx")
+italy_1878 <- readxl::read_xlsx("./data/patent_data/raw_patent_data/Patents_Italy_1878.xlsx")
+italy_1889 <- readxl::read_xlsx("./data/patent_data/raw_patent_data/Patents_Italy_1889.xlsx") |>
+  janitor::clean_names() |>
+  group_by(location, country) |> 
+  count() |>
+  mutate(year = 1889)
+
+italy_1902_1911 <- readxl::read_xlsx("./data/patent_data/raw_patent_data/Patents_Italy_1902_1911.xlsx") |>
+  janitor::clean_names() |>
+  filter(nazione_1 == "Italia") |>
+  select(benchmark, residenza_luogo_1, residenza_provincia_1) |>
+  group_by(benchmark, residenza_luogo_1, residenza_provincia_1) |> 
+  count() |>
+  mutate(residenza_luogo_1 = if_else(is.na(residenza_luogo_1), residenza_provincia_1, residenza_luogo_1)) |>
+  ungroup() |>
+  select(-residenza_provincia_1) |>
+  rename(year = benchmark, location = residenza_luogo_1)
+
+
+italy_together <- bind_rows(italy1863_1867, italy_1878) |>
+  rename(year=anno, location=comune_1871, n = n_patents, comune_code = n_istat_1871) |>
+  bind_rows(italy_1889) |>
+  bind_rows(italy_1902_1911) |>
+  bind_rows(piedmont)
 
 # Geomatch these data as well
 geocode_place <- function(row){
@@ -184,20 +213,6 @@ geocode_place <- function(row){
   return(out)
 }
 
-test <- piedmont |> 
-  rowwise() |> 
-  mutate(coordinate = geocode_place(cur_data()))
-
-test2 <- test |> 
-  unnest_wider(coordinate) |>
-  st_as_sf(crs='wgs84') |>
-  mutate(year = as.numeric(str_extract(Period, "\\d{4}")),
-         quarter = as.numeric(str_extract(Period, "\\d$")))
-
-grid <- expand_grid(relevant_part$LAU_ID, year=1856:1862,quarter=1:4) |>
-  rename(LAU_ID = `relevant_part$LAU_ID`)
-
-polygon_panel <- grid |> left_join(relevant_part, by = "LAU_ID")
 
 # Make a rowwise() function to extract the patents in location i in quarter t
 # patents argument pertains to test2 data.frame
