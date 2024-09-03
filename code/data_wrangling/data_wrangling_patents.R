@@ -1,5 +1,5 @@
 # italy_create_1856_1900_patents
-library(sf); library(tidyverse); library(selenider); library(rvest); library(osmdata)
+library(sf); library(tidyverse); library(selenider); library(rvest); library(osmdata); library(tidygeocoder)
 
 # Scrape Austrian Patents
 # Connect to a Chrome instance
@@ -67,23 +67,32 @@ data_ready <- data |>
 write_csv2(data_ready, './data/patent_data/interim_patent_data/austrian_patent_data_cleaned.csv')
 
 # For geocoding, scrape each URL:
-all_urls <- map(1:992, ~ {
-  url <- paste0("https://privilegien.patentamt.at/search/-/-/",
-                .x,
-                "/RELEVANCE/-/")
-  links_on_page <- read_html(url) |>
-    html_elements("div.search-list__hit-title h3 a") |>
+all_urls <- map(1837:1899, ~ {
+  url <- paste0("https://privilegien.patentamt.at/sitelinks/", .x, "/")
+  out <- read_html(url) |>
+    html_elements("div.sitelinks__hits a") |>
     html_attr("href")
-  Sys.sleep(3)
-  return(links_on_page)
-})
+  
+  return(out)
+}
+)
 
 all_urls <- all_urls |> list_c()
 
 data_for_urls <- map(all_urls, ~ {
-  description <- read_html(.x) |>
-    html_elements("div#widgetMetadata dt, div#widgetMetadata dd") |>
+  doc <- read_html(.x)
+  data_box <- doc |>
+    html_elements("div.metadata__wrapper div.metadata__ungrouped-wrapper, div.metadata__wrapper div.metadata__element-wrapper-single") |>
     html_text2()
+  
+  # Titles and Values
+  titles <- map_chr(data_box, ~ str_extract(.x, "(.+):"))
+  values <- map_chr(data_box, ~ str_extract(.x, ":\n(.+)"))
+
+  out <- tibble(titles=titles, data=values) |>
+    pivot_wider(names_from=titles, values_from = data)
+  
+  return(out)
   
 })
 
@@ -164,7 +173,7 @@ pp <- pp |>
 # Integrate the Piedmontese data
 pp_austria <- read_csv2('./data/patent_data/interim_patent_data/austrian_patent_data_cleaned.csv')
 
-# Import the Piedmontese and Italian Data
+# 2. Import the Piedmontese and Italian Data
 piedmont <- readxl::read_xlsx('./data/patent_data/raw_patent_data/Patents_Piedmont_1855_1862.xlsx') |>
   janitor::clean_names() |>
   mutate(year = as.numeric(str_extract(period, "\\d{4}"))) |>
@@ -195,45 +204,58 @@ italy_together <- bind_rows(italy1863_1867, italy_1878) |>
   rename(year=anno, location=comune_1871, n = n_patents, comune_code = n_istat_1871) |>
   bind_rows(italy_1889) |>
   bind_rows(italy_1902_1911) |>
-  bind_rows(piedmont)
+  bind_rows(piedmont) |>
+  distinct()
 
 # Geomatch these data as well
+sf::sf_use_s2(FALSE)
+municipalities <- read_sf('./shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp') |>
+  st_transform("wgs84") 
+
+# Use 2 different API's: for google, use usethis::edit_r_environ() and set GOOGLEGEOCODE_API_KEY variable
+osm_geocoded <- italy_together |>
+  tidygeocoder::geocode(address=location, method="osm")
+google_geocoded <- italy_together |>
+  tidygeocoder::geocode(address=location, method="google")
+
+# Keep the geomatch from google if there, otherwise, use OSM
+osm_geocoded <- osm_geocoded |>
+  rename(lat2 = lat, long2 = long)
+
+together <- google_geocoded |>
+  left_join(osm_geocoded, by = c('year', 'comune_code', 'n', 'location', 'country')) |>
+  mutate(lat = if_else(is.na(lat), lat2, lat),
+         long = if_else(is.na(long), long2, long)) |>
+  select(-c(lat2, long2)) |>
+  distinct()
+
+# Match to a municipality number
+
 geocode_place <- function(row){
-  loc <- row$Location
+  lat <- row$lat
+  long <- row$long
   out <- tryCatch({
-    box <- getbb(loc)
-    centroid <- data.frame(x=(box[1,1]+box[1,2])/2, y = (box[2,1]+box[2,2])/2)
-    out <- st_as_sf(centroid, coords = c('x', 'y'), crs='wgs84')
+    point <- st_point(c(long, lat))
+    
+    # Check which municipality contains this point
+    out <- municipalities |>
+      filter(st_contains(geometry, point, sparse = FALSE)) |>
+      select(COMUNE, PRO_COM) |>
+      st_drop_geometry()
   }, 
   error=function(e){
-    centroid <- data.frame(x=0, y=0)
-    out <- st_as_sf(centroid, coords=c('x', 'y'), crs='wgs84')
+    out <- tibble(COMUNE=NA, PRO_COM=NA)
   })
   
   return(out)
 }
 
+together <- together |>
+  rowwise() |>
+  mutate(exp = list(geocode_place(pick(everything()))))
+together <- together |> 
+  unnest_wider(exp)
 
-# Make a rowwise() function to extract the patents in location i in quarter t
-# patents argument pertains to test2 data.frame
-count_patents_piedmont <- function(row, patents){
-  yr <- row$year
-  qrt <- row$quarter
-  polygon <- row$`_ogr_geometry_` |> 
-    st_buffer(dist=1500)
-  found_patents <- patents |> 
-    filter(year == yr, quarter == qrt) |>
-    st_filter(polygon)
-  
-  out <- found_patents |>
-    summarize(total = sum(n, na.rm=T)) |>
-    pull(total)
-  return(out)
-}
-
-pp <- polygon_panel |>
-  rowwise() |> 
-  mutate(patents = count_patents_piedmont(cur_data(), test2))
 
 # Incorporate the Piedmontese patents and the Austrian patents together
 pp_austria_to_be_merged <- pp_austria |>
@@ -257,14 +279,6 @@ together <- left_join(pp_austria_to_be_merged,  pp_piedmont_to_be_merged,
 # Export the together dataset
 # Assuming your tibble is named 'together'
 
-# Extract the coordinates from `_ogr_geometry_` column and convert to sf
-together_sf <- left_join(together |>
-                           select(-`_ogr_geometry_`), 
-                         italy_municipalities |>
-                           select(LAU_ID), by= 'LAU_ID') |> 
-  st_as_sf() |>
-  select(-c(FID.y)) |>
-  rename(FID = FID.x)
 
 # Write this to geojson
 st_write(together_sf, "./data/italy_austrian_piedmontese_patents.geojson")
