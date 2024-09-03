@@ -255,29 +255,12 @@ together <- together |>
   mutate(exp = list(geocode_place(pick(everything()))))
 together <- together |> 
   unnest_wider(exp)
-
+# Write to csv
+#together |>
+#  write_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
 
 # Incorporate the Piedmontese patents and the Austrian patents together
-pp_austria_to_be_merged <- pp_austria |>
-  filter(is.element(year, 1856:1862)) |>
-  group_by(LAU_ID, year) |>
-  mutate(quarter = row_number()) |>
-  rename(patents_austria = patents) |>
-  ungroup()
 
-pp_piedmont_to_be_merged <- pp |>
-  rename(patents_piedmont = patents) |>
-  ungroup() |>
-  st_drop_geometry() |>
-  select(c(LAU_ID, year, quarter, patents_piedmont))
-
-# Merge them together
-together <- left_join(pp_austria_to_be_merged,  pp_piedmont_to_be_merged,
-                      by=c("LAU_ID", "year", "quarter")) |>
-  mutate(patents = patents_austria + patents_piedmont)
-
-# Export the together dataset
-# Assuming your tibble is named 'together'
 
 
 # Write this to geojson
