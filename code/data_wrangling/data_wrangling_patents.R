@@ -59,81 +59,67 @@ data_for_urls <- data_for_urls |>
   mutate(across(everything(), ~ str_remove(.x, ":\n")))
 
 # Geocode the Obtained Data Frame - Geocode only Italy
-get_point <- function(row){
-  place <- row$`Place of publication`
-  country <- row$Country
-  
-  x <- NA
-  y <- NA
-  
-  tryCatch({
-    if (place != "-") {
-      loc <- getbb(paste0(place, ", ", country))
-      x <- (loc[1, 1] + loc[1, 2]) / 2
-      y <- (loc[2, 1] + loc[2, 2]) / 2
-    }
-  }, error = function(e) {
-    x <- NA
-    y <- NA
+## OSM
+austrian_geocoded_osm <- data_for_urls |>
+  select(shelfmark, country, granted_on, place_of_publication) |> 
+  filter(str_detect(country, "Italy")) |>
+  mutate(temp = paste0(place_of_publication, ", ", country)) |>
+  tidygeocoder::geocode(address=temp, method="osm")
+## Google
+austrian_geocoded_google <- data_for_urls |>
+  select(shelfmark, country, granted_on, place_of_publication) |> 
+  filter(str_detect(country, "Italy")) |>
+  mutate(temp = paste0(place_of_publication, ", ", country)) |>
+  tidygeocoder::geocode(address=temp, method="google")
+
+austrian_geocoded_patents_italy <- left_join(austrian_geocoded_google, austrian_geocoded_osm,
+          by = c("shelfmark", "country", "granted_on", "place_of_publication", "temp")) |>
+  mutate(lat = if_else(is.na(lat.x), lat.y, lat.x),
+         long = if_else(is.na(long.x), long.y, long.x)) |>
+  mutate(lat = if_else(str_detect(place_of_publication, "-"), NA, lat),
+         long = if_else(str_detect(place_of_publication, "-"), NA, long)) |>
+  select(-c(lat.x, long.x, lat.y, long.y)) |>
+  mutate(year = as.numeric(str_extract(granted_on, "\\d{4}")))
+
+# Use the municipalities data.frame to put this inside a polygon
+sf::sf_use_s2(FALSE)
+municipalities <- read_sf('./shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp') |>
+  st_transform("wgs84") 
+
+geocode_place <- function(row){
+  lat <- row$lat
+  long <- row$long
+  out <- tryCatch({
+    point <- st_point(c(long, lat))
+    
+    # Check which municipality contains this point
+    out <- municipalities |>
+      filter(st_contains(geometry, point, sparse = FALSE)) |>
+      select(COMUNE, PRO_COM) |>
+      st_drop_geometry()
+  }, 
+  error=function(e){
+    out <- tibble(COMUNE=NA, PRO_COM=NA)
   })
   
-  return(data.frame(x=x, y=y))
-  
+  return(out)
 }
 
-# Merge data_ready with the location information and gecoded
-
-data_geocoded <- data_ready |>
+austrian_geocoded_patents_italy <- austrian_geocoded_patents_italy |>
   rowwise() |>
-  mutate(coordinates = list(get_point(cur_data())))
+  mutate(exp = list(geocode_place(pick(everything()))))
 
-#write_rds(data_geocoded, './data/austrian_patent_data_geocoded.RData')
-data_sf <- data_geocoded |> unnest_wider(coordinates)
+austrian_geocoded_patents_italy <- austrian_geocoded_patents_italy |>
+  unnest_wider(exp)
 
-# Transform into sf data.frame
-data_sf <- st_as_sf(data_sf |> mutate(
-  x = if_else(is.na(x), 0, x),
-  y = if_else(is.na(y), 0, y),
-  not_available = if_else(x == 0 & y == 0, 1, 0)),
-  coords=c("x", "y"), crs='wgs84')
+# Put in the form Comune, year, count:
+austrian_geocoded_patents_italy <- austrian_geocoded_patents_italy |>
+  group_by(PRO_COM, COMUNE, year) |>
+  count()
 
-# Create variables for each quarter in the timeframe 1856-1900
-dates_start <- seq(as.Date("1856-01-01"), as.Date("1900-10-01"), by = "quarter")
-dates_end <- dates_start + months(3)
-
-# Create a df with a start and end for each municipality
-grid <- expand_grid(relevant_part$LAU_ID, tibble(ds=dates_start, de=dates_end)) |>
-  rename(LAU_ID = `relevant_part$LAU_ID`)
-
-# Merge this with the relevant_part data.frame to obtain the polygon panel
-polygon_panel <- grid |>
-  left_join(relevant_part, by = "LAU_ID")
-
-# Import the Austrian patent data
-patents <- read_sf("./data/austrian_patent_data_geocoded_matched.geojson")
-
-# Make a rowwise() function to extract the already geocoded patents in location i in quarter t
-count_patents <- function(row, patents){
-  date_start <- row$ds
-  date_end <- row$de
-  polygon <- row$`_ogr_geometry_` |> 
-    st_buffer(dist=1500)
-  found_patents <- patents |> 
-    filter(between(granted_on, date_start, date_end)) |>
-    st_filter(polygon)
-  
-  return(nrow(found_patents))
-}
-
-pp <- polygon_panel |>
-  rowwise() |> 
-  mutate(patents = count_patents(cur_data(), patents))
-
-pp <- pp |> 
-  mutate(year = year(ds))
-
-# Integrate the Piedmontese data
-pp_austria <- read_csv2('./data/patent_data/interim_patent_data/austrian_patent_data_cleaned.csv')
+# Write to csv
+#write_csv2(austrian_geocoded_patents_italy, 
+#           "./data/patent_data/interim_patent_data/austrian_patent_data_cleaned_geocoded.csv")
 
 # 2. Import the Piedmontese and Italian Data
 piedmont <- readxl::read_xlsx('./data/patent_data/raw_patent_data/Patents_Piedmont_1855_1862.xlsx') |>
@@ -217,13 +203,25 @@ together <- together |>
   mutate(exp = list(geocode_place(pick(everything()))))
 together <- together |> 
   unnest_wider(exp)
+
 # Write to csv
 #together |>
 #  write_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
+# read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
 
 # 3. Incorporate the Piedmontese/Italian patents and the Austrian patents together
+italy <- read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
+austria <- read_csv2("./data/patent_data/interim_patent_data/austrian_patent_data_cleaned_geocoded.csv")
 
+patents_together <- full_join(italy, austria,
+          by = c("year", "PRO_COM", "COMUNE")) |>
+  rename(patents_italy = n.x, 
+         patents_austria = n.y) |>
+  mutate(patents_italy = if_else(is.na(patents_italy), 0, patents_italy),
+         patents_austria = if_else(is.na(patents_austria), 0, patents_austria),
+         patents_together = patents_italy + patents_austria)
 
-
-# Write this to geojson
-st_write(together_sf, "./data/italy_austrian_piedmontese_patents.geojson")
+# Write this to final dataset
+patents_together <- patents_together |>
+  select(year, location, COMUNE, lat, long, PRO_COM, comune_code, patents_austria, patents_italy, patents_together)
+write_csv2(patents_together, "./data/patents_final_dataset.csv")

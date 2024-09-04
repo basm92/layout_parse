@@ -1,0 +1,502 @@
+PRO_COM;COMUNE;year;n
+1035;Bricherasio;1896;1
+1058;Carignano;1896;1
+1068;Castiglione Torinese;1888;1
+1082;Chivasso;1895;1
+1090;Collegno;1893;1
+1125;Ivrea;1886;1
+1191;Pinerolo;1883;1
+1194;Piossasco;1882;1
+1194;Piossasco;1883;1
+1217;Rivarolo Canavese;1897;1
+1272;Torino;1856;1
+1272;Torino;1861;1
+1272;Torino;1865;1
+1272;Torino;1866;1
+1272;Torino;1867;2
+1272;Torino;1868;2
+1272;Torino;1869;2
+1272;Torino;1870;2
+1272;Torino;1873;1
+1272;Torino;1874;3
+1272;Torino;1875;3
+1272;Torino;1876;1
+1272;Torino;1877;1
+1272;Torino;1879;4
+1272;Torino;1880;4
+1272;Torino;1881;1
+1272;Torino;1883;6
+1272;Torino;1884;4
+1272;Torino;1885;2
+1272;Torino;1886;2
+1272;Torino;1887;3
+1272;Torino;1888;4
+1272;Torino;1889;4
+1272;Torino;1890;7
+1272;Torino;1891;4
+1272;Torino;1892;6
+1272;Torino;1893;7
+1272;Torino;1894;4
+1272;Torino;1895;9
+1272;Torino;1896;2
+1272;Torino;1897;11
+1272;Torino;1898;12
+1272;Torino;1899;3
+2012;Biella;1880;1
+2086;Occhieppo Inferiore;1891;1
+2158;Vercelli;1899;1
+3021;Bogogno;1864;1
+3084;Lesa;1889;1
+3106;Novara;1888;1
+4003;Alba;1870;2
+4215;Savigliano;1899;1
+4240;Verzuolo;1886;1
+5003;Antignano;1898;1
+5005;Asti;1885;1
+5014;Calliano;1895;1
+6009;Arquata Scrivia;1899;1
+6039;Casale Monferrato;1891;1
+7063;Saint-Pierre;1871;1
+8029;Dolceacqua;1890;1
+9056;Savona;1888;1
+9056;Savona;1895;1
+10025;Genova;1870;1
+10025;Genova;1872;2
+10025;Genova;1873;2
+10025;Genova;1880;1
+10025;Genova;1881;3
+10025;Genova;1882;1
+10025;Genova;1883;1
+10025;Genova;1884;3
+10025;Genova;1885;4
+10025;Genova;1886;3
+10025;Genova;1888;5
+10025;Genova;1889;1
+10025;Genova;1890;3
+10025;Genova;1891;2
+10025;Genova;1893;8
+10025;Genova;1894;5
+10025;Genova;1895;1
+10025;Genova;1896;1
+10025;Genova;1897;3
+10025;Genova;1898;2
+10025;Genova;1899;3
+10051;Rossiglione;1895;1
+11015;La Spezia;1896;3
+12026;Busto Arsizio;1886;1
+12070;Gallarate;1886;1
+12133;Varese;1885;1
+13013;Asso;1886;1
+13075;Como;1895;1
+13075;Como;1897;1
+13112;Gravedona;1896;1
+13113;Griante;1891;1
+13208;Sant'Abbondio;1897;1
+15027;Bollate;1896;1
+15054;Casalpusterlengo;1892;1
+15126;Lodi;1891;1
+15146;Milano;1847;1
+15146;Milano;1868;1
+15146;Milano;1871;1
+15146;Milano;1872;3
+15146;Milano;1873;3
+15146;Milano;1875;1
+15146;Milano;1878;2
+15146;Milano;1879;2
+15146;Milano;1880;5
+15146;Milano;1881;5
+15146;Milano;1882;4
+15146;Milano;1883;2
+15146;Milano;1884;2
+15146;Milano;1885;1
+15146;Milano;1886;3
+15146;Milano;1887;3
+15146;Milano;1888;5
+15146;Milano;1889;3
+15146;Milano;1890;4
+15146;Milano;1891;3
+15146;Milano;1892;6
+15146;Milano;1893;11
+15146;Milano;1894;12
+15146;Milano;1895;10
+15146;Milano;1896;16
+15146;Milano;1897;10
+15146;Milano;1898;9
+15146;Milano;1899;2
+15149;Monza;1891;1
+15149;Monza;1894;2
+15210;Settala;1896;1
+15223;Triuggio;1892;1
+16004;Albino;1889;1
+16004;Albino;1895;1
+16024;Bergamo;1866;1
+16024;Bergamo;1872;1
+16024;Bergamo;1891;1
+17029;Brescia;1888;1
+18110;Pavia;1896;1
+18110;Pavia;1898;1
+19025;Castelleone;1896;1
+19036;Cremona;1869;1
+19036;Cremona;1879;1
+20030;Mantova;1892;1
+20030;Mantova;1896;1
+20030;Mantova;1898;1
+20065;Suzzara;1897;1
+21008;Bolzano;1864;1
+21008;Bolzano;1871;2
+21008;Bolzano;1877;2
+21008;Bolzano;1878;1
+21008;Bolzano;1888;3
+21008;Bolzano;1889;3
+21008;Bolzano;1891;1
+21008;Bolzano;1895;1
+21008;Bolzano;1897;1
+21008;Bolzano;1898;1
+21011;Bressanone;1880;2
+21013;Brunico;1885;1
+21020;Cermes;1888;1
+21051;Merano;1879;1
+21051;Merano;1880;2
+21051;Merano;1881;1
+21051;Merano;1882;1
+21051;Merano;1889;1
+21051;Merano;1893;1
+21051;Merano;1894;4
+21051;Merano;1895;1
+21051;Merano;1896;1
+21051;Merano;1897;1
+21051;Merano;1898;1
+21051;Merano;1899;1
+21065;Ponte Gardena;1894;1
+22014;Bezzecca;1872;1
+22014;Bezzecca;1880;1
+22050;Cavalese;1895;1
+22064;Commezzadura;1879;1
+22153;Riva del Garda;1886;1
+22153;Riva del Garda;1893;1
+22205;Trento;1867;2
+22205;Trento;1876;1
+22205;Trento;1882;1
+22205;Trento;1888;2
+22205;Trento;1892;1
+22205;Trento;1894;1
+22205;Trento;1897;1
+23034;Ferrara di Monte Baldo;1874;1
+23091;Verona;1870;1
+23091;Verona;1880;1
+23091;Verona;1883;1
+23091;Verona;1886;1
+23091;Verona;1891;1
+23091;Verona;1895;1
+23091;Verona;1897;2
+24057;Marostica;1898;1
+24060;Montebello Vicentino;1883;1
+24100;Schio;1891;1
+24100;Schio;1896;1
+24100;Schio;1897;1
+24100;Schio;1898;1
+24118;Villaverla;1891;1
+25005;Auronzo di Cadore;1892;1
+26021;Conegliano;1882;1
+26021;Conegliano;1888;1
+26086;Treviso;1865;1
+26086;Treviso;1873;1
+26086;Treviso;1884;1
+26086;Treviso;1891;1
+26092;Vittorio Veneto;1889;1
+27023;Mira;1864;1
+27023;Mira;1886;1
+27024;Mirano;1888;1
+27042;Venezia;1859;1
+27042;Venezia;1861;2
+27042;Venezia;1864;2
+27042;Venezia;1865;1
+27042;Venezia;1873;1
+27042;Venezia;1874;2
+27042;Venezia;1878;1
+27042;Venezia;1880;1
+27042;Venezia;1881;1
+27042;Venezia;1888;1
+27042;Venezia;1889;1
+27042;Venezia;1890;4
+27042;Venezia;1891;1
+27042;Venezia;1892;1
+27042;Venezia;1895;1
+27042;Venezia;1896;1
+27042;Venezia;1897;1
+27042;Venezia;1898;1
+28045;Limena;1894;1
+28045;Limena;1895;1
+28046;Loreggia;1869;1
+28054;Mestrino;1891;1
+28060;Padova;1867;1
+28060;Padova;1888;1
+28060;Padova;1889;1
+28060;Padova;1893;1
+28060;Padova;1897;1
+28060;Padova;1898;3
+28060;Padova;1899;1
+30023;Cervignano del Friuli;1874;1
+30023;Cervignano del Friuli;1881;1
+30023;Cervignano del Friuli;1882;2
+30023;Cervignano del Friuli;1884;1
+30023;Cervignano del Friuli;1888;1
+30049;Lignano Sabbiadoro;1866;1
+30049;Lignano Sabbiadoro;1892;1
+30049;Lignano Sabbiadoro;1893;1
+30049;Lignano Sabbiadoro;1894;1
+30054;Malborghetto Valbruna;1879;2
+30117;Tarvisio;1885;1
+30129;Udine;1892;1
+31007;Gorizia;1875;1
+31007;Gorizia;1877;1
+31007;Gorizia;1879;1
+31007;Gorizia;1882;2
+31007;Gorizia;1883;1
+31007;Gorizia;1885;1
+31007;Gorizia;1887;1
+31007;Gorizia;1888;2
+31007;Gorizia;1889;2
+31007;Gorizia;1890;2
+31007;Gorizia;1891;3
+31007;Gorizia;1893;1
+31007;Gorizia;1894;1
+31007;Gorizia;1895;1
+31007;Gorizia;1897;4
+31007;Gorizia;1898;2
+31007;Gorizia;1899;1
+31008;Gradisca d'Isonzo;1875;1
+31012;Monfalcone;1889;2
+31017;Sagrado;1894;4
+32001;Duino-Aurisina;1869;2
+32001;Duino-Aurisina;1870;1
+32001;Duino-Aurisina;1875;3
+32001;Duino-Aurisina;1899;1
+32004;San Dorligo della Valle;1880;1
+32004;San Dorligo della Valle;1897;1
+32006;Trieste;1858;2
+32006;Trieste;1864;2
+32006;Trieste;1865;2
+32006;Trieste;1866;2
+32006;Trieste;1867;2
+32006;Trieste;1868;5
+32006;Trieste;1869;2
+32006;Trieste;1870;6
+32006;Trieste;1871;5
+32006;Trieste;1872;8
+32006;Trieste;1873;8
+32006;Trieste;1874;11
+32006;Trieste;1875;7
+32006;Trieste;1876;5
+32006;Trieste;1877;9
+32006;Trieste;1878;7
+32006;Trieste;1879;6
+32006;Trieste;1880;5
+32006;Trieste;1881;5
+32006;Trieste;1882;4
+32006;Trieste;1883;10
+32006;Trieste;1884;5
+32006;Trieste;1885;3
+32006;Trieste;1886;2
+32006;Trieste;1887;8
+32006;Trieste;1888;5
+32006;Trieste;1889;5
+32006;Trieste;1890;4
+32006;Trieste;1891;4
+32006;Trieste;1892;8
+32006;Trieste;1893;5
+32006;Trieste;1894;11
+32006;Trieste;1895;9
+32006;Trieste;1896;19
+32006;Trieste;1897;15
+32006;Trieste;1898;12
+32006;Trieste;1899;7
+34027;Parma;1897;1
+37006;Bologna;1876;1
+37006;Bologna;1879;1
+37006;Bologna;1880;1
+37006;Bologna;1881;1
+37006;Bologna;1883;2
+37006;Bologna;1891;1
+37006;Bologna;1893;1
+37006;Bologna;1895;3
+37006;Bologna;1896;3
+37006;Bologna;1897;3
+37006;Bologna;1898;1
+37006;Bologna;1899;1
+37032;Imola;1877;1
+37032;Imola;1886;1
+38008;Ferrara;1865;1
+38008;Ferrara;1897;1
+38014;Mesola;1892;1
+40012;Forli';1891;1
+40012;Forli';1894;1
+40012;Forli';1898;1
+40019;Meldola;1868;1
+41044;Pesaro;1890;1
+42002;Ancona;1880;1
+42002;Ancona;1887;1
+42002;Ancona;1894;2
+42035;Ostra;1882;1
+43044;Recanati;1895;1
+46017;Lucca;1898;1
+47011;Montecatini-Terme;1889;1
+47014;Pistoia;1874;1
+48010;Castelfiorentino;1898;1
+48017;Firenze;1867;2
+48017;Firenze;1869;1
+48017;Firenze;1873;2
+48017;Firenze;1874;5
+48017;Firenze;1875;1
+48017;Firenze;1876;2
+48017;Firenze;1877;3
+48017;Firenze;1878;1
+48017;Firenze;1879;1
+48017;Firenze;1880;1
+48017;Firenze;1883;2
+48017;Firenze;1884;2
+48017;Firenze;1885;2
+48017;Firenze;1889;1
+48017;Firenze;1890;1
+48017;Firenze;1891;1
+48017;Firenze;1892;4
+48017;Firenze;1893;2
+48017;Firenze;1895;4
+48017;Firenze;1896;3
+48017;Firenze;1897;1
+48017;Firenze;1898;3
+48017;Firenze;1899;1
+48034;Prato;1893;1
+48044;Signa;1890;1
+48044;Signa;1893;1
+48044;Signa;1894;1
+48044;Signa;1895;1
+49009;Livorno;1867;1
+49009;Livorno;1871;1
+49009;Livorno;1873;1
+49009;Livorno;1889;1
+49009;Livorno;1895;1
+49014;Portoferraio;1892;1
+49014;Portoferraio;1896;1
+50026;Pisa;1879;1
+50026;Pisa;1882;1
+50026;Pisa;1894;1
+50026;Pisa;1897;1
+50036;Terricciola;1884;1
+51011;Castiglion Fibocchi;1896;1
+54022;Gualdo Cattaneo;1897;1
+54028;Massa Martana;1881;1
+54028;Massa Martana;1892;1
+54028;Massa Martana;1896;1
+54028;Massa Martana;1897;1
+55032;Terni;1893;1
+58032;Civitavecchia;1896;1
+58091;Roma;1865;1
+58091;Roma;1871;1
+58091;Roma;1872;2
+58091;Roma;1874;1
+58091;Roma;1875;1
+58091;Roma;1876;1
+58091;Roma;1880;3
+58091;Roma;1881;3
+58091;Roma;1882;2
+58091;Roma;1884;3
+58091;Roma;1885;4
+58091;Roma;1886;3
+58091;Roma;1887;3
+58091;Roma;1888;3
+58091;Roma;1889;2
+58091;Roma;1890;3
+58091;Roma;1891;4
+58091;Roma;1892;4
+58091;Roma;1893;12
+58091;Roma;1894;9
+58091;Roma;1895;5
+58091;Roma;1896;10
+58091;Roma;1897;12
+58091;Roma;1898;9
+58091;Roma;1899;5
+63024;Castellammare di Stabia;1873;1
+63049;Napoli;1867;1
+63049;Napoli;1870;1
+63049;Napoli;1873;1
+63049;Napoli;1874;1
+63049;Napoli;1875;2
+63049;Napoli;1876;1
+63049;Napoli;1879;1
+63049;Napoli;1880;1
+63049;Napoli;1881;1
+63049;Napoli;1882;2
+63049;Napoli;1884;1
+63049;Napoli;1885;1
+63049;Napoli;1887;1
+63049;Napoli;1888;1
+63049;Napoli;1890;1
+63049;Napoli;1892;2
+63049;Napoli;1893;2
+63049;Napoli;1894;1
+63049;Napoli;1895;1
+63049;Napoli;1896;3
+63049;Napoli;1898;4
+63049;Napoli;1899;1
+63058;Pompei;1890;1
+64002;Altavilla Irpina;1894;1
+65116;Salerno;1897;1
+66098;Sulmona;1880;1
+67036;Rocca Santa Maria;1866;1
+67036;Rocca Santa Maria;1874;1
+67036;Rocca Santa Maria;1877;3
+67036;Rocca Santa Maria;1879;1
+67036;Rocca Santa Maria;1880;1
+67036;Rocca Santa Maria;1881;1
+67036;Rocca Santa Maria;1884;1
+67036;Rocca Santa Maria;1885;1
+67036;Rocca Santa Maria;1887;2
+67036;Rocca Santa Maria;1888;2
+67036;Rocca Santa Maria;1889;7
+67036;Rocca Santa Maria;1890;3
+67036;Rocca Santa Maria;1892;3
+67036;Rocca Santa Maria;1894;4
+67036;Rocca Santa Maria;1895;7
+67036;Rocca Santa Maria;1896;4
+67036;Rocca Santa Maria;1897;1
+67036;Rocca Santa Maria;1898;4
+69022;Chieti;1895;1
+69022;Chieti;1898;1
+71046;San Giovanni Rotondo;1888;1
+71046;San Giovanni Rotondo;1897;1
+72006;Bari;1889;1
+72006;Bari;1893;1
+72007;Barletta;1889;1
+74001;Brindisi;1869;1
+80063;Reggio di Calabria;1888;1
+80063;Reggio di Calabria;1895;1
+82053;Palermo;1878;1
+82053;Palermo;1880;1
+82053;Palermo;1886;1
+83048;Messina;1875;1
+87006;Adrano;1873;1
+88009;Ragusa;1895;1
+89001;Augusta;1886;1
+89017;Siracusa;1897;1
+90035;La Maddalena;1891;1
+91009;Bitti;1894;1
+92009;Cagliari;1893;1
+92009;Cagliari;1899;1
+92013;Carloforte;1893;1
+92033;Iglesias;1887;1
+92033;Iglesias;1888;1
+92050;Pula;1876;1
+92050;Pula;1882;1
+93033;Pordenone;1898;1
+NA;NA;1850;1
+NA;NA;1852;1
+NA;NA;1857;1
+NA;NA;1863;1
+NA;NA;1866;1
+NA;NA;1867;1
+NA;NA;1868;1
+NA;NA;1881;1
+NA;NA;1886;1
+NA;NA;1891;1
+NA;NA;1895;1
