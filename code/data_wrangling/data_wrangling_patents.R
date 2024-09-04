@@ -79,6 +79,8 @@ all_urls <- map(1837:1899, ~ {
 
 all_urls <- all_urls |> list_c()
 
+# Scrape the metadata for all URLS
+## This is better done in batches 
 data_for_urls <- map(all_urls, ~ {
   doc <- read_html(.x)
   data_box <- doc |>
@@ -96,7 +98,30 @@ data_for_urls <- map(all_urls, ~ {
   
 })
 
-# Geocode the Obtained Data Frame
+# The output has to be cleaned
+data_for_urls <- readRDS("temporary_all_austrian_data.RDS")
+data_for_urls |>
+  list_rbind()
+
+clean <- function(df){
+  if(class(df$`Shelfmark:`)=="list"){
+    out <- unnest(df) |>
+      distinct()
+  } else{
+    out <- df
+  }
+  return(out)
+}
+
+data_for_urls <- data_for_urls |>
+  map(clean) |>
+  list_rbind()
+
+## Save and read
+# data_for_urls |> write_csv2("./data/patent_data/interim_patent_data/austrian_patent_data_cleaned_location.csv")
+
+
+# Geocode the Obtained Data Frame - Geocode only Italy
 get_point <- function(row){
   place <- row$`Place of publication`
   country <- row$Country
@@ -259,7 +284,7 @@ together <- together |>
 #together |>
 #  write_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
 
-# Incorporate the Piedmontese patents and the Austrian patents together
+# 3. Incorporate the Piedmontese/Italian patents and the Austrian patents together
 
 
 
