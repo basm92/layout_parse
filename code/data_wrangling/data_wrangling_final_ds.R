@@ -29,3 +29,14 @@ base <- base |>
   left_join(exhibitions)
 # Now add the base dataset to the geofile to make the final dataset (without control variables)
 final <- merge(geofile, base)
+
+# Add zero's for observations we observe, but not for "gap years" in the exhibition
+exhibition_years <- c(1855, 1867, 1878, 1889, 1900, 1911)
+final <- final |> 
+  mutate(across(contains("patents"), ~ if_else(is.na(.x), 0, .x))) |>
+  mutate(count = if_else(is.element(year, exhibition_years) & is.na(count), 0, count))
+
+# Export dataset to csv
+final |> 
+  st_drop_geometry() |> 
+  write_csv2("./data/final_dataset.csv")
