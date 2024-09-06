@@ -91,6 +91,42 @@ replace_accents <- function(text) {
   return(text)
 }
 
+# Define a function to split strings and find a match on the basis of that
+find_match_in_df <- function(input_string) {
+  # Step 1: Split the string by spaces
+  splitted_strings <- str_split(input_string, " ")[[1]]
+  # Step 2: Process each part of the split string
+  results <- map(splitted_strings, function(s) {
+    # 2.1: Use str_squish to remove extra spaces and remove symbols like ( ) + / -
+    s <- str_squish(s)
+    s <- str_remove_all(s, "[\\(\\)\\+\\/-]")
+    
+    # 2.3: Attempt to find a match in the df$COMUNE
+    match <- municipalities_with_compartimenti |>
+      filter(str_detect(COMUNE, fixed(s, ignore_case = TRUE))) |>
+      select(PRO_COM_T, COMUNE, score)
+    
+    # Return the first match if found, otherwise NA
+    if (nrow(match) > 0) {
+      return(match[1,])
+    } else {
+      return(tibble(PRO_COM_T = NA, COMUNE=NA, score=NA))
+    }
+  })
+  
+  # Step 3: Filter out NAs and return the first non-NA result
+  first_non_na <- results |>
+    discard(~ all(is.na(.x))) |>  # Remove data frames that contain only NA entries
+    first() 
+  
+  if(is.null(first_non_na)){
+    return(tibble(PRO_COM_T = NA, COMUNE=NA, score=NA))
+  } else{
+    return(first_non_na)
+  }
+
+}
+
 ## Add customized databases of translations
 french <- read_delim('./data/dictionaries/french_italian_names_dictionary.txt', delim=' - ', ) |> 
   janitor::clean_names() |>
@@ -236,12 +272,12 @@ geocode_row <- function(row){
     return(exact_match)
   }
   
-  ## 7.2 Name Identifier on the basis of d' or de
+  ## 7.2 Name Identifier on the basis of a or de
   ### 7.2.1 Simple Case
   name_raw <- row$name
   match <- name_raw |> 
-    str_extract("(?:à |de ' )(\\b\\w+\\b)") |>
-    str_remove("de |à ")
+    str_extract("(?<=(de|à)\\s)\\S+") |>
+    str_remove_all("de |à ")
   
   exact_match <- municipalities_with_compartimenti |>
     filter(COMUNE == match) |>
@@ -263,10 +299,18 @@ geocode_row <- function(row){
     return(exact_match)
   }
   
-  ### 7.3.3 Translation (for d')
+  ### 7.3.3 Translation (for d') - Original and Translation
   match_updated <- name_raw |>
     str_extract("d'[^ ]+") |>
     str_remove("d'")
+  
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == match_updated) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
   
   match <- french |>
     filter(french == match_updated) |>
@@ -297,6 +341,59 @@ geocode_row <- function(row){
       select(PRO_COM_T, COMUNE, score)
     return(exact_match)
   }
+  
+  ## 7.4 Before the Comma - Original And Translation
+  # Original
+  match <- place_raw |>
+    str_extract("^[^,]+") |>
+    str_remove(",")
+  
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == match) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
+  
+  # Translation
+  match <- french |>
+    filter(french == match) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  
+  ## 7.5 First Word - Original And Translation
+  # Original
+  match <- place_raw |>
+    str_extract("\\b[A-Z][^\\s]*\\b")
+  exact_match <- municipalities_with_compartimenti |>
+    filter(COMUNE == match) |>
+    select(PRO_COM_T, COMUNE, score)
+  
+  if(nrow(exact_match)>0){
+    return(exact_match)
+  }
+  
+  # Translation
+  match <- french |>
+    filter(french == match) |>
+    select(italian) |>
+    rename(COMUNE = italian)
+  
+  if(nrow(match)>0){
+    exact_match <- municipalities_with_compartimenti |>
+      filter(COMUNE == match$COMUNE) |>
+      select(PRO_COM_T, COMUNE, score)
+    return(exact_match)
+  }
+  
   
   # 12. Bracket Stuff
   # 12. Exact Match Proceeding from Raw - In Brackets
@@ -370,7 +467,13 @@ geocode_row <- function(row){
     return(exact_match)
   }
   
-  # 11. Finally, Fuzzy Match with high threshold
+  # 11. If the place is NA, try exact Matching on name vector
+  if(is.na(row$place)){
+    name_vector <- row$name
+    exact_match <- find_match_in_df(name_vector)
+  } else {
+  
+  # 12. Finally, Fuzzy Match with high threshold
   ## First, Place without brackets
   place_without_brackets <- str_remove_all(place_raw, "\\((.+)\\)") |>
     str_squish()
@@ -399,24 +502,51 @@ geocode_row <- function(row){
     match_PRO_COM_T <- municipalities_with_compartimenti[index,]$PRO_COM_T
     exact_match <- tibble(PRO_COM_T = match_PRO_COM_T, COMUNE = match_name, score = score_2)
   }
+  }
   
   return(exact_match)
   
 }
 
-test <- individual_with_class |>
+iwc_geocoded <- individual_with_class |>
   rowwise() |>
   mutate(geo = list(geocode_row(pick(everything()))))
 
-test <- test |>
+iwc_geocoded <- iwc_geocoded |>
   unnest_wider(geo)
 
+# Look at the non-matches
+insPect <- iwc_geocoded |> filter(!is.na(score) | is.na(COMUNE))
+
+# Short post-processing
+iwc_geocoded <- iwc_geocoded |>
+  filter(score < 0.15 | is.na(score)) |>
+  filter(!str_detect(place, "Vienne|Londres|Paris"))
+
 # Aggregate the data to the (year, city, count) level and use geocode
-aggregated_data <- individual_with_class |>
-  group_by(year, place) |>
+aggregated_data <- iwc_geocoded |>
+  group_by(year, PRO_COM_T) |>
   summarize(count = n(), 
             average_complexity = mean(pci, na.rm=T),
-            top_complexity = max(pci))
+            top_complexity = max(pci, na.rm=T))
 
+out <- aggregated_data |>
+  mutate(average_complexity = if_else(is.nan(average_complexity), NA, average_complexity),
+         top_complexity = if_else(top_complexity == -Inf, NA, top_complexity)) |>
+  ungroup()
 
+# Merge and write to csv
+years <- out$year |> unique()
+
+municipality_year <- municipalities_with_compartimenti |>
+  ungroup() |>
+  select(-score) |>
+  expand_grid(years) |>
+  rename(year = years)
+
+final <- municipality_year |>
+  left_join(out, by = c("PRO_COM_T", "year"))
+
+final |>
+  write_csv2('./data/exhibitions_final_dataset.csv')
 
