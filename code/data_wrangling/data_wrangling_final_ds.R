@@ -36,7 +36,20 @@ final <- final |>
   mutate(across(contains("patents"), ~ if_else(is.na(.x), 0, .x))) |>
   mutate(count = if_else(is.element(year, exhibition_years) & is.na(count), 0, count))
 
+coords <- geofile |>
+  st_transform('wgs84') |>
+  st_centroid() |> 
+  mutate(longitude = st_coordinates(geometry)[,1],
+         latitude = st_coordinates(geometry)[,2]) |>
+  dplyr::select(PRO_COM, longitude, latitude) |>
+  st_drop_geometry()
+
+# Set the data to the correct years
+final <- final |>
+  left_join(coords,by="PRO_COM")
+
 # Export dataset to csv
 final |> 
   st_drop_geometry() |> 
   write_csv2("./data/final_dataset.csv")
+

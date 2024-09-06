@@ -1,0 +1,52 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Estimates of Unification on Exhibition Activity\label{tab:exhibition}},
+note{}={Table reports estimates of the difference in exhibition count in Veneto relative to Lombardy. 
+Panel A focuses on the pre-unification period (the 1855 Exhibition), and 
+Panel B on the unification period for Lombardy (the 1867 Exhibition).  
+The estimates in Columns 1-2 are conducted at the \textit{Circondario} level, 
+whereas the estimates in Columns 3-4 are conducted at the \textit{Comune} level. 
+The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Poisson estimates. 
+The estimates are weighted by the inverse absolute distance to the border, and control for area, distance to the border, latitude and longitude
+, and are also conditional on year fixed-effects. Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+width={0.9\linewidth},
+colspec={X[0.3]X[0.15]X[0.15]X[0.15]X[0.15]},
+cell{3}{1}={c=5}{},cell{8}{1}={c=5}{},
+cell{4}{1}={preto={\hspace{1em}}},
+cell{5}{1}={preto={\hspace{1em}}},
+cell{6}{1}={preto={\hspace{1em}}},
+cell{7}{1}={preto={\hspace{1em}}},
+cell{9}{1}={preto={\hspace{1em}}},
+cell{10}{1}={preto={\hspace{1em}}},
+cell{11}{1}={preto={\hspace{1em}}},
+cell{12}{1}={preto={\hspace{1em}}},
+cell{13}{1}={preto={\hspace{1em}}},
+cell{1}{2}={c=2,}{halign=c,},
+cell{1}{4}={c=2,}{halign=c,},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+row{3}={,cmd=\bfseries,},
+row{8}={,cmd=\bfseries,},
+}                     %% tabularray inner close
+\toprule
+& Circondario &  & Comune &  \\ \cmidrule[lr]{2-3}\cmidrule[lr]{4-5}
+& OLS & Poisson & OLS  & Poisson  \\ \midrule %% TinyTableHeader
+Panel A: Pre-Unification &&&& \\
+Veneto     & -1.171  & -2.540*** & 0.011   & 2.837***  \\
+& (0.742) & (0.784)   & (0.020) & (0.858)   \\
+Adj. $R^2$ & 0.435   &           & 0.002   &           \\
+N          & 108     & 108       & 2185    & 2185      \\
+Panel B: Post-Lombardy Unification, Pre-Veneto Unification &&&& \\
+Veneto     & -2.902  & -4.012*** & 0.105   & -6.508*** \\
+& (1.802) & (0.838)   & (0.260) & (0.576)   \\
+Adj. $R^2$ & 0.427   &           & 0.069   &           \\
+N          & 108     & 108       & 2185    & 2185      \\
+\bottomrule
+\end{talltblr}
+\end{table}

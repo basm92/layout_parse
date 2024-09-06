@@ -1,38 +1,40 @@
 # Long Run: Patents and Exhibitions
-library(fixest); library(tidyverse); library(did); library(didimputation); library(rdrobust); library(modelr)
+library(fixest); library(tidyverse)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
-## Estimator: Staggered DiD - Use the Borusyak-Jaravel estimator or Callaway-Sant'Anna
+
+# Set the global bandwidth
+bw <- 100000
+
 ## DV: Log(PatentCount_{Italy, Austria}), 
 ## Part 1: Patents: {1855-1867-1878-1890-1902-1911}
-## Robustness: Extensive vs. Intensive Margin; Unit of Measurement
+## Also idea: Make use of the 5 preceding years
+patents1855 <- feols(patents_together*1e4 ~  allegiance_1861 + area_of_intersection + running | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1855)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+patents1867 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersection + running | year, 
+                     data = final |> group_by(PRO_COM) |> filter(abs(running) < bw, is.element(year, 1867)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+patents1878 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersection + running  | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1878)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+patents1889 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersection + running   | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1889)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+patents1902 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersection + running   | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1902)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
 
+modelsummary(list(patents1855, patents1867, patents1878, patents1889, patents1902), stars=T)
 
 ## Part 2: Exhibitions: {1855-1867-1878-1889-1900-1911}
 ## DV: Log(ExhibitionCount), AvgComplexity, TopComplexity
 ## Weights: Stuff by Population
 ## Robustness: Extensive vs. Intensive Margin; Unit of Measurement
-final <- final |>
-  mutate(treated = if_else((year > 1855 & allegiance_1861 == "Lombardia") | (year > 1867 & allegiance_1861 == "Veneto"), 1, 0),
-         treatment = case_when(allegiance_1861 == "Lombardia" ~ 1867, 
-                               allegiance_1861 == "Veneto"~ 1878, 
-                               TRUE ~ NA))
-
-# 1855 placebo
-data <- final  |>
-  filter(between(year, 1860, 1865)) |>
-  mutate(lc = log(patents_together + 1)) |>
-  filter(!is.na(lc))
-
-rdrobust(y=data$lc, x=data$running, cluster=data$DEN_CIRC) |>
-  summary()
-
-out <- feols(log(count) ~ 1, data = data)
-data <- data |> 
-  add_residuals(out) |>
-  rename(dv = resid) |>
-  filter(!is.na(dv), !is.na(running)) |>
-  mutate(lc = log(count))
-
 
 
 
