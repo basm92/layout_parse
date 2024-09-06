@@ -1,5 +1,5 @@
 # Long Run: Patents and Exhibitions
-library(fixest); library(tidyverse); library(did); library(didimputation)
+library(fixest); library(tidyverse); library(did); library(didimputation); library(rdrobust); library(modelr)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 ## Estimator: Staggered DiD - Use the Borusyak-Jaravel estimator or Callaway-Sant'Anna
 ## DV: Log(PatentCount_{Italy, Austria}), 
@@ -17,16 +17,23 @@ final <- final |>
                                allegiance_1861 == "Veneto"~ 1878, 
                                TRUE ~ NA))
 
-feols(log(1+count) ~ 1 + i(year, ref=1855) + i(year, treated) | PRO_COM, 
-      data = final ,
-      vcov=~DEN_CIRC)
+# 1855 placebo
+data <- final  |>
+  filter(between(year, 1860, 1865)) |>
+  mutate(lc = log(patents_together + 1)) |>
+  filter(!is.na(lc))
 
-did::att_gt(yname="count", 
-            gname="treatment",
-            idname="PRO_COM",
-            tname="year",
-            xformla=~1,
-            data=final,
-            est_method="reg",
-            control_group = "notyettreated"
-            )
+rdrobust(y=data$lc, x=data$running, cluster=data$DEN_CIRC) |>
+  summary()
+
+out <- feols(log(count) ~ 1, data = data)
+data <- data |> 
+  add_residuals(out) |>
+  rename(dv = resid) |>
+  filter(!is.na(dv), !is.na(running)) |>
+  mutate(lc = log(count))
+
+
+
+
+
