@@ -58,8 +58,7 @@ modelsummary(panels,
              notes = n, 
              output = "tinytable",
              width=c(0.20, 0.15, 0.15, 0.15, 0.15, 0.15)) |>
-  style_tt(
-    i=1, bold=T) |>
+  style_tt(i=0, j=1:6, bold=T) |> 
   save_tt("./tables/patents_long_term.tex", overwrite = T)
 
 
