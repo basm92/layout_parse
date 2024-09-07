@@ -13,7 +13,7 @@ patents1855 <- feols(patents_together*1e4 ~  allegiance_1861 + area_of_intersect
                      weights=~1/abs(running),
                      vcov=~DEN_PROV)
 patents1867 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersection + running | year, 
-                     data = final |> group_by(PRO_COM) |> filter(abs(running) < bw, is.element(year, 1867)),
+                     data = final |> filter(abs(running) < bw, is.element(year, 1867)),
                      weights=~1/abs(running),
                      vcov=~DEN_PROV)
 patents1878 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersection + running  | year, 
