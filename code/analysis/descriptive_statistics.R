@@ -73,10 +73,11 @@ table_no_exh |>
   datasummary_df(
     title="Exhibitions in Veneto and Lombardy",
     notes = n,
-    fmt=0) |> 
+    fmt=0,
+    width=0.7) |> 
   style_tt(i=5, line="b", line_width=0.1) |>
   style_tt(j=2:3, align='r') |>
-  save_tt("./tables/table_no_exhibitions.tex")
+  save_tt("./tables/table_no_exhibitions.tex", overwrite=T)
 
 ## Number of Exhibitions 
 ## Geographical Distribution {1855, 1867}
