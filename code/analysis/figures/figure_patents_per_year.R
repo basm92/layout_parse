@@ -37,8 +37,6 @@ data_for_graph <- left_join(sum_ap_from_italy, all_ap) |>
   mutate(share = no_patents/n) |>
   filter(year < 1900)
 
-test <- data_for_urls |>
-  filter(str_detect(place_of_publication, unknown))
 
 g1 <- data_for_graph |> ggplot(aes(year, no_patents)) + geom_line() + geom_point()
 g2 <- data_for_graph |> ggplot(aes(year, share)) + geom_line() + geom_point()
