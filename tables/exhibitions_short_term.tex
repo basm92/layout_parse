@@ -7,7 +7,7 @@ Panel A focuses on the pre-unification period (the 1855 Exhibition), and
 Panel B on the unification period for Lombardy (the 1867 Exhibition).  
 The estimates in Columns 1-2 are conducted at the \textit{Circondario} level, 
 whereas the estimates in Columns 3-4 are conducted at the \textit{Comune} level. 
-The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Poisson estimates. 
+The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Negative Binomial estimates. 
 The estimates are weighted by the inverse absolute distance to the border, and control for area, distance to the border, latitude and longitude
 , and are also conditional on year fixed-effects. Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$.},
 ]                     %% tabularray outer close
@@ -36,17 +36,17 @@ row{8}={,cmd=\bfseries,},
 }                     %% tabularray inner close
 \toprule
 & Circondario &  & Comune &  \\ \cmidrule[lr]{2-3}\cmidrule[lr]{4-5}
-& OLS & Poisson & OLS  & Poisson  \\ \midrule %% TinyTableHeader
+& OLS & Neg. Bin. & OLS  & Neg. Bin.  \\ \midrule %% TinyTableHeader
 Panel A: Pre-Unification &&&& \\
-Veneto     & -1.171  & -2.540*** & 0.011   & 2.837***  \\
-& (0.742) & (0.784)   & (0.020) & (0.858)   \\
-Adj. $R^2$ & 0.435   &           & 0.002   &           \\
-N          & 108     & 108       & 2185    & 2185      \\
+Veneto     & -0.227  & 4.296   & -0.004    & 0.379     \\
+& (0.341) & (2.851) & (0.003)   & (0.413)   \\
+Adj. $R^2$ & 0.199   & 0.084   & -0.001    & -0.008    \\
+N          & 66      & 66      & 1260      & 1260      \\
 Panel B: Post-Lombardy Unification, Pre-Veneto Unification &&&& \\
-Veneto     & -2.902  & -4.012*** & 0.105   & -6.508*** \\
-& (1.802) & (0.838)   & (0.260) & (0.576)   \\
-Adj. $R^2$ & 0.427   &           & 0.069   &           \\
-N          & 108     & 108       & 2185    & 2185      \\
+Veneto     & -1.423  & 2.452** & -0.437*** & -2.658*** \\
+& (2.293) & (1.037) & (0.126)   & (0.773)   \\
+Adj. $R^2$ & 0.415   & 0.058   & 0.036     & 0.135     \\
+N          & 66      & 66      & 1260      & 1260      \\
 \bottomrule
 \end{talltblr}
 \end{table}
