@@ -28,81 +28,67 @@ compute_optimal_bw <- function(dv,
 }
 
 # Set the global bandwidth
-bw <- 80000
+bw <- 100000
 ## DV: {Sum_patents, Patents_Piedmonte, Patents_Austria}
 ## Treatment: Lombardia
 ## Robustness: Bandwidth around the border (Poisson-RDD)
 
 #1. Patents
 # Aggregate to the Circondario-level
-p_aggregated_circ_pre <- final |> 
+aggregated_circ <- final |> 
   st_drop_geometry() |> 
   group_by(DEN_CIRC, year) |> 
   mutate(sum_patents = sum(patents_together),
+         mean_patents = mean(patents_together),
          running=mean(running),
-         count = mean(count)) |>
-  distinct(DEN_CIRC, year, .keep_all = T) |>
-  filter(between(year, 1855, 1858)) |>
-  mutate(running_abs = abs(running))
-
-p_aggregated_circ_post <- final |> 
-  st_drop_geometry() |> 
-  group_by(DEN_CIRC, year) |> 
-  mutate(sum_patents = sum(patents_together),
-         running=mean(running),
-         count=mean(count)) |>
-  distinct(DEN_CIRC, year, .keep_all = T) |>
-  filter(between(year, 1860, 1866)) |>
-  mutate(running_abs = abs(running))
-
-p_municipality_pre <- final |>
-  st_drop_geometry() |>
-  filter(between(year, 1855, 1858)) 
-
-p_municipality_post <- final |>
-  st_drop_geometry() |>
-  filter(between(year, 1860, 1866)) 
+         mean_count = mean(count),
+         sum_count = sum(count),
+         area_of_intersection = sum(area_of_intersection),
+         no_municipalities=n()) |>
+  distinct(DEN_CIRC, year, .keep_all = T)
+  
 
 ## Placebo's: before 1859 Annexation of Lombardy
 # Circondare level
-placebo_model_ols_circ <- feols(sum_patents ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude | as.factor(year),
-                                data=p_aggregated_circ_pre |> filter(abs(running) < bw),
-                                weights=~1/abs(running),
-                                vcov=~DEN_PROV)
-placebo_model_pois_circ <- fepois(sum_patents ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                                  data=p_aggregated_circ_pre |> filter(abs(running) < bw),
-                                  weights=~1/abs(running),
-                                  vcov=~DEN_PROV)
+patents1858circ <- feols(sum_patents ~ allegiance_1861 + area_of_intersection + no_municipalities + running | year, 
+                         data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                         weights=~1/abs(running),
+                         vcov=~DEN_PROV)
+patents1858circpois <- fenegbin(sum_patents ~ allegiance_1861 + abs_distance_to_border | year, 
+                         data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                         weights=~1/abs(running),
+                         vcov=~DEN_PROV)
+
 # Municipality level
-placebo_model_ols_munip <- feols(patents_together ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year), 
-                                 data = p_municipality_pre |> filter(abs(running) < bw),
-                                 weights=~1/abs(running),
-                                 vcov=~DEN_PROV)
-placebo_model_pois_munip <- fepois(patents_together ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                                   data = p_municipality_pre |> filter(abs(running) < bw),
-                                   weights=~1/abs(running),
-                                   vcov=~DEN_PROV)
+patents1858 <- feols(patents_together*1e3 ~ allegiance_1861 + area_of_intersection + running | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+patents1858pois <- fenegbin(patents_together ~ allegiance_1861 + abs_distance_to_border | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
 
 ## Real tests: After the 1859 Annexation of Lombardy
 # Circondare Level
-post_model_ols_circ <- feols(sum_patents ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                                data=p_aggregated_circ_post |> filter(abs(running) < bw),
-                             weights=~1/abs(running),
-                             vcov=~DEN_PROV)
-post_model_pois_circ <- fepois(sum_patents ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                                  data=p_aggregated_circ_post |> filter(abs(running) < bw), 
-                               weights=~1/abs(running),
-                               vcov=~DEN_PROV)
-# Municipality level
-post_model_ols_munip <- feols(patents_together ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude | as.factor(year), 
-                                 data = p_municipality_post |> filter(abs(running) < bw),
-                              weights=~1/abs(running),
-                              vcov=~DEN_PROV)
-post_model_pois_munip <- fepois(patents_together ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                                data = p_municipality_post |> filter(abs(running) < bw),
-                                weights=~1/abs(running),
-                                vcov=~DEN_PROV)
+patents1867circ <- feols(sum_patents ~ allegiance_1861  + running + area_of_intersection + no_municipalities | year, 
+                     data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+patents1867circpois <- fenegbin(sum_patents ~ allegiance_1861 + running + no_municipalities | year, 
+                         data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                         weights=~1/abs(running),
+                         cluster=~DEN_PROV)
 
+# Municipality level
+patents1867 <- feols(patents_together*1e3 ~ allegiance_1861 + area_of_intersection + running | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+patents1867pois <- fenegbin(patents_together ~ allegiance_1861 + abs_distance_to_border | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
 
 coef_map <- c("allegiance_1861Veneto"="Veneto")
 
@@ -112,22 +98,22 @@ Panel A focuses on the pre-unification period (1855 to 1858), and
 Panel B on the unification period for Lombardy (1860-1866), but not for Veneto. 
 The estimates in Columns 1-2 are conducted at the \\textit{Circondario} level, 
 whereas the estimates in Columns 3-4 are conducted at the \\textit{Comune} level. 
-The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Poisson estimates. 
+The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Negative Binomial estimates. 
 The estimates are weighted by the inverse absolute distance to the border, and control for area, distance to the border, latitude and longitude
 , and are also conditional on year fixed-effects. Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
 
 
 panels <- list(
   "Panel A: Pre-Unification"=list(
-    'OLS'=placebo_model_ols_circ, 
-    'Poisson'=placebo_model_pois_circ,
-    'OLS'=placebo_model_ols_munip,
-    'Poisson'=placebo_model_pois_munip),
+    'OLS'=patents1858circ, 
+    'Neg. Bin.'=patents1858circpois,
+    'OLS'=patents1858,
+    'Neg. Bin.'=patents1858pois),
   "Panel B: Post-Lombardy Unification, Pre-Veneto Unification"=list(
-    'OLS'=post_model_ols_circ, 
-    'Poisson'=post_model_pois_circ,
-    'OLS'=post_model_ols_munip,
-    'Poisson'=post_model_pois_munip
+    'OLS'=patents1867circ, 
+    'Neg. Bin.'=patents1867circpois,
+    'OLS'=patents1867,
+    'Neg. Bin.'=patents1867pois
   )
 )
 
@@ -151,74 +137,57 @@ modelsummary(panels,
   save_tt("./tables/patents_short_term.tex", overwrite = T)
 
 # 2. Exhibitions
-## 2.1 Make the appropriate datasets (Exhibition of 1855 vs. later exhibitions)
-e_municipality_pre <- p_municipality_pre
-e_aggregated_circ_pre <- p_aggregated_circ_pre
-e_municipality_post <- final |>
-  st_drop_geometry() |>
-  filter(between(year, 1866, 1868)) 
-
-e_aggregated_circ_post <- final |> 
-  st_drop_geometry() |> 
-  group_by(DEN_CIRC, year) |> 
-  mutate(sum_patents = sum(patents_together),
-         running=mean(running),
-         count=mean(count)) |>
-  distinct(DEN_CIRC, year, .keep_all = T) |>
-  filter(between(year, 1866, 1868)) |>
-  mutate(running_abs = abs(running))
-
-bw<-1e9
 # Circondare Level
-placebo_model_ols_circ <- feols(count ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude | as.factor(year),
-                                data=e_aggregated_circ_pre |> filter(abs(running) < bw),
-                                weights=~1/abs(running),
-                                vcov=~DEN_PROV)
-placebo_model_pois_circ <- fepois(count ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                                  data=e_aggregated_circ_pre |> filter(abs(running) < bw),
-                                  weights=~1/abs(running),
-                                  vcov=~DEN_PROV)
+exhibitions1855circ <- feols(sum_count ~ allegiance_1861 + area_of_intersection + no_municipalities + running | year, 
+                         data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                         weights=~1/abs(running),
+                         vcov=~DEN_PROV)
+exhibitions1855circpois <- fenegbin(sum_count ~ allegiance_1861 + no_municipalities + abs_distance_to_border | year, 
+                              data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                              weights=~1/abs(running),
+                              vcov=~DEN_PROV)
+
 # Municipality level
-placebo_model_ols_munip <- feols(count ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year), 
-                                 data = e_municipality_pre |> filter(abs(running) < bw),
-                                 weights=~1/abs(running),
-                                 vcov=~DEN_PROV)
-placebo_model_pois_munip <- fepois(count ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                                   data = e_municipality_pre |> filter(abs(running) < bw),
-                                   weights=~1/abs(running),
-                                   vcov=~DEN_PROV)
+exhibitions1855 <- feols(count ~ allegiance_1861 + area_of_intersection + running | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+exhibitions1855pois <- fenegbin(count ~ allegiance_1861 + abs_distance_to_border | year, 
+                          data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                          weights=~1/abs(running),
+                          vcov=~DEN_PROV)
 
 ## Real tests: After the 1859 Annexation of Lombardy
 # Circondare Level
-post_model_ols_circ <- feols(count ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                             data= e_aggregated_circ_post |> filter(abs(running) < bw),
-                             weights=~1/abs(running),
-                             vcov=~DEN_PROV)
-post_model_pois_circ <- fepois(count ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                               data=e_aggregated_circ_post |> filter(abs(running) < bw),
-                               weights=~1/abs(running),
-                               vcov=~DEN_PROV)
-# Municipality level
-post_model_ols_munip <- feols(count ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year), 
-                              data = e_municipality_post |> filter(abs(running) < bw),
+exhibitions1867circ <- feols(sum_count ~ allegiance_1861 + area_of_intersection + running + no_municipalities | year, 
+                         data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                         weights=~1/abs(running),
+                         vcov=~DEN_PROV)
+exhibitions1867circpois <- fenegbin(sum_count ~ allegiance_1861 + abs_distance_to_border + no_municipalities | year, 
+                              data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1860:1867)),
                               weights=~1/abs(running),
                               vcov=~DEN_PROV)
-post_model_pois_munip <- fepois(count ~ allegiance_1861 + area_of_intersection + angle_to_line + longitude  | as.factor(year),
-                                data = e_municipality_post |> filter(abs(running) < bw),
-                                weights=~1/abs(running),
-                                vcov=~DEN_PROV)
+# Municipality level
+exhibitions1867 <- feols(count ~ allegiance_1861 + area_of_intersection + running | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
+exhibitions1867pois <- fenegbin(count ~ allegiance_1861 + area_of_intersection + abs_distance_to_border | year, 
+                          data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                          weights=~1/abs(running),
+                          vcov=~DEN_PROV)
 
 panels <- list(
   "Panel A: Pre-Unification"=list(
-    'OLS'=placebo_model_ols_circ, 
-    'Poisson'=placebo_model_pois_circ,
-    'OLS'=placebo_model_ols_munip,
-    'Poisson'=placebo_model_pois_munip),
+    'OLS'=exhibitions1855circ,
+    'Neg. Bin.'=exhibitions1855circpois,
+    'OLS'=exhibitions1855,
+    'Neg. Bin.'=exhibitions1855pois),
   "Panel B: Post-Lombardy Unification, Pre-Veneto Unification"=list(
-    'OLS'=post_model_ols_circ, 
-    'Poisson'=post_model_pois_circ,
-    'OLS'=post_model_ols_munip,
-    'Poisson'=post_model_pois_munip
+    'OLS'=exhibitions1867circ, 
+    'Neg. Bin.'=exhibitions1867circpois,
+    'OLS'=exhibitions1867,
+    'Neg. Bin.'=exhibitions1867pois
   )
 )
 
@@ -227,7 +196,7 @@ Panel A focuses on the pre-unification period (the 1855 Exhibition), and
 Panel B on the unification period for Lombardy (the 1867 Exhibition).  
 The estimates in Columns 1-2 are conducted at the \\textit{Circondario} level, 
 whereas the estimates in Columns 3-4 are conducted at the \\textit{Comune} level. 
-The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Poisson estimates. 
+The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Negative Binomial estimates. 
 The estimates are weighted by the inverse absolute distance to the border, and control for area, distance to the border, latitude and longitude
 , and are also conditional on year fixed-effects. Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
 
