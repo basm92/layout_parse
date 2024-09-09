@@ -90,7 +90,8 @@ patents1867pois <- fenegbin(patents_together ~ allegiance_1861 + abs_distance_to
                      weights=~1/abs(running),
                      vcov=~DEN_PROV)
 
-coef_map <- c("allegiance_1861Veneto"="Veneto")
+coef_map <- c("allegiance_1861Veneto"="Veneto",
+              "allegiance_1861Lombardia" = "Lombardia")
 
 # Table notes
 n <- "Table reports estimates of the difference in patent count in Veneto relative to Lombardy. 
