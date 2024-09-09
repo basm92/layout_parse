@@ -46,7 +46,8 @@ coords <- geofile |>
 
 # Set the data to the correct years
 final <- final |>
-  left_join(coords,by="PRO_COM")
+  left_join(coords,by="PRO_COM") |>
+  mutate(allegiance_1861 = factor(allegiance_1861, levels=c("Veneto", "Lombardia")))
 
 # Export dataset to csv
 final |> 

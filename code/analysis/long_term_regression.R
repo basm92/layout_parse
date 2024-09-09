@@ -29,7 +29,9 @@ patents1902 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersecti
                      weights=~1/abs(running),
                      vcov=~DEN_PROV)
 
-coef_map <- c("allegiance_1861Veneto"="Veneto")
+coef_map <- c("allegiance_1861Veneto"="Veneto",
+              "allegiance_1861Lombardia" = "Lombardia")
+
 
 # Table notes
 n <- "Table reports estimates of the difference in patent count in Veneto relative to Lombardy, 
