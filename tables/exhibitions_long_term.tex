@@ -3,21 +3,22 @@
 \begin{talltblr}[         %% tabularray outer open
 caption={Estimates of Unification on Long-term Exhibition Activity\label{tab:exhibition_lt}},
 note{}={Table reports estimates of the difference in exhibitions count in Veneto relative to Lombardy, 
-focusing on 5 successive years in which exhibitions took place: 1855, 1867, 1878, 1889, and 1900. 
+focusing on 5 successive years in which exhibitions took place: 1855, 1867, 1878, 1889, 1900, and 1911. 
 The coefficients are estimated by OLS with a bandwidth of 100 kilometer, and are conducted at the \textit{Comune} level. 
 The estimates are weighted by the inverse absolute distance to the border, and control for area and distance to the border, 
 and are also conditional on year fixed-effects. Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$.},
 ]                     %% tabularray outer close
 {                     %% tabularray inner open
-width={0.95\linewidth},
-colspec={X[0.2]X[0.15]X[0.15]X[0.15]X[0.15]X[0.15]},
+width={0.92\linewidth},
+colspec={X[0.2]X[0.12]X[0.12]X[0.12]X[0.12]X[0.12]X[0.12]},
 column{1}={halign=l,},
 column{2}={halign=c,},
 column{3}={halign=c,},
 column{4}={halign=c,},
 column{5}={halign=c,},
 column{6}={halign=c,},
-hline{4}={1,2,3,4,5,6}{solid, 0.05em, black},
+column{7}={halign=c,},
+hline{4}={1,2,3,4,5,6,7}{solid, 0.05em, black},
 cell{1}{1}={}{,cmd=\bfseries,},
 cell{1}{2}={}{,cmd=\bfseries,},
 cell{1}{3}={}{,cmd=\bfseries,},
@@ -26,11 +27,11 @@ cell{1}{5}={}{,cmd=\bfseries,},
 cell{1}{6}={}{,cmd=\bfseries,},
 }                     %% tabularray inner close
 \toprule
-& 1855 & 1867 & 1878 & 1889 & 1900 \\ \midrule %% TinyTableHeader
-Veneto     & -0.004  & -0.437*** & -0.008* & -0.001  & 1.054   \\
-& (0.003) & (0.126)   & (0.004) & (0.001) & (0.773) \\
-Adj. $R^2$ & -0.001  & 0.036     & -0.002  & -0.001  & 0.303   \\
-N          & 1260    & 1260      & 1260    & 1263    & 1260    \\
+& 1855 & 1867 & 1878 & 1889 & 1900 & 1911 \\ \midrule %% TinyTableHeader
+Lombardia  & 0.004   & 0.437*** & 0.008*  & 0.001   & -1.054  & 0.006*  \\
+& (0.003) & (0.126)  & (0.004) & (0.001) & (0.773) & (0.003) \\
+Adj. $R^2$ & -0.001  & 0.036    & -0.002  & -0.001  & 0.303   & -0.002  \\
+N          & 1260    & 1260     & 1260    & 1263    & 1260    & 1262    \\
 \bottomrule
 \end{talltblr}
 \end{table}

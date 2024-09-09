@@ -28,6 +28,10 @@ patents1902 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersecti
                      data = final |> filter(abs(running) < bw, is.element(year, 1902)),
                      weights=~1/abs(running),
                      vcov=~DEN_PROV)
+patents1911 <- feols(patents_together*1e4 ~ allegiance_1861 + area_of_intersection + running   | year, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1911)),
+                     weights=~1/abs(running),
+                     vcov=~DEN_PROV)
 
 coef_map <- c("allegiance_1861Veneto"="Veneto",
               "allegiance_1861Lombardia" = "Lombardia")
@@ -35,7 +39,7 @@ coef_map <- c("allegiance_1861Veneto"="Veneto",
 
 # Table notes
 n <- "Table reports estimates of the difference in patent count in Veneto relative to Lombardy, 
-focusing on 5 years for which patent counts are available: 1855, 1867, 1878, 1889, and 1900. 
+focusing on 5 years for which patent counts are available: 1855, 1867, 1878, 1889, 1900 and 1911. 
 The coefficient size is multiplied by 1000 for interpretability. 
 The coefficients are estimated by OLS with a bandwidth of 100 kilometer, and are conducted at the \\textit{Comune} level. 
 The estimates are weighted by the inverse absolute distance to the border, and control for area and distance to the border, 
@@ -47,7 +51,8 @@ panels <- list(
   '1867'=patents1867, 
   '1878'=patents1878,
   '1889'=patents1889,
-  '1902'=patents1902)
+  '1902'=patents1902,
+  '1911'=patents1911)
 
 modelsummary(panels,
              coef_map=coef_map,
@@ -59,7 +64,7 @@ modelsummary(panels,
              estimate = "{estimate}{stars}",
              notes = n, 
              output = "tinytable",
-             width=c(0.20, 0.15, 0.15, 0.15, 0.15, 0.15)) |>
+             width=c(0.20, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12)) |>
   style_tt(i=0, j=1:6, bold=T) |> 
   save_tt("./tables/patents_long_term.tex", overwrite = T)
 
@@ -87,11 +92,15 @@ exhibitions1900 <- feols(count ~ allegiance_1861 + area_of_intersection + runnin
                      data = final |> filter(abs(running) < bw, is.element(year, 1900)),
                      weights=~1/abs(running),
                      vcov=~DEN_PROV)
+exhibitions1911 <- feols(count ~ allegiance_1861 + area_of_intersection + running   | year, 
+                         data = final |> filter(abs(running) < bw, is.element(year, 1911)),
+                         weights=~1/abs(running),
+                         vcov=~DEN_PROV)
 
 
 # Table notes
 n <- "Table reports estimates of the difference in exhibitions count in Veneto relative to Lombardy, 
-focusing on 5 successive years in which exhibitions took place: 1855, 1867, 1878, 1889, and 1900. 
+focusing on 5 successive years in which exhibitions took place: 1855, 1867, 1878, 1889, 1900, and 1911. 
 The coefficients are estimated by OLS with a bandwidth of 100 kilometer, and are conducted at the \\textit{Comune} level. 
 The estimates are weighted by the inverse absolute distance to the border, and control for area and distance to the border, 
 and are also conditional on year fixed-effects. Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
@@ -102,7 +111,8 @@ panels <- list(
   '1867'=exhibitions1867, 
   '1878'=exhibitions1878,
   '1889'=exhibitions1889,
-  '1900'=exhibitions1900)
+  '1900'=exhibitions1900,
+  '1911'=exhibitions1911)
 
 modelsummary(panels,
              coef_map=coef_map,
@@ -114,7 +124,7 @@ modelsummary(panels,
              estimate = "{estimate}{stars}",
              notes = n, 
              output = "tinytable",
-             width=c(0.20, 0.15, 0.15, 0.15, 0.15, 0.15)) |>
+             width=c(0.20, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12)) |>
   style_tt(i=0, j=1:6, bold=T) |> 
   save_tt("./tables/exhibitions_long_term.tex", overwrite = T)
 
