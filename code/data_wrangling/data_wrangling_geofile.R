@@ -1,4 +1,4 @@
-library(sf); library(tidyverse)
+library(sf); library(tidyverse); library(tidygeocoder)
 
 ## Part 1: Create the border
 compartimenti_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Compartimenti_1861/Compartimenti_1861.shp')
@@ -152,3 +152,59 @@ matched |>
   write_sf('./data/shapefiles_images/geofile.geojson')
 
 #matched <- read_sf('./data/shapefiles_images/geofile.geojson')
+
+# Geomatch (a part of) the census data
+files <- list.files("./data/raw_control_variables/population_census_italy_ocr/",
+                    full.names = TRUE, 
+                    pattern="page([2-5][0-9]|6[0-2])(.+).csv")
+files_read <- map(files, read_csv)
+raw_censusdata <- files_read |> 
+  map(~ {
+    .x |>
+      mutate(across(everything(), as.character))
+    }
+    ) |>
+  list_rbind()
+
+
+# Clean the names and use google geocode
+to_be_geocoded_census <- raw_censusdata |>
+  filter(!str_detect(City, "POPOLAZ")) |>
+  mutate(City = str_squish(str_remove_all(City, "[0-9]"))) |>
+  mutate(city_for_matching = paste0(City, ", Italy"))
+
+#geocoded_census <- to_be_geocoded_census |>
+#  tidygeocoder::geocode(city_for_matching, method="google")
+communi_1991 <- communi_1991 |>
+  st_transform('wgs84')
+sf::sf_use_s2(FALSE)
+
+geocode_place <- function(row){
+  lat <- row$lat
+  long <- row$long
+  out <- tryCatch({
+    point <- st_point(c(long, lat))
+    
+    # Check which municipality contains this point
+    out <- communi_1991 |>
+      filter(st_contains(geometry, point, sparse = FALSE)) |>
+      select(COMUNE, PRO_COM) |>
+      st_drop_geometry()
+  }, 
+  error=function(e){
+    out <- tibble(COMUNE=NA, PRO_COM=NA)
+  })
+  
+  return(out)
+}
+
+geocoded_census <- geocoded_census |>
+  rowwise() |>
+  mutate(exp = list(geocode_place(pick(everything()))))
+
+geocoded_census <- geocoded_census |>
+  unnest_wider(exp)
+
+geocoded_census |>
+  write_csv2("./data/control_variables/geocoded_census.csv")
+
