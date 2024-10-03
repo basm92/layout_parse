@@ -198,6 +198,7 @@ geocode_place <- function(row){
   return(out)
 }
 
+#Geocode the census
 geocoded_census <- geocoded_census |>
   rowwise() |>
   mutate(exp = list(geocode_place(pick(everything()))))
