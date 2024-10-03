@@ -7,7 +7,8 @@
 *.jpg
 .ipynb_checkpoints
 api_key.txt
-*/italy_austrian_patents.csv
+data/patent_data/raw_patent_data/italy_austrian_patents.csv
 *.tiff
 data/primary_sources
 *api_key*
+.env
