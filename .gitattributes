@@ -7,3 +7,5 @@
 /shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp filter=lfs diff=lfs merge=lfs -text
 /temporary_all_austrian_data.RDS filter=lfs diff=lfs merge=lfs -text
 /data/patent_data/interim_patent_data/austrian_patent_data.RDS filter=lfs diff=lfs merge=lfs -text
+/data/raw_control_variables/historicalGDPpc-main/misc/SHP_files/shapefile_Kanada/gadm41_CAN_0.shp filter=lfs diff=lfs merge=lfs -text
+/data/raw_control_variables/historicalGDPpc-main/misc/SHP_files/shapefile_MSA_USA/tl_2019_us_cbsa.shp filter=lfs diff=lfs merge=lfs -text
