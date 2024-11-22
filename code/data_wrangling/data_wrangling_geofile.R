@@ -1,4 +1,6 @@
-library(sf); library(tidyverse); library(tidygeocoder)
+library(sf); library(tidyverse); library(tidygeocoder); library(jsonlite)
+# Parameter to run geocoding, default=FALSE
+run_geocoding <- FALSE
 
 ## Part 1: Create the border
 compartimenti_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Compartimenti_1861/Compartimenti_1861.shp')
@@ -59,7 +61,7 @@ final_border <- st_union(north_border, south_border) |>
   st_union()
 
 # Save the border as a shapefile
-st_write(final_border, "final_border.geojson")
+#st_write(final_border, "final_border.geojson")
 #final_border <- read_sf("shapefiles_images/final_border.geojson")
 
 ## Part 2: Create the map with the different administrational units
@@ -173,8 +175,11 @@ to_be_geocoded_census <- raw_censusdata |>
   mutate(City = str_squish(str_remove_all(City, "[0-9]"))) |>
   mutate(city_for_matching = paste0(City, ", Italy"))
 
-#geocoded_census <- to_be_geocoded_census |>
-#  tidygeocoder::geocode(city_for_matching, method="google")
+if(run_geocoding){
+  geocoded_census <- to_be_geocoded_census |>
+    tidygeocoder::geocode(city_for_matching, method="google")
+
+
 communi_1991 <- communi_1991 |>
   st_transform('wgs84')
 sf::sf_use_s2(FALSE)
@@ -208,4 +213,8 @@ geocoded_census <- geocoded_census |>
 
 geocoded_census |>
   write_csv2("./data/control_variables/geocoded_census.csv")
+}
+
+geocoded_census <- read_csv2('./data/control_variables/geocoded_census.csv')
+
 

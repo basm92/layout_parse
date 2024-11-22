@@ -1,5 +1,7 @@
 # italy_create_1856_1900_patents
-library(sf); library(tidyverse); library(selenider); library(rvest); library(osmdata); library(tidygeocoder)
+library(sf); library(tidyverse); library(selenider); library(rvest); library(osmdata); library(tidygeocoder); library(jsonlite)
+run_geocoding_verzeichnisse <- FALSE
+run_geocoding_erfindungen <- FALSE
 
 # Scrape Austrian Patents
 # For geocoding, scrape each URL:
@@ -225,3 +227,43 @@ patents_together <- full_join(italy, austria,
 patents_together <- patents_together |>
   select(year, location, COMUNE, lat, long, PRO_COM, comune_code, patents_austria, patents_italy, patents_together)
 write_csv2(patents_together, "./data/patents_final_dataset.csv")
+
+
+# 4. Incorporate the alternative source (Verzeichnisse) for Austrian Patents
+if(run_geocoding_verzeichnisse){
+  # Import the Verzeichnisse answers by GPT
+  verzeichnisse <- read_json("./data/patent_data/interim_patent_data/batch_verzeichnisse_df_with_answers.json") |>
+    as_tibble() |>
+    unnest()
+  
+  # Geocode the "answers" column
+  geocoded_verzeichnisse <- verzeichnisse |>
+    tidygeocoder::geocode(answers, method="google")
+  
+  # Save the geocoded verzeichnisse
+  geocoded_verzeichnisse |>
+    write_delim("./data/patent_data/interim_patent_data/verzeichnisse_geocoded.csv", delim="\t")
+  
+}
+
+patents_together <- read_csv2("./data/patents_final_dataset.csv")
+geocoded_verzeichnisse <- read_delim("./data/patent_data/interim_patent_data/verzeichnisse_geocoded.csv", delim = "\t")
+
+# Give every observation a COMUNE in so far as they are in Italy
+geocoded_verzeichnisse <- geocoded_verzeichnisse |>
+  rowwise() |>
+  mutate(exp = list(geocode_place(pick(everything()))))
+
+# Merge this to the final dataset
+
+
+
+# 5. Geocode the Erfindungen Data (Pre-trends)
+if(run_geocoding_erfindungen){
+  erfindungen_data <- read_csv2("data/patent_data/erfindungen_data")
+  
+  erfindungen_geocoded <- tidygeocoder::geocode(erfindungen_data,
+                                                adress = "Ort",
+                                                method="google")
+  
+}
