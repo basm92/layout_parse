@@ -1,4 +1,7 @@
-library(sf); library(tidyverse); library(tidygeocoder)
+library(sf); library(tidyverse); library(tidygeocoder); library(jsonlite)
+# Parameter to run geocoding, default=FALSE
+run_geocoding <- FALSE
+run_geocoding_verzeichnisse <- FALSE
 
 ## Part 1: Create the border
 compartimenti_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Compartimenti_1861/Compartimenti_1861.shp')
@@ -173,8 +176,11 @@ to_be_geocoded_census <- raw_censusdata |>
   mutate(City = str_squish(str_remove_all(City, "[0-9]"))) |>
   mutate(city_for_matching = paste0(City, ", Italy"))
 
-#geocoded_census <- to_be_geocoded_census |>
-#  tidygeocoder::geocode(city_for_matching, method="google")
+if(run_geocoding){
+  geocoded_census <- to_be_geocoded_census |>
+    tidygeocoder::geocode(city_for_matching, method="google")
+
+
 communi_1991 <- communi_1991 |>
   st_transform('wgs84')
 sf::sf_use_s2(FALSE)
@@ -208,4 +214,23 @@ geocoded_census <- geocoded_census |>
 
 geocoded_census |>
   write_csv2("./data/control_variables/geocoded_census.csv")
+}
+
+geocoded_census <- read_csv2('./data/control_variables/geocoded_census.csv')
+
+if(run_geocoding_verzeichnisse){
+  # Import the Verzeichnisse answers by GPT
+  verzeichnisse <- read_json("./data/patent_data/interim_patent_data/batch_verzeichnisse_df_with_answers.json") |>
+    as_tibble() |>
+    unnest()
+  
+  # Geocode the "answers" column
+  geocoded_verzeichnisse <- verzeichnisse |>
+    tidygeocoder::geocode(answers, method="google")
+  
+  # Save the geocoded verzeichnisse
+  geocoded_verzeichnisse |>
+    write_csv("./data/patent_data/interim_patent_data/verzeichnisse_geocoded.csv")
+  
+}
 
