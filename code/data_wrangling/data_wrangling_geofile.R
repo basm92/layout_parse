@@ -62,7 +62,7 @@ final_border <- st_union(north_border, south_border) |>
   st_union()
 
 # Save the border as a shapefile
-st_write(final_border, "final_border.geojson")
+#st_write(final_border, "final_border.geojson")
 #final_border <- read_sf("shapefiles_images/final_border.geojson")
 
 ## Part 2: Create the map with the different administrational units
