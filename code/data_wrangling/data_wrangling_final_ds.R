@@ -1,4 +1,5 @@
 # data_wrangling_final_ds
+export <- FALSE
 ## In this file, on the basis of:
 ### ./data/shapefiles_images/geofile.geojson (resulting from data_wrangling_geofile.R)
 ### ./data/patents_final_dataset.csv (resulting from data_wrangling_patents.R)
@@ -89,7 +90,9 @@ final <- final |>
          count_pc = count / interpolated_population)
 
 # Export dataset to csv
-final |> 
+if(export){
+  final |> 
   select(-geometry) |>
   write_csv2("./data/final_dataset.csv")
+}
 
