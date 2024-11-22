@@ -90,6 +90,6 @@ final <- final |>
 
 # Export dataset to csv
 final |> 
-  st_drop_geometry() |> 
+  select(-geometry) |>
   write_csv2("./data/final_dataset.csv")
 
