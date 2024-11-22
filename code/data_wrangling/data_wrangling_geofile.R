@@ -1,7 +1,6 @@
 library(sf); library(tidyverse); library(tidygeocoder); library(jsonlite)
 # Parameter to run geocoding, default=FALSE
 run_geocoding <- FALSE
-run_geocoding_verzeichnisse <- FALSE
 
 ## Part 1: Create the border
 compartimenti_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Compartimenti_1861/Compartimenti_1861.shp')
@@ -218,19 +217,4 @@ geocoded_census |>
 
 geocoded_census <- read_csv2('./data/control_variables/geocoded_census.csv')
 
-if(run_geocoding_verzeichnisse){
-  # Import the Verzeichnisse answers by GPT
-  verzeichnisse <- read_json("./data/patent_data/interim_patent_data/batch_verzeichnisse_df_with_answers.json") |>
-    as_tibble() |>
-    unnest()
-  
-  # Geocode the "answers" column
-  geocoded_verzeichnisse <- verzeichnisse |>
-    tidygeocoder::geocode(answers, method="google")
-  
-  # Save the geocoded verzeichnisse
-  geocoded_verzeichnisse |>
-    write_csv("./data/patent_data/interim_patent_data/verzeichnisse_geocoded.csv")
-  
-}
 
