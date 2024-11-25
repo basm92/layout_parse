@@ -12,6 +12,7 @@ geofile <- sf::read_sf("./data/shapefiles_images/geofile.geojson") |>
   select(-c(POP_1991, contains("Shape"), overlap, CC_P)) |>
   distinct()
 # Create a grid for the patent years and exhibition years
+## Change the grid to incorporate pre-trends
 years <- 1855:1911
 base <- expand_grid(PRO_COM=geofile$PRO_COM, year=years)
 base <- base |>
@@ -19,12 +20,10 @@ base <- base |>
               st_drop_geometry() |> 
               select(PRO_COM, PRO_COM_T))
 
-patents <- read_csv2("./data/patents_final_dataset.csv") |>
+patents <- read_delim("./data/patents_final_dataset.csv") |>
   select(PRO_COM, year, contains("patents"))
 exhibitions <- read_csv2("./data/exhibitions_final_dataset.csv") |>
   select(PRO_COM_T, year, count, contains("complexity"))
-#patents_from_verzeichnisse <- read_csv2("./data/patents_verzeichnisse_final_dataset.csv") |>
-## To finish: import these patents and integrate them in the final dataset
 
 # Add the dependent variables to the dataset
 base <- base |>
@@ -92,7 +91,7 @@ final <- final |>
 # Export dataset to csv
 if(export){
   final |> 
-  select(-geometry) |>
-  write_csv2("./data/final_dataset.csv")
+    select(-geometry) |>
+    write_csv2("./data/final_dataset.csv")
 }
 
