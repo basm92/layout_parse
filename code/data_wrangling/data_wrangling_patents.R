@@ -325,8 +325,27 @@ erfindungen_geocoded_matched <- erfindungen_geocoded_matched |>
   ungroup() |>
   unnest_wider(exp)
 
+## 6.2 Put them in the same format as together_geocoded_full
 erfindungen_italy <- erfindungen_geocoded_matched |>
-  group_by(PRO_COM, COMUNE, Jahr) |>
+  group_by(PRO_COM, COMUNE, Jahr, lat, long) |>
   count() |>
-  ungroup()
+  ungroup() |>
+  rename(patents_austria = n, year = Jahr) |>
+  filter(!is.na(PRO_COM))
 
+## 6.3 Merge them together
+final_dataset <- together_geocoded_full |>
+  bind_rows(erfindungen_italy)
+
+## 6.4 Create an additional patents_together variable that is 
+## defined as 'patents_verzeichnisse + patents_italy'
+
+final_dataset <- final_dataset |>
+  rowwise() |>
+  mutate(patents_together_verz_italy = sum(patents_verzeichnisse, patents_italy, na.rm=T))
+
+final_dataset <- final_dataset |>
+  select(PRO_COM, year, COMUNE, lat, long, everything())
+
+final_dataset |>
+  write_delim("./data/patents_final_dataset.csv", delim="\t")
