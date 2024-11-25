@@ -317,5 +317,16 @@ if(run_geocoding_erfindungen){
 
 # 6. Merge the Erfindungen together with the rest of the patents (in together_geocoded_full)
 ## 6.1 Get the Italian PRO_COM's for the erfindungen data
+erfindungen_geocoded_matched <- erfindungen_geocoded |>
+  rowwise() |>
+  mutate(exp = list(geocode_place(pick(everything()))))
 
+erfindungen_geocoded_matched <- erfindungen_geocoded_matched |>
+  ungroup() |>
+  unnest_wider(exp)
+
+erfindungen_italy <- erfindungen_geocoded_matched |>
+  group_by(PRO_COM, COMUNE, Jahr) |>
+  count() |>
+  ungroup()
 
