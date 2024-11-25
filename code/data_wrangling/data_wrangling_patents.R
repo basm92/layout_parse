@@ -2,6 +2,7 @@
 library(sf); library(tidyverse); library(selenider); library(rvest); library(osmdata); library(tidygeocoder); library(jsonlite)
 run_geocoding_verzeichnisse <- FALSE
 run_geocoding_erfindungen <- FALSE
+run_geocoding_patentstogether <- FALSE
 
 # Scrape Austrian Patents
 # For geocoding, scrape each URL:
@@ -223,11 +224,10 @@ patents_together <- full_join(italy, austria,
          patents_austria = if_else(is.na(patents_austria), 0, patents_austria),
          patents_together = patents_italy + patents_austria)
 
-# Write this to final dataset
+# Write this to interim patents dataset
 patents_together <- patents_together |>
   select(year, location, COMUNE, lat, long, PRO_COM, comune_code, patents_austria, patents_italy, patents_together)
-write_csv2(patents_together, "./data/patents_final_dataset.csv")
-
+write_csv2(patents_together, "./data/patent_data/interim_patent_data/patents_interim_dataset.csv")
 
 # 4. Incorporate the alternative source (Verzeichnisse) for Austrian Patents
 if(run_geocoding_verzeichnisse){
@@ -246,7 +246,7 @@ if(run_geocoding_verzeichnisse){
   
 }
 
-patents_together <- read_csv2("./data/patents_final_dataset.csv")
+patents_together <- read_csv2("./data/patent_data/interim_patent_data/patents_interim_dataset.csv")
 geocoded_verzeichnisse <- read_delim("./data/patent_data/interim_patent_data/verzeichnisse_geocoded.csv", delim = "\t")
 
 # Give every observation a COMUNE in so far as they are in Italy
@@ -254,16 +254,68 @@ geocoded_verzeichnisse <- geocoded_verzeichnisse |>
   rowwise() |>
   mutate(exp = list(geocode_place(pick(everything()))))
 
-# Merge this to the final dataset
+geocoded_verzeichnisse <- geocoded_verzeichnisse |>
+  ungroup() |>
+  unnest_wider(exp)
 
+# Merge the Italian part of this dataset to the final dataset
+italian_part <- geocoded_verzeichnisse |>
+  group_by(PRO_COM, verzeichniss) |>
+  summarize(count = n(), lat=mean(lat), long=mean(long)) |>
+  filter(!is.na(PRO_COM)) |>
+  rename(year = verzeichniss, patents_verzeichnisse = count) |>
+  ungroup()
+  
+names <- municipalities |>
+  st_drop_geometry() |>
+  select(PRO_COM, COMUNE)
+
+to_be_merged <- left_join(italian_part, names, by = c("PRO_COM")) |>
+  select(-c(lat, long))
+  
+to_be_merged_2 <- patents_together |>
+  select(year, COMUNE, PRO_COM, contains('patents'))
+
+together <- full_join(to_be_merged, to_be_merged_2, by = c("PRO_COM", "year", "COMUNE")) 
+
+# Recover the rest of the variables: lat and long
+if(run_geocoding_patentstogether){
+  
+  together_geocoded <- tidygeocoder::geocode(together,
+                                                address = "COMUNE",
+                                                method="google")
+  
+  together_geocoded_full <- together_geocoded |>
+    left_join(patents_together |>
+                select(COMUNE, lat, long) |>
+                group_by(COMUNE) |>
+                summarize(lat=mean(lat,na.rm=T), long=mean(long, na.rm=T)) |>
+                distinct(),
+              by="COMUNE")
+  
+  together_geocoded_full <- together_geocoded_full |>
+    filter(!is.na(PRO_COM)) |>
+    mutate(lat.x = if_else(is.na(lat.x), lat.y, lat.x), long.x=if_else(is.na(long.x), long.y, long.x)) |>
+    rename(lat=lat.x, long=long.x) |>
+    select(-c(long.y, lat.y))
+}
 
 
 # 5. Geocode the Erfindungen Data (Pre-trends)
 if(run_geocoding_erfindungen){
-  erfindungen_data <- read_csv2("data/patent_data/erfindungen_data")
+  erfindungen_data <- read_delim("data/patent_data/erfindungen_data.csv")
   
   erfindungen_geocoded <- tidygeocoder::geocode(erfindungen_data,
-                                                adress = "Ort",
+                                                address = "Ort",
                                                 method="google")
   
+  erfindungen_geocoded |> 
+    write_delim("./data/patent_data/interim_patent_data/erfindungen_data_geocoded.csv", delim="\t")
+  
 }
+
+
+# 6. Merge the Erfindungen together with the rest of the patents (in together_geocoded_full)
+## 6.1 Get the Italian PRO_COM's for the erfindungen data
+
+
