@@ -216,8 +216,9 @@ together <- together |>
 italy <- read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
 austria <- read_csv2("./data/patent_data/interim_patent_data/austrian_patent_data_cleaned_geocoded.csv")
 
-## To do: fix the bug of multiple occurring year-comune observations somewhere here
 
+## To do: fix the bug of multiple occurring year-comune observations somewhere here
+## This dataset should have only one observation per comune-year 
 patents_together <- full_join(italy, austria,
           by = c("year", "PRO_COM", "COMUNE")) |>
   rename(patents_italy = n.x, 
