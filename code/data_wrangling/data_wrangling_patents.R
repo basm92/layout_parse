@@ -213,16 +213,21 @@ together <- together |>
 #  read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
 
 # 3. Incorporate the Piedmontese/Italian patents and the Austrian patents together
-italy <- read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
-austria <- read_csv2("./data/patent_data/interim_patent_data/austrian_patent_data_cleaned_geocoded.csv")
+italy <- read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv") |>
+  filter(!is.na(PRO_COM))
+austria <- read_csv2("./data/patent_data/interim_patent_data/austrian_patent_data_cleaned_geocoded.csv") |>
+  filter(!is.na(PRO_COM))
 
 
 ## To do: fix the bug of multiple occurring year-comune observations somewhere here
 ## This dataset should have only one observation per comune-year 
 patents_together <- full_join(italy, austria,
-          by = c("year", "PRO_COM", "COMUNE")) |>
+          by = c("year", "PRO_COM", "COMUNE")) #|>   
+  group_by(PRO_COM, year) |>
+  summarize(test=lat[n.x == max(n.x, na.rm=T)]) # Check how to do this tomorrow - I need to take into account both n.x and n.y
   rename(patents_italy = n.x, 
          patents_austria = n.y) |>
+  # The following only works if we have one observation per comune-year
   mutate(patents_italy = if_else(is.na(patents_italy), 0, patents_italy),
          patents_austria = if_else(is.na(patents_austria), 0, patents_austria),
          patents_together = patents_italy + patents_austria)
