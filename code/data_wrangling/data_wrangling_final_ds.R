@@ -38,7 +38,7 @@ final <- left_join(base, geofile, by = c("PRO_COM" = "PRO_COM"))
 # Add zero's for observations we observe, but not for "gap years" in the exhibition
 exhibition_years <- c(1855, 1867, 1878, 1889, 1900, 1911)
 final <- final |> 
-  mutate(across(contains("patents"), ~ if_else(is.na(.x), 0, .x))) |>
+ # mutate(across(contains("patents"), ~ if_else(is.na(.x), 0, .x))) |>
   mutate(count = if_else(is.element(year, exhibition_years) & is.na(count), 0, count))
 
 coords <- geofile |>
@@ -71,15 +71,24 @@ geocoded_census <- geocoded_census |>
 final <- left_join(final, geocoded_census, by = c("PRO_COM", "year"))
 
 # Now, linearly interpolate the population based on a FE model with time
+# The relevant census years are 1861, 1871, 1881, 1901, 1911
+# Code the interpolated_pop for all years
 final <- final |> 
   group_by(PRO_COM) |> 
   mutate(interpolated_population = case_when(
+    # Until 1881 Separately Since Lombardy is in the census in 1861 and Veneto is not
     allegiance_1861 == "Lombardia" & year <= 1871 ~ pop[year == 1861] + ((pop[year==1871] - pop[year==1861])/10)*(year - 1861),
+    allegiance_1861 == "Lombardia" & between(year, 1872, 1881) ~ pop[year == 1871] + ((pop[year==1881] - pop[year==1871])/10)*(year - 1871),
     allegiance_1861 == "Veneto" & year <= 1881 ~ pop[year == 1871] + ((pop[year==1881] - pop[year==1871])/10)*(year - 1871),
-    year == 1878 ~ pop[year==1881],
-    year == 1889 ~ pop[year==1881] + ((pop[year==1901] - pop[year==1881])/20)*(year - 1881),
-    year == 1900 ~ pop[year==1901],
+    # After 1881 Jointly
+    between(year, 1882, 1901) ~ pop[year==1881] + ((pop[year==1901] - pop[year==1881])/20)*(year - 1881),
+    between(year, 1902, 1911) ~ pop[year==1901] + ((pop[year==1911] - pop[year==1901])/10)*(year - 1901),
     TRUE ~ NA
+  )) |>
+  mutate(interpolated_population = case_when(
+    between(year, 1855, 1861) & interpolated_population < 0 ~ interpolated_population[year==1861],
+    year < 1855 ~ NA,
+    TRUE ~ interpolated_population
   )) |>
   ungroup()
   
@@ -87,6 +96,10 @@ final <- final |>
 final <- final |>
   mutate(across(contains("patents_"), ~ .x / interpolated_population, .names = "{.col}_pc"),
          count_pc = count / interpolated_population)
+
+# Make NA observations for years at which there are no patents_together
+# And also for which there are no exhibitions
+
 
 # Export dataset to csv
 if(export){
