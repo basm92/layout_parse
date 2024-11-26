@@ -4,8 +4,8 @@ run_geocoding_verzeichnisse <- FALSE
 run_geocoding_erfindungen <- FALSE
 run_geocoding_patentstogether <- FALSE
 
-# Scrape Austrian Patents
-# For geocoding, scrape each URL:
+# 1. Scrape Austrian Patents
+## For geocoding, scrape each URL:
 all_urls <- map(1837:1899, ~ {
   url <- paste0("https://privilegien.patentamt.at/sitelinks/", .x, "/")
   out <- read_html(url) |>
@@ -18,7 +18,7 @@ all_urls <- map(1837:1899, ~ {
 
 all_urls <- all_urls |> list_c()
 
-# Scrape the metadata for all URLS
+## Scrape the metadata for all URLS
 ## This is better done in batches 
 data_for_urls <- map(all_urls, ~ {
   doc <- read_html(.x)
@@ -37,7 +37,7 @@ data_for_urls <- map(all_urls, ~ {
   
 })
 
-# The output has to be cleaned
+## The output has to be cleaned
 #data_for_urls |> writeRDS("./data/patent_data/interim_patent_data/austrian_patent_data.RDS")
 #data_for_urls <- readRDS("./data/patent_data/interim_patent_data/austrian_patent_data.RDS")
 data_for_urls |>
@@ -61,7 +61,7 @@ data_for_urls <- data_for_urls |>
   janitor::clean_names() |>
   mutate(across(everything(), ~ str_remove(.x, ":\n")))
 
-# Geocode the Obtained Data Frame - Geocode only Italy
+# 2. Geocode the Obtained Data Frame - Geocode only Italy
 ## OSM
 austrian_geocoded_osm <- data_for_urls |>
   select(shelfmark, country, granted_on, place_of_publication) |> 
@@ -210,11 +210,13 @@ together <- together |>
 # Write to csv
 #together |>
 #  write_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
-# read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
+#  read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
 
 # 3. Incorporate the Piedmontese/Italian patents and the Austrian patents together
 italy <- read_csv2("./data/patent_data/interim_patent_data/italian_patent_data_cleaned_geocoded.csv")
 austria <- read_csv2("./data/patent_data/interim_patent_data/austrian_patent_data_cleaned_geocoded.csv")
+
+## To do: fix the bug of multiple occurring year-comune observations somewhere here
 
 patents_together <- full_join(italy, austria,
           by = c("year", "PRO_COM", "COMUNE")) |>
