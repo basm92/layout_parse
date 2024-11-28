@@ -219,22 +219,18 @@ austria <- read_csv2("./data/patent_data/interim_patent_data/austrian_patent_dat
   filter(!is.na(PRO_COM))
 
 
-## To do: fix the bug of multiple occurring year-comune observations somewhere here
-## This dataset should have only one observation per comune-year 
+## This dataset now has only one observation per comune-year 
 patents_together <- full_join(italy, austria,
-          by = c("year", "PRO_COM", "COMUNE")) #|>   
+          by = c("year", "PRO_COM", "COMUNE")) |>   
   group_by(PRO_COM, year) |>
-  summarize(test=lat[n.x == max(n.x, na.rm=T)]) # Check how to do this tomorrow - I need to take into account both n.x and n.y
-  rename(patents_italy = n.x, 
-         patents_austria = n.y) |>
-  # The following only works if we have one observation per comune-year
-  mutate(patents_italy = if_else(is.na(patents_italy), 0, patents_italy),
-         patents_austria = if_else(is.na(patents_austria), 0, patents_austria),
-         patents_together = patents_italy + patents_austria)
+  summarize(n.x = sum(n.x, na.rm=T),
+            n.y = sum(n.y, na.rm=T)) |> 
+rename(patents_italy = n.x, 
+       patents_austria = n.y) |>
+  mutate(patents_together = patents_italy + patents_austria) |>
+  ungroup()
 
 # Write this to interim patents dataset
-patents_together <- patents_together |>
-  select(year, location, COMUNE, lat, long, PRO_COM, comune_code, patents_austria, patents_italy, patents_together)
 write_csv2(patents_together, "./data/patent_data/interim_patent_data/patents_interim_dataset.csv")
 
 # 4. Incorporate the alternative source (Verzeichnisse) for Austrian Patents
@@ -269,24 +265,15 @@ geocoded_verzeichnisse <- geocoded_verzeichnisse |>
 # Merge the Italian part of this dataset to the final dataset
 italian_part <- geocoded_verzeichnisse |>
   group_by(PRO_COM, verzeichniss) |>
-  summarize(count = n(), lat=mean(lat), long=mean(long)) |>
+  summarize(count = n()) |>
   filter(!is.na(PRO_COM)) |>
   rename(year = verzeichniss, patents_verzeichnisse = count) |>
   ungroup()
   
-names <- municipalities |>
-  st_drop_geometry() |>
-  select(PRO_COM, COMUNE)
-
-to_be_merged <- left_join(italian_part, names, by = c("PRO_COM")) |>
-  select(-c(lat, long))
-  
-to_be_merged_2 <- patents_together |>
-  select(year, COMUNE, PRO_COM, contains('patents'))
-
-together <- full_join(to_be_merged, to_be_merged_2, by = c("PRO_COM", "year", "COMUNE")) 
+together <- full_join(patents_together, italian_part, by = c("PRO_COM", "year"))
 
 # Recover the rest of the variables: lat and long
+# Do we need this? I think no
 if(run_geocoding_patentstogether){
   
   together_geocoded <- tidygeocoder::geocode(together,
@@ -321,10 +308,11 @@ if(run_geocoding_erfindungen){
     write_delim("./data/patent_data/interim_patent_data/erfindungen_data_geocoded.csv", delim="\t")
   
 }
-
+# erfindungen_geocoded <- read_delim('./data/patent_data/interim_patent_data/erfindungen_data_geocoded.csv')
 
 # 6. Merge the Erfindungen together with the rest of the patents (in together_geocoded_full)
 ## 6.1 Get the Italian PRO_COM's for the erfindungen data
+## Start here tomorrow to debug
 erfindungen_geocoded_matched <- erfindungen_geocoded |>
   rowwise() |>
   mutate(exp = list(geocode_place(pick(everything()))))
@@ -335,25 +323,21 @@ erfindungen_geocoded_matched <- erfindungen_geocoded_matched |>
 
 ## 6.2 Put them in the same format as together_geocoded_full
 erfindungen_italy <- erfindungen_geocoded_matched |>
-  group_by(PRO_COM, COMUNE, Jahr, lat, long) |>
+  group_by(PRO_COM, Jahr) |>
   count() |>
   ungroup() |>
   rename(patents_austria = n, year = Jahr) |>
   filter(!is.na(PRO_COM))
 
 ## 6.3 Merge them together
-final_dataset <- together_geocoded_full |>
-  bind_rows(erfindungen_italy)
+final_dataset <- together |> full_join(erfindungen_italy, by=c("PRO_COM", "year", "patents_austria"))
 
 ## 6.4 Create an additional patents_together variable that is 
 ## defined as 'patents_verzeichnisse + patents_italy'
-
 final_dataset <- final_dataset |>
   rowwise() |>
-  mutate(patents_together_verz_italy = sum(patents_verzeichnisse, patents_italy, na.rm=T))
-
-final_dataset <- final_dataset |>
-  select(PRO_COM, year, COMUNE, lat, long, everything())
+  mutate(patents_together_verz_italy = sum(patents_verzeichnisse, patents_italy, na.rm=T)) |>
+  rename(patents_together_amt_italy = patents_together)
 
 final_dataset |>
   write_delim("./data/patents_final_dataset.csv", delim="\t")
