@@ -38,23 +38,6 @@ bw <- 100000
 ## Treatment: Lombardia
 ## Robustness: Bandwidth around the border (Poisson-RDD)
 
-#1. Patents
-# Aggregate to the Circondario-level
-aggregated_circ <- final |> 
-  st_drop_geometry() |> 
-  group_by(DEN_CIRC, year) |> 
-  mutate(sum_patents = sum(patents_together_verz_italy, na.rm=T),
-         mean_patents = mean(patents_together_verz_italy, na.rm=T),
-         running=mean(running),
-         mean_count = mean(count),
-         sum_count = sum(count),
-         interpolated_population = sum(interpolated_population, na.rm=T),
-         area_of_intersection = sum(area_of_intersection),
-         no_municipalities=n()) |>
-  distinct(DEN_CIRC, year, .keep_all = T) |>
-  mutate(sum_patents_pc = sum_patents/interpolated_population)
-
-
 ## Placebo's: before 1859 Annexation of Lombardy
 # Municipality level
 patents1858 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
