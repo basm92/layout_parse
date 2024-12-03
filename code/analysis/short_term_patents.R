@@ -1,0 +1,174 @@
+# Patents 1855-1866 
+library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
+source("./code/data_wrangling/data_wrangling_final_ds.R")
+
+# Mutate
+final <- final |>
+  mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
+         patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
+
+compute_optimal_bw <- function(dv, 
+                               iv, 
+                               control_eq, # of the form "dv ~ x | fe"
+                               dataset,
+                               bwselect='msetwo'){
+  dataset <- dataset |>
+    mutate(dv = eval(parse(text = dv)),
+           iv = eval(parse(text = iv))) |>
+    filter(!is.na(dv), !is.na(iv))
+  
+  if(!is.null(control_eq)){
+    result <- feols(as.formula(control_eq), data = dataset)
+    dataset <- modelr::add_residuals(dataset, result, var = "resid")
+    dataset <- dataset |>
+      select(-dv) |>
+      rename(dv = resid)
+  }
+  
+  out <- rdrobust::rdbwselect(y=dataset$dv, x=dataset$iv, c=0, bwselect=bwselect)
+  left_bw <- out$bws[1]
+  right_bw <- out$bws[2]
+  fr <- c(left_bw, right_bw)
+  return(fr)
+}
+
+# Set the global bandwidth
+bw <- 100000
+## DV: {Sum_patents, Patents_Piedmonte, Patents_Austria}
+## Treatment: Lombardia
+## Robustness: Bandwidth around the border (Poisson-RDD)
+
+#1. Patents
+# Aggregate to the Circondario-level
+aggregated_circ <- final |> 
+  st_drop_geometry() |> 
+  group_by(DEN_CIRC, year) |> 
+  mutate(sum_patents = sum(patents_together_verz_italy, na.rm=T),
+         mean_patents = mean(patents_together_verz_italy, na.rm=T),
+         running=mean(running),
+         mean_count = mean(count),
+         sum_count = sum(count),
+         interpolated_population = sum(interpolated_population, na.rm=T),
+         area_of_intersection = sum(area_of_intersection),
+         no_municipalities=n()) |>
+  distinct(DEN_CIRC, year, .keep_all = T) |>
+  mutate(sum_patents_pc = sum_patents/interpolated_population)
+
+
+## Placebo's: before 1859 Annexation of Lombardy
+# Municipality level
+patents1858 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
+                     data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                     vcov=~PRO_COM)
+patents1858pois <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
+                          data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                          vcov=~PRO_COM)
+patents1858cv <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
+                       data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                       vcov=~PRO_COM)
+patents1858poiscv <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+                            data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                            vcov=~PRO_COM)
+patents1858cvfe <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border | year, 
+                       data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                       vcov=~PRO_COM)
+patents1858poiscvfe <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+                            data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                            vcov=~PRO_COM)
+#modelsummary(list(patents1858, patents1858pois, patents1858cv, patents1858poiscv, patents1858cvfe, patents1858poiscvfe), stars=T)
+
+## Real tests: After the 1859 Annexation of Lombardy
+# Municipality level
+patents1867 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
+                     data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                     vcov=~PRO_COM)
+patents1867pois <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
+                          data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                          vcov=~PRO_COM)
+patents1867cv <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+                     data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                     vcov=~PRO_COM)
+patents1867poiscv <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+                            data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                            vcov=~PRO_COM)
+patents1867cvfe <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+                       data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                       vcov=~PRO_COM)
+patents1867poiscvfe <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+                            data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                            vcov=~PRO_COM)
+
+#modelsummary(list(patents1867, patents1867pois, patents1867cv, patents1867poiscv, patents1867cvfe, patents1867poiscvfe), stars=T)
+
+coef_map <- c("allegiance_1861Veneto"="Veneto",
+              "allegiance_1861Lombardia" = "Lombardia")
+
+# Table notes
+n <- "Table reports estimates of the difference in patent count in Veneto relative to Lombardy. 
+The dependent variable is patents per 100,000 population. 
+Panel A focuses on the pre-unification period (1855 to 1858), and 
+Panel B on the unification period for Lombardy (1860-1866), but not for Veneto. 
+The estimates are conducted at the \\textit{Comune} level. 
+The estimates in Columns 1, 3, and 5 are OLS estimates, and the estimates in Columns 2, 4, and 6 are Poisson estimates. 
+The estimates control for area, distance to the border and population
+, and Models 5 and 6 are also conditional on year fixed-effects. Heteroskedasticity-robust standard errors are clustered at the Comune-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
+
+
+panel_a <- list(
+#  "Panel A: Pre-Unification"
+    'OLS'=patents1858,
+    'Poisson'=patents1858pois,
+    'OLS'=patents1858cv,
+    'Poisson'=patents1858poiscv,
+    'OLS'=patents1858cvfe,
+    'Poisson'=patents1858poiscvfe)
+  
+panel_b <- list(
+#  "Panel B: Post-Lombardy Unification, Pre-Veneto Unification"=list(
+    'OLS'=patents1867,
+    'Poisson'=patents1867pois,
+    'OLS'=patents1867cv,
+    'Poisson'=patents1867poiscv,
+    'OLS'=patents1867cvfe,
+    'Poisson'=patents1867poiscvfe
+  )
+
+tt1 <- modelsummary(panel_a,
+             coef_map=coef_map,
+             stars=c("*"=0.1, "**"=0.05, "***"=0.01),
+             gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
+                              clean=c("Adj. $R^2$", "N"),
+                              fmt=c(3, 0)),
+             title="Estimates of Unification on Patenting Activity\\label{tab:patent}",
+             estimate = "{estimate}{stars}",
+             #notes = n, 
+             output = "tinytable",
+             width=c(0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 
+             add_rows = as_tibble_row(c("Year FE", rep("No", 4), rep("Yes", 2)), .name_repair = "unique") |>
+               bind_rows(as_tibble_row(c("Controls", rep("No", 2), rep("Yes", 4)), .name_repair = "unique"))
+)
+
+tt2 <-  modelsummary(panel_b,
+                     coef_map=coef_map,
+                     stars=c("*"=0.1, "**"=0.05, "***"=0.01),
+                     gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
+                                      clean=c("Adj. $R^2$", "N"),
+                                      fmt=c(3, 0)),
+                     title="Testimates of Unification on Patenting Activity\\label{tab:patent}",
+                     estimate = "{estimate}{stars}",
+                     notes = n, 
+                     output = "tinytable",
+                     width=c(0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 
+                     add_rows = as_tibble_row(c("Year FE", rep("No", 4), rep("Yes", 2)), .name_repair = "unique") |>
+                       bind_rows(as_tibble_row(c("Controls", rep("No", 2), rep("Yes", 4)), .name_repair = "unique"))
+) 
+
+rbind2(tt1, tt2) |>
+  group_tt(i=list("Panel A: Pre-Unification"=1, "Panel B: Post-Lombardy, Pre-Veneto Unification"=7)) |>
+  style_tt(
+    i=c(1, 8, 9), bold=T) |>
+  style_tt(i = 3, line = "b") |>
+  style_tt(i = 7, line = "b") |>
+  style_tt(i = 11, line = "b") |>
+  style_tt(i = 15, line = "b") |>
+  save_tt("./tables/patents_short_term.tex", overwrite = T)
