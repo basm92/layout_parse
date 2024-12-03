@@ -86,7 +86,8 @@ final <- final |>
     TRUE ~ NA
   )) |>
   mutate(interpolated_population = case_when(
-    between(year, 1855, 1861) & interpolated_population < 0 ~ interpolated_population[year==1861],
+    between(year, 1855, 1861) & interpolated_population < 0 & interpolated_population[year==1861] > 0 ~ interpolated_population[year==1861],
+    between(year, 185, 1861) & interpolated_population < 0 ~ NA,
     year < 1855 ~ NA,
     TRUE ~ interpolated_population
   )) |>
