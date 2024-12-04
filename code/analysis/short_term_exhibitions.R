@@ -1,44 +1,59 @@
 # 2. Exhibitions
-# Circondare Level
-exhibitions1855circ <- feols(sum_count ~ allegiance_1861 + area_of_intersection + no_municipalities + running | year, 
-                         data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1855:1858)),
-                         weights=~1/abs(running),
-                         vcov=~DEN_PROV)
-exhibitions1855circpois <- fenegbin(sum_count ~ allegiance_1861 + no_municipalities + abs_distance_to_border | year, 
-                              data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1855:1858)),
-                              weights=~1/abs(running),
-                              vcov=~DEN_PROV)
+# Patents 1855-1866 
+library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
+source("./code/data_wrangling/data_wrangling_final_ds.R")
+bw <- 80000
 
-# Municipality level
-exhibitions1855 <- feols(count ~ allegiance_1861 + area_of_intersection + running | year, 
-                     data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
-                     weights=~1/abs(running),
-                     vcov=~DEN_PROV)
-exhibitions1855pois <- fenegbin(count ~ allegiance_1861 + abs_distance_to_border | year, 
-                          data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
-                          weights=~1/abs(running),
-                          vcov=~DEN_PROV)
 
-## Real tests: After the 1859 Annexation of Lombardy
-# Circondare Level
-exhibitions1867circ <- feols(sum_count ~ allegiance_1861 + area_of_intersection + running + no_municipalities | year, 
-                         data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1860:1867)),
-                         weights=~1/abs(running),
-                         vcov=~DEN_PROV)
-exhibitions1867circpois <- fenegbin(sum_count ~ allegiance_1861 + abs_distance_to_border + no_municipalities | year, 
-                              data = aggregated_circ |> filter(abs(running) < bw, is.element(year, 1860:1867)),
-                              weights=~1/abs(running),
-                              vcov=~DEN_PROV)
-# Municipality level
-exhibitions1867 <- feols(count ~ allegiance_1861 + area_of_intersection + running | year, 
-                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
-                     weights=~1/abs(running),
-                     vcov=~DEN_PROV)
-exhibitions1867pois <- fenegbin(count ~ allegiance_1861 + area_of_intersection + abs_distance_to_border | year, 
-                          data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
-                          weights=~1/abs(running),
-                          vcov=~DEN_PROV)
+# Pre-Unification (1855)
+exhibitions1855 <- feols(count_pc*1e6 ~ allegiance_1861, 
+                         data = final |> filter(abs(running) < bw, is.element(year, 1855)),
+                         vcov='hc1')
+exhibitions1855pois <- fepois(count_pc*1e6 ~ allegiance_1861, 
+                         data = final |> filter(abs(running) < bw, is.element(year, 1855)),
+                         vcov='hc1')
+exhibitions1855cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1855)),
+                     vcov='hc1')
+exhibitions1855poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
+                           data = final |> filter(abs(running) < bw, is.element(year, 1855)),
+                           vcov='hc1')
 
+## After the 1859 Annexation of Lombardy (1867)
+exhibitions1867 <- feols(count_pc*1e6 ~ allegiance_1861, 
+                         data = final |> filter(abs(running) < bw, is.element(year, 1867)),
+                         vcov='hc1')
+exhibitions1867pois <- fepois(count_pc*1e6 ~ allegiance_1861, 
+                              data = final |> filter(abs(running) < bw, is.element(year, 1867)),
+                              vcov='hc1')
+exhibitions1867cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
+                           data = final |> filter(abs(running) < bw, is.element(year, 1867)),
+                           vcov='hc1')
+exhibitions1867poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
+                                data = final |> filter(abs(running) < bw, is.element(year, 1867)),
+                                vcov='hc1')
+
+
+beta1 <- coef(exhibitions1855)["allegiance_1861Lombardia"]
+beta2 <- coef(exhibitions1867)["allegiance_1861Lombardia"]
+se1 <- sqrt(vcov(exhibitions1855)["allegiance_1861Lombardia", "allegiance_1861Lombardia"])
+se2 <- sqrt(vcov(exhibitions1867)["allegiance_1861Lombardia", "allegiance_1861Lombardia"])
+Z <- (beta1 - beta2) / sqrt(se1^2 + se2^2)
+
+# Compute p-value (two-tailed test)
+p_value <- 2 * (1 - pnorm(abs(Z)))
+
+test <- feols(count_pc*1e6 ~ as.factor(year) + allegiance_1861 + allegiance_1861:as.factor(year), 
+              data = final |> filter(abs(running) < bw, is.element(year, c(1855, 1867))),
+              vcov=~PRO_COM)
+
+test2 <- feols(count_pc*1e6 ~ as.factor(year) + allegiance_1861 + latitude + longitude + allegiance_1861:as.factor(year)  + interpolated_population:as.factor(year) + abs_distance_to_border:as.factor(year) + area_of_intersection:as.factor(year)| DEN_PROV, 
+              data = final |> filter(abs(running) < bw, is.element(year, c(1855, 1867))),
+              vcov=~PRO_COM)
+
+library(car)
+test3<-linearHypothesis(test, "as.factor(year)1867 = as.factor(year)1867:allegiance_1861Lombardia")
+test4<-linearHypothesis(test2, "as.factor(year)1867 = as.factor(year)1867:allegiance_1861Lombardia")
 panels <- list(
   "Panel A: Pre-Unification"=list(
     'OLS'=exhibitions1855circ,
@@ -80,11 +95,4 @@ modelsummary(panels,
   style_tt(
     i=c(1, 6), bold=T) |>
   save_tt("./tables/exhibitions_short_term.tex", overwrite = T)
-
-
-# 3. Patents with Optimal Bandwidth
-bws_circ_pre <- compute_optimal_bw("patents_together", "running", "dv ~ 1 | as.factor(year)", p_aggregated_circ_pre)
-bws_munip_pre <- compute_optimal_bw("patents_together", "running", "dv ~ 1 | as.factor(year)", p_municipality_pre)
-bws_circ_post <- compute_optimal_bw("patents_together", "running", "dv ~ 1 | as.factor(year)", p_aggregated_circ_post)
-bws_munip_post <- compute_optimal_bw("patents_together", "running", "dv ~ 1 | as.factor(year)", p_municipality_post, bwselect='mserd')
 
