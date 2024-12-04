@@ -33,7 +33,7 @@ compute_optimal_bw <- function(dv,
 }
 
 # Set the global bandwidth
-bw <- 100000
+bw <- 80000
 ## DV: {Sum_patents, Patents_Piedmonte, Patents_Austria}
 ## Treatment: Lombardia
 ## Robustness: Bandwidth around the border (Poisson-RDD)
@@ -41,44 +41,44 @@ bw <- 100000
 ## Placebo's: before 1859 Annexation of Lombardy
 # Municipality level
 patents1858 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
-                     data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                     data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
                      vcov=~PRO_COM)
 patents1858pois <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
-                          data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                          data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
                           vcov=~PRO_COM)
 patents1858cv <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                       data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                       data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
                        vcov=~PRO_COM)
 patents1858poiscv <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
-                            data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                            data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
                             vcov=~PRO_COM)
 patents1858cvfe <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border | year, 
-                       data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                       data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
                        vcov=~PRO_COM)
 patents1858poiscvfe <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
-                            data = final |> filter(abs(running) < 100000, is.element(year, 1855:1858)),
+                            data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
                             vcov=~PRO_COM)
 #modelsummary(list(patents1858, patents1858pois, patents1858cv, patents1858poiscv, patents1858cvfe, patents1858poiscvfe), stars=T)
 
 ## Real tests: After the 1859 Annexation of Lombardy
 # Municipality level
 patents1867 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
-                     data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
                      vcov=~PRO_COM)
 patents1867pois <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
-                          data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                          data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
                           vcov=~PRO_COM)
 patents1867cv <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
-                     data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
                      vcov=~PRO_COM)
 patents1867poiscv <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
-                            data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                            data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
                             vcov=~PRO_COM)
 patents1867cvfe <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
-                       data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                       data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
                        vcov=~PRO_COM)
 patents1867poiscvfe <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
-                            data = final |> filter(abs(running) < 100000, is.element(year, 1860:1867)),
+                            data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
                             vcov=~PRO_COM)
 
 #modelsummary(list(patents1867, patents1867pois, patents1867cv, patents1867poiscv, patents1867cvfe, patents1867poiscvfe), stars=T)
