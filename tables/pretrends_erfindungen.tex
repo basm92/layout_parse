@@ -1,0 +1,40 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Pre-Trends in Patenting Activity\label{tab:pretrends_erf}},
+entry=none,label=none,
+note{}={Table reports estimates of the difference in patent count in Lombardy relative to Veneto in different decades. 
+The dependent variable is patent count. 
+The estimates are conducted at the \textit{Comune} level. 
+The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Poisson estimates. 
+Where applicable, the estimates control for area, distance to the border, longitude and latitude. 
+Heteroskedasticity-robust standard errors are clustered at the Comune-level. $*: p<0.1, **: p<0.05, ***: p<0.01$.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+width={0.7\linewidth},
+colspec={X[0.3]X[0.1]X[0.1]X[0.1]X[0.1]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+hline{12}={1,2,3,4,5}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& OLS & Poisson & OLS  & Poisson  \\ \midrule %% TinyTableHeader
+Lombardia x 1800-1810 & 0.000   & -0.001*** & 0.002*  & 0.153     \\
+& (0.000) & (0.000)   & (0.001) & (0.240)   \\
+Lombardia x 1811-1820 & 0.000   & 15.385*** & 0.000   & 15.210*** \\
+& (0.000) & (0.745)   & (0.000) & (0.773)   \\
+Lombardia x 1821-1830 & -0.001  & -0.281    & -0.001  & -0.325    \\
+& (0.003) & (0.768)   & (0.003) & (0.694)   \\
+Lombardia x 1831-1840 & -0.002  & -0.937    & -0.002  & -0.980    \\
+& (0.002) & (1.047)   & (0.002) & (1.038)   \\
+Lombardia x 1841-1852 & -0.001  & -0.664    & -0.001  & -0.708    \\
+& (0.001) & (0.705)   & (0.001) & (0.654)   \\
+Adj. $R^2$            & 0.001   & 0.054     & 0.010   & 0.236     \\
+N                     & 68370   & 68370     & 68370   & 68370     \\
+Controls              & No      & No        & Yes     & Yes       \\
+\bottomrule
+\end{talltblr}
+\end{table}

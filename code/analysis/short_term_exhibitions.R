@@ -33,9 +33,9 @@ exhibitions1867poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_po
                                 data = final |> filter(abs(running) < bw, is.element(year, 1867)),
                                 vcov='hc1')
 
-modelsummary(list("panel a"=list(exhibitions1855, exhibitions1855pois, exhibitions1855cv, exhibitions1855poiscv),
-                  "panel b"=list(exhibitions1867, exhibitions1867pois, exhibitions1867cv, exhibitions1867poiscv)),
-             shape='rbind',stars=c('*'=0.1, '**'=0.05, '***'=0.01))
+#modelsummary(list("panel a"=list(exhibitions1855, exhibitions1855pois, exhibitions1855cv, exhibitions1855poiscv),
+#                  "panel b"=list(exhibitions1867, exhibitions1867pois, exhibitions1867cv, exhibitions1867poiscv)),
+#             shape='rbind',stars=c('*'=0.1, '**'=0.05, '***'=0.01))
 
 
 
@@ -49,6 +49,9 @@ The estimates are conducted at the \\textit{Comune} level.
 The estimates in Columns 1 and 3 are OLS estimates, and the estimates in Columns 2 and 4 are Poisson estimates. 
 The estimates control for area, distance to the border, and population. 
 Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
+
+coef_map <- c("allegiance_1861Veneto"="Veneto",
+              "allegiance_1861Lombardia" = "Lombardia")
 
 tt1 <- modelsummary(panel_a,
                     coef_map=coef_map,
