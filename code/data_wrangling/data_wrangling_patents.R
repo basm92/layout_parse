@@ -329,6 +329,10 @@ erfindungen_italy <- erfindungen_geocoded_matched |>
   rename(patents_austria = n, year = Jahr) |>
   filter(!is.na(PRO_COM))
 
+# Save erfindungen from italy dataset
+erfindungen_italy |>
+  write_csv2("./data/patent_data/erfindungen_italy_geocoded.csv")
+
 ## 6.3 Merge them together
 final_dataset <- together |> full_join(erfindungen_italy, by=c("PRO_COM", "year", "patents_austria"))
 
