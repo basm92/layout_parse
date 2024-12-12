@@ -2,11 +2,15 @@
 library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 
+# Set the global bandwidth
+bw <- 150000
+
 # Mutate
 final <- final |>
   mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
          patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
 
+# Potentially Compute optimal RDD bandwidth
 compute_optimal_bw <- function(dv, 
                                iv, 
                                control_eq, # of the form "dv ~ x | fe"
@@ -32,14 +36,7 @@ compute_optimal_bw <- function(dv,
   return(fr)
 }
 
-# Set the global bandwidth
-bw <- 80000
-## DV: {Sum_patents, Patents_Piedmonte, Patents_Austria}
-## Treatment: Lombardia
-## Robustness: Bandwidth around the border (Poisson-RDD)
-
 ## Placebo's: before 1859 Annexation of Lombardy
-# Municipality level
 patents1858 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
                      data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
                      vcov=~PRO_COM)
@@ -61,7 +58,6 @@ patents1858poiscvfe <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_18
 #modelsummary(list(patents1858, patents1858pois, patents1858cv, patents1858poiscv, patents1858cvfe, patents1858poiscvfe), stars=T)
 
 ## Real tests: After the 1859 Annexation of Lombardy
-# Municipality level
 patents1867 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
                      data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
                      vcov=~PRO_COM)
@@ -83,9 +79,6 @@ patents1867poiscvfe <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_18
 
 #modelsummary(list(patents1867, patents1867pois, patents1867cv, patents1867poiscv, patents1867cvfe, patents1867poiscvfe), stars=T)
 
-coef_map <- c("allegiance_1861Veneto"="Veneto",
-              "allegiance_1861Lombardia" = "Lombardia")
-
 # Table notes
 n <- "Table reports estimates of the difference in patent count in Veneto relative to Lombardy. 
 The dependent variable is patents per 100,000 population. 
@@ -96,6 +89,8 @@ The estimates in Columns 1, 3, and 5 are OLS estimates, and the estimates in Col
 The estimates control for area, distance to the border and population
 , and Models 5 and 6 are also conditional on year fixed-effects. Heteroskedasticity-robust standard errors are clustered at the Comune-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
 
+coef_map <- c("allegiance_1861Veneto"="Veneto",
+              "allegiance_1861Lombardia" = "Lombardia")
 
 panel_a <- list(
 #  "Panel A: Pre-Unification"
