@@ -11,7 +11,6 @@ avg_pop_time <- final |>
   group_by(year, allegiance_1861) |>
   summarize(avg_pop = mean(pop, na.rm=F)) 
 
-
 # Inhabitants per square kilometer
 pop_dens_time <- final |>
   filter(pop != 0) |>
