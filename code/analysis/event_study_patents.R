@@ -7,13 +7,26 @@ source("./code/data_wrangling/data_wrangling_final_ds.R")
 bw <- 150000
 
 # Mutate
-final <- final |>
+#final <- 
+final2 <- final |>
+  group_by(DEN_CIRC, year, allegiance_1861) |>
+  summarize(ptvi = sum(patents_together_verz_italy, na.rm=T),
+            ip = sum(interpolated_population, na.rm=T)) |>
+  mutate(ppc = ptvi/ip) |>
+  ungroup()
+
+model1 <- feols(ppc*1e7 ~ i(as.factor(year), allegiance_1861, ref="1859", ref2 = "Veneto") + ip | DEN_CIRC + year, 
+                data = final2 |> filter(is.element(year, 1855:1866)))
+
+
+final |> 
   mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
          patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
 
-model1 <- feols(patents_together_verz_italy_pc*1e7 ~ i(as.factor(year), allegiance_1861, ref="1859", ref2 = "Veneto") + interpolated_population + abs_distance_to_border | year, 
+model1 <- feols(patents_together_verz_italy_pc*1e7 ~ i(as.factor(year), allegiance_1861, ref="1859", ref2 = "Veneto") + interpolated_population + abs_distance_to_border | as.factor(COD_PROV)+ year, 
                 data = final |> 
-                  filter(abs(running) < bw, is.element(year, 1855:1866)),
+                  filter(abs(running) < bw,
+                    is.element(year, 1855:1866)),
                 vcov=~PRO_COM)
 
 
@@ -24,6 +37,7 @@ test <- final |>
 
 test |> 
   ggplot(aes(x=year, y=total_patents_per_capita, color=allegiance_1861, group=allegiance_1861)) + geom_line()
+
 summary(model1)
 
 
