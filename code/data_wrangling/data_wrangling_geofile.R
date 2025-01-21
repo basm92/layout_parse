@@ -9,6 +9,7 @@ province_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Pr
 province_1871 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1871/Province_1871/Province_1871.shp')
 circondari_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Circondari_1861/Circondari_1861.shp')
 circondari_1871 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1871/Circondari_ 1871/Circondari_1871.shp')
+circondari_1911 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1911/Circondari_1911/Circondari_1911.shp') 
 communi_1991 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp')
 
 # Border in two ways: North of Mantova, rely on intersection between Veneto and Lombardia
@@ -61,7 +62,7 @@ final_border <- st_union(north_border, south_border) |>
   st_union()
 
 # Save the border as a shapefile
-#st_write(final_border, "final_border.geojson")
+#st_write(final_border, "shapefiles_images/final_border.geojson")
 #final_border <- read_sf("shapefiles_images/final_border.geojson")
 
 ## Part 2: Create the map with the different administrational units
@@ -101,11 +102,18 @@ ggplot() +
   geom_sf(data=circondari_province_compartimenti_1871, alpha=0.01,color='orange')
 
 # Clean and exclude these circondari:
-exclude <- c("Lomellina", "Voghera", "Bobbio")
+# Clean and exclude these circondari:
+exclude <- c("Lomellina", "Mortara", "Voghera", "Bobbio")
+exclude_municip <- 	c(018001, 018030, 018041, 018062, 
+                      018091, 018112, 018137, 018138,
+                      018147, 018151, 018162, 018179, 018190) |>
+  sprintf(fmt="%06d")
+
 matched <- matched |>
   select(-c(COMUNE_A, COD_CIRC, COD_PROV.1, COD_COMP)) |>
   ungroup() |>
-  filter(!is.element(DEN_CIRC, exclude))
+  filter(!is.element(DEN_CIRC, exclude), !is.element(PRO_COM_T, exclude_municip))
+
 
 matched |> 
   ggplot(aes(fill=DEN_COMP)) + geom_sf()
