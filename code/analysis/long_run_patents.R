@@ -4,16 +4,18 @@
 # Patents 1855-1866 
 library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
-bw <- 150000
+#bw <- 150000
 
+# Correct Definitions
 final <- final |> 
   mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
          patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
 
 # OLS
-feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1867", ref2 = "Veneto")  + interpolated_population | year + as.factor(PRO_COM),
+feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto")  + interpolated_population | year + as.factor(PRO_COM),
       data=final |>
         filter(
+          str_detect(DEN_PROV, "Mantova"),
           is.element(year, c(1855, 1867, 1878, 1889, 1902, 1911)),
           abs(running) < 200000),
       vcov='hc1')

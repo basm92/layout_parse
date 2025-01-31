@@ -13,7 +13,7 @@ geofile <- sf::read_sf("./data/shapefiles_images/geofile.geojson") |>
   distinct()
 # Create a grid for the patent years and exhibition years
 ## Change the grid to incorporate pre-trends
-years <- 1855:1911
+years <- 1804:1911
 base <- expand_grid(PRO_COM=geofile$PRO_COM, year=years)
 base <- base |>
   left_join(geofile |> 
@@ -76,6 +76,7 @@ final <- left_join(final, geocoded_census, by = c("PRO_COM", "year"))
 final <- final |> 
   group_by(PRO_COM) |> 
   mutate(interpolated_population = case_when(
+    year < 1855 ~ NA,
     # Until 1881 Separately Since Lombardy is in the census in 1861 and Veneto is not
     allegiance_1861 == "Lombardia" & year <= 1871 ~ pop[year == 1861] + ((pop[year==1871] - pop[year==1861])/10)*(year - 1861),
     allegiance_1861 == "Lombardia" & between(year, 1872, 1881) ~ pop[year == 1871] + ((pop[year==1881] - pop[year==1871])/10)*(year - 1871),

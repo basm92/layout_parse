@@ -10,3 +10,4 @@
 /data/raw_control_variables/historicalGDPpc-main/misc/SHP_files/shapefile_Kanada/gadm41_CAN_0.shp filter=lfs diff=lfs merge=lfs -text
 /data/raw_control_variables/historicalGDPpc-main/misc/SHP_files/shapefile_MSA_USA/tl_2019_us_cbsa.shp filter=lfs diff=lfs merge=lfs -text
 /data/shapefiles_images/geofile.geojson filter=lfs diff=lfs merge=lfs -text
+/data/final_dataset.csv filter=lfs diff=lfs merge=lfs -text
