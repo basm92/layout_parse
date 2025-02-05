@@ -2,7 +2,6 @@
 \centering
 \begin{talltblr}[         %% tabularray outer open
 caption={Estimates of Unification on Exhibition Activity\label{tab:exhibition_long_term}},
-entry=none,label=none,
 note{}={Table reports estimates of the difference in exhibition count per 100,000 inhabitants in Lombardy relative to Veneto. 
 Panel A reports OLS estimates, Panel B reports Poisson estimates in various exhibition years from 1855 to 1911. 
 The estimates are conducted at the \textit{Comune} level. 
@@ -13,39 +12,42 @@ Heteroskedasticity-robust standard errors are clustered at the province-level. $
 width={0.9\linewidth},
 colspec={X[0.3]X[0.1]X[0.1]X[0.1]X[0.1]X[0.1]X[0.1]},
 cell{2}{1}={c=7}{},cell{8}{1}={c=7}{},
-cell{3}{1}={preto={\hspace{1em}}},
-cell{4}{1}={preto={\hspace{1em}}},
-cell{5}{1}={preto={\hspace{1em}}},
-cell{6}{1}={preto={\hspace{1em}}},
-cell{7}{1}={preto={\hspace{1em}}},
-cell{9}{1}={preto={\hspace{1em}}},
-cell{10}{1}={preto={\hspace{1em}}},
-cell{11}{1}={preto={\hspace{1em}}},
-cell{12}{1}={preto={\hspace{1em}}},
-cell{13}{1}={preto={\hspace{1em}}},
-cell{14}{1}={preto={\hspace{1em}}},
-cell{15}{1}={preto={\hspace{1em}}},
-row{2}={,cmd=\bfseries,},
-row{8}={,cmd=\bfseries,},
-row{9}={,cmd=\bfseries,},
-hline{8}={1,2,3,4,5,6,7}{solid, 0.1em, black},
-hline{10}={1,2,3,4,5,6,7}{solid, 0.1em, black},
-hline{15}={1,2,3,4,5,6,7}{solid, 0.1em, black},
+row{2,8}={}{cmd=\bfseries,},
+cell{9}{2}={}{cmd=\bfseries,},
+cell{9}{3}={}{cmd=\bfseries,},
+cell{9}{4}={}{cmd=\bfseries,},
+cell{9}{5}={}{cmd=\bfseries,},
+cell{9}{6}={}{cmd=\bfseries,},
+cell{9}{7}={}{cmd=\bfseries,},
+cell{3}{1}={}{preto={\hspace{1em}},},
+cell{4}{1}={}{preto={\hspace{1em}},},
+cell{5}{1}={}{preto={\hspace{1em}},},
+cell{6}{1}={}{preto={\hspace{1em}},},
+cell{7}{1}={}{preto={\hspace{1em}},},
+cell{10}{1}={}{preto={\hspace{1em}},},
+cell{11}{1}={}{preto={\hspace{1em}},},
+cell{12}{1}={}{preto={\hspace{1em}},},
+cell{13}{1}={}{preto={\hspace{1em}},},
+cell{14}{1}={}{preto={\hspace{1em}},},
+cell{9}{1}={}{preto={\hspace{1em}}, cmd=\bfseries,},
+hline{8}={1,2,3,4,5,6,7}{solid, black, 0.1em},
+hline{10}={1,2,3,4,5,6,7}{solid, black, 0.1em},
+hline{15}={1,2,3,4,5,6,7}{solid, black, 0.1em},
 }                     %% tabularray inner close
 \toprule
 & 1855 & 1867 & 1878 & 1889 & 1900 & 1911 \\ \midrule %% TinyTableHeader
 Panel A: OLS &&&&&& \\
-Lombardia  & 4.557   & 21.710*** & 10.400*** & 1.130   & 5.790   & 8.755** \\
-& (3.228) & (5.862)   & (3.640)   & (1.123) & (5.583) & (3.827) \\
-Adj. $R^2$ & 0.012   & 0.082     & 0.037     & 0.032   & 0.013   & 0.041   \\
-N          & 1916    & 1917      & 1917      & 1917    & 1917    & 1917    \\
+Lombardia  & 4.873   & 22.630*** & 10.857*** & 1.237   & 6.226   & -2.180  \\
+& (3.230) & (6.071)   & (3.705)   & (1.141) & (5.702) & (6.948) \\
+Adj. $R^2$ & 0.012   & 0.082     & 0.037     & 0.033   & 0.013   & 0.030   \\
+N          & 1876    & 1877      & 1877      & 1877    & 1877    & 1877    \\
 Controls   & Yes     & Yes       & Yes       & Yes     & Yes     & Yes     \\
 Panel B: Poisson &&&&&& \\
 & 1855    & 1867      & 1878      & 1889    & 1900    & 1911    \\
-Lombardia  & 0.477   & 0.927***  & 0.704*    & 0.198   & 0.113   & 0.363   \\
-& (0.712) & (0.318)   & (0.383)   & (0.988) & (0.295) & (0.291) \\
-Adj. $R^2$ & 0.061   & 0.184     & 0.099     & 0.113   & 0.047   & 0.128   \\
-N          & 1916    & 1917      & 1917      & 1917    & 1917    & 1917    \\
+Lombardia  & 0.502   & 0.940***  & 0.714*    & 0.229   & 0.123   & 0.379   \\
+& (0.706) & (0.319)   & (0.383)   & (0.992) & (0.297) & (0.292) \\
+Adj. $R^2$ & 0.061   & 0.183     & 0.099     & 0.115   & 0.048   & 0.132   \\
+N          & 1876    & 1877      & 1877      & 1877    & 1877    & 1877    \\
 Controls   & Yes     & Yes       & Yes       & Yes     & Yes     & Yes     \\
 \bottomrule
 \end{talltblr}

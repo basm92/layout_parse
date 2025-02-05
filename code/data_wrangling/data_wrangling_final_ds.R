@@ -93,6 +93,9 @@ final <- final |>
     TRUE ~ interpolated_population
   )) |>
   ungroup()
+
+# Interpolate the population before 1855 with a logarithmic relationship - per municipality separately
+## Compute the log pop = \beta (t-1855) on a couple of data points after 1855 and predict values for t<1855
   
 # Compute the per-capita equivalents of DV's
 final <- final |>

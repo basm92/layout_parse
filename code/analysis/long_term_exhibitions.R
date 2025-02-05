@@ -5,6 +5,13 @@ library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 bw <- 150000
 
+test <- feols(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto")+ area_of_intersection + abs_distance_to_border + interpolated_population | year,
+              data=final |>
+                filter(
+                  # str_detect(DEN_PROV, "Mantova"),
+                  is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911)),
+                  abs(running) < bw),
+              vcov='hc1')
 
 # OLS
 exhibitions1855cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
@@ -22,7 +29,7 @@ exhibitions1889cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_populat
 exhibitions1900cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
                            data = final |> filter(abs(running) < bw, is.element(year, 1900)),
                            vcov='hc1')
-exhibitions1911cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
+exhibitions1911cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border | DEN_CIRC, 
                            data = final |> filter(abs(running) < bw, is.element(year, 1911)),
                            vcov='hc1')
 

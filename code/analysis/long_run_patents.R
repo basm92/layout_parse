@@ -6,17 +6,31 @@ library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 #bw <- 150000
 
-# Correct Definitions
+# Correct Definitions (Put this in data_wrangling_final_ds.R)
 final <- final |> 
+  # Add the Erfindungen to the "patents_together_verz_italy" variable (keep the name for convenience)
+  rowwise() |>
+  mutate(patents_together_verz_italy = patents_together_verz_italy + patents_austria) |>
+  ungroup() |>
   mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
          patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
 
+
+test <- final |>
+  group_by(year) |>
+  summarize(sum_p = sum(patents_together_verz_italy))
+
+
 # OLS
-feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto")  + interpolated_population | year + as.factor(PRO_COM),
+final |> 
+  filter(across(c(patents_together_verz_italy, PRO_COM), ~ !is.na(.x)),
+         is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911)))
+
+test <- feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year + as.factor(PRO_COM),
       data=final |>
         filter(
-          str_detect(DEN_PROV, "Mantova"),
-          is.element(year, c(1855, 1867, 1878, 1889, 1902, 1911)),
+         # str_detect(DEN_PROV, "Mantova"),
+          is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911)),
           abs(running) < 200000),
       vcov='hc1')
 
