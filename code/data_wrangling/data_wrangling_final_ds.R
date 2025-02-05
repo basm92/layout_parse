@@ -96,7 +96,39 @@ final <- final |>
 
 # Interpolate the population before 1855 with a logarithmic relationship - per municipality separately
 ## Compute the log pop = \beta (t-1855) on a couple of data points after 1855 and predict values for t<1855
+grouped_data <- final |>
+  group_by(PRO_COM) |>
+  group_split()
   
+results <- map(grouped_data, function(data){
+  out <- NULL
+  ip <- data |>
+    filter(between(year, 1855, 1860)) |>
+    select(interpolated_population) |>
+    pull()
+  
+  if(all(!is.na(ip))) {
+    data <- data |>
+      mutate(yearp = year - 1855)
+    result <- feols(log(interpolated_population) ~ year, data=data)
+    predictions <- predict(result, newdata=tibble(year=1804:1854)) |> exp()
+    
+    rest <- data |>
+      filter(between(year, 1855, 1911)) |>
+      select(interpolated_population) |>
+      pull()
+    
+    comb <- c(predictions, rest)
+    out <- tibble(PRO_COM=data$PRO_COM[1],year=1804:1911, pred=comb)
+  }
+  return(out)
+})
+
+final <- left_join(final, results |> bind_rows(),
+          by=c("PRO_COM", "year")) |>
+  select(-interpolated_population) |>
+  rename(interpolated_population = pred)
+
 # Compute the per-capita equivalents of DV's
 final <- final |>
   mutate(across(contains("patents_"), ~ .x / interpolated_population, .names = "{.col}_pc"),

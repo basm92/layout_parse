@@ -8,37 +8,55 @@ source("./code/data_wrangling/data_wrangling_final_ds.R")
 
 # Correct Definitions (Put this in data_wrangling_final_ds.R)
 final <- final |> 
-  # Add the Erfindungen to the "patents_together_verz_italy" variable (keep the name for convenience)
+  # Add the Erfindungen (patents_austria) to the "patents_together_verz_italy" variable (keep the name for convenience)
   rowwise() |>
   mutate(patents_together_verz_italy = patents_together_verz_italy + patents_austria) |>
   ungroup() |>
   mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
          patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
 
-
-test <- final |>
+# How many patents do we have in total in each year?
+total_patents_per_year <- final |>
   group_by(year) |>
   summarize(sum_p = sum(patents_together_verz_italy))
 
+# Group a couple of years together for the years it is possible
+final <- final |>
+  mutate(year_group = case_when(
+    between(year, 1821, 1823) ~ "1822",
+    between(year, 1832, 1834) ~ "1833",
+    between(year, 1843, 1845) ~ "1844",
+    between(year, 1855, 1857) ~ "1855",
+    between(year, 1865, 1867) ~ "1867", 
+    year == 1878 ~ "1878",
+    year == 1889 ~ "1889", 
+    year == 1902 ~ "1902",
+    year == 1911 ~ "1911",
+    TRUE ~ NA
+  ))
 
 # OLS
 final |> 
   filter(across(c(patents_together_verz_italy, PRO_COM), ~ !is.na(.x)),
          is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911)))
 
-test <- feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year + as.factor(PRO_COM),
+test <- feols(a*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year + as.factor(PRO_COM),
       data=final |>
+        mutate(a=patents_together_verz_italy/interpolated_population) |>
         filter(
-         # str_detect(DEN_PROV, "Mantova"),
           is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911)),
           abs(running) < 200000),
-      vcov='hc1')
+      vcov=vcov_conley(cutoff=50))
 
-# How many patents in each of these years?
-final |> 
-  filter(is.element(year, c(1855, 1867, 1878, 1889, 1902, 1911))) |>
-  group_by(year) |> 
-  summarize(count = sum(patents_together_verz_italy))
+test2 <- feols(a*1e6 ~  i(as.factor(year_group), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year + as.factor(PRO_COM),
+              data=final |>
+                mutate(a=patents_together_verz_italy/interpolated_population) |>
+                filter(
+                  !is.na(year_group),
+                  abs(running) < 200000),
+              vcov=vcov_conley(cutoff=100))
+
+
 
 # Poisson
 exhibitions1855poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
