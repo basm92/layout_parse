@@ -43,3 +43,52 @@ Misc:
     - And based on diplomatic relationships to France/Switserland
     - If market access is so important, we compare East Lombardy vs West Lombardy. If the story about effort is correct, we should expect a higher increase in patenting on the east side.
     - What if we observe a negative effect? Local Market Access
+
+
+# Notes Seminar AE
+
+- Emmanuel: proximate vs. fundamental causes of ec. growth
+- Maria: patent applications influenced by relative price difference. What are the explanations?
+- Uli: Why would Austro-Hungarians go to Paris? Prohibitive costs + France was friendlier to Italy
+    - Could potentially also look at London or "neutral" countries
+    - Countries less likely to be directly involved
+- Empirical strategy slide: make clear that it is a municipal-level design
+- Emmanuel: complexity question - is it sophistication of the product or the number of countries that matters? 
+    - Complexity: country-level vs. municipal-level
+- Trends: Veneto on steeper trend, implying any evidence in favor of Lombardy we find might be a lower bound
+- Paul: What is the unit of analysis?
+- Maria: Marco Martinez has patent data for a later period
+- Sparse Data: 
+    - Deal with many zeroes (Poisson regression maybe)
+- Maria: patents vs. patents per capita can be huge
+    - Look at a later census maybe
+    - Aggregate to the region level or the distritto level
+- Uli: intensive vs. extensive margin
+    - Weighted regressions
+- Paul: could this be a change in countries? You just lose your old market access and need to compensate for that by innovating more
+    - We should control for that in some way
+    - How about studying an effect "the other way around"? 
+    - E.g. Nice and Savoie to France?
+- Uli: war-related distruction
+    - No artillery, likely neglible, but have to find out
+- Jeroen: Relatively short timeframe: surprising to find effects on the short-term
+    - Currently missing: why could that be? 
+    - Which type of innovation and why? 
+    - Distinguish between different inventors or maybe the same inventor!
+    - More generally, look at individual-level information
+    - Patents in German vs. in Italian 
+- Jeroen: Invention vs. protection of invention (increase in patenting w/o increase in exhibiting may suggest it is about protection)
+- Maria: Since when did the patent system exist in Italy vs. Austria? (Both 1848)
+    - Check graph of evolution
+    - But DiD so check differential trends in patents
+- Uli: do we know for how long?
+    - Not for Austrian, maybe for Italian via the Bolletino source
+    - Long-duration patents were cheaper in Italy
+- Uli: the Italian system might have been more accessible to Italians (language)
+- Samuele: different industrial specialization may drive patenting differences, given different propensity to patent across industries
+- Samuele: Lombardy's growth in patenting might be seen as catching up, given its lower level coefficient
+- Samuele: the House of Savoy was not so liberal as we say. The liberal constitution in Piedmont might have been necessary to attract other Italians, given large differences among regions. Instead, the core part of Austrian empire was formed by much more honogenous constituent parts (before embarking very different regions e.g. Hungary)
+- Samuele: Italian language was codified already in 15th c. (by a Venetian doge for legal/diplomatic purposes), not in 19th c. as commonly assumed. Inventors might have strictly preferred to file paplications in their own language.
+	
+# Seminar PPE
+- Jacob: what about migration? Could be a confounder

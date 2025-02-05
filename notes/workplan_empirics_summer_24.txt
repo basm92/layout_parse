@@ -1,9 +1,0 @@
-Do exercises:
-	- OCR Exhibition
-	- OCR Population
-	- Extend short-run patent regressions to 1867
-	- Patents long run (till 1911)
-	- Exhibitions long run (till 1911)
-	- Complexity regression
-	- Maps of Austrian industrial stats
-	- Map of complexity in 1855
