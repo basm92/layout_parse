@@ -134,8 +134,30 @@ final <- final |>
   mutate(across(contains("patents_"), ~ .x / interpolated_population, .names = "{.col}_pc"),
          count_pc = count / interpolated_population)
 
-# Make NA observations for years at which there are no patents_together
-# And also for which there are no exhibitions
+# Correct Definitions (Put this in data_wrangling_final_ds.R)
+final <- final |> 
+  # Add the Erfindungen (patents_austria) to the "patents_together_verz_italy" variable (keep the name for convenience)
+  rowwise() |>
+  mutate(patents_together_verz_italy = patents_together_verz_italy + patents_austria) |>
+  ungroup() |>
+  mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
+         patents_together_verz_italy_pc =patents_together_verz_italy / interpolated_population)
+
+# Group a couple of years together for the years it is possible
+final <- final |>
+  mutate(year_group = case_when(
+    between(year, 1821, 1823) ~ "1822",
+    between(year, 1832, 1834) ~ "1833",
+    between(year, 1843, 1845) ~ "1844",
+    between(year, 1855, 1857) ~ "1855",
+    between(year, 1865, 1867) ~ "1867", 
+    year == 1878 ~ "1878",
+    year == 1889 ~ "1889", 
+    year == 1902 ~ "1902",
+    year == 1911 ~ "1911",
+    TRUE ~ NA
+  ))
+
 
 
 # Export dataset to csv

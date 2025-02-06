@@ -6,89 +6,44 @@ library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 #bw <- 150000
 
-# Correct Definitions (Put this in data_wrangling_final_ds.R)
-final <- final |> 
-  # Add the Erfindungen (patents_austria) to the "patents_together_verz_italy" variable (keep the name for convenience)
-  rowwise() |>
-  mutate(patents_together_verz_italy = patents_together_verz_italy + patents_austria) |>
-  ungroup() |>
-  mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
-         patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
-
 # How many patents do we have in total in each year?
 total_patents_per_year <- final |>
   group_by(year) |>
   summarize(sum_p = sum(patents_together_verz_italy))
 
-# Group a couple of years together for the years it is possible
-final <- final |>
-  mutate(year_group = case_when(
-    between(year, 1821, 1823) ~ "1822",
-    between(year, 1832, 1834) ~ "1833",
-    between(year, 1843, 1845) ~ "1844",
-    between(year, 1855, 1857) ~ "1855",
-    between(year, 1865, 1867) ~ "1867", 
-    year == 1878 ~ "1878",
-    year == 1889 ~ "1889", 
-    year == 1902 ~ "1902",
-    year == 1911 ~ "1911",
-    TRUE ~ NA
-  ))
+# Just Years
+model1 <- feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") | year,
+      data=final |> filter(is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911))),
+      vcov='hc1')
 
-# OLS
-final |> 
-  filter(across(c(patents_together_verz_italy, PRO_COM), ~ !is.na(.x)),
-         is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911)))
+model2 <- feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year + as.factor(PRO_COM),
+                data=final |> filter(is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911))),
+                vcov='hc1')
 
-test <- feols(a*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year + as.factor(PRO_COM),
-      data=final |>
-        mutate(a=patents_together_verz_italy/interpolated_population) |>
-        filter(
-          is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911)),
-          abs(running) < 200000),
-      vcov=vcov_conley(cutoff=50))
+model3 <- fepois(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year,
+                data=final |> filter(is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911))),
+                vcov='hc1')
 
-test2 <- feols(a*1e6 ~  i(as.factor(year_group), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year + as.factor(PRO_COM),
-              data=final |>
-                mutate(a=patents_together_verz_italy/interpolated_population) |>
-                filter(
-                  !is.na(year_group),
-                  abs(running) < 200000),
-              vcov=vcov_conley(cutoff=100))
+# Years +- To Eliminate Noise
+model4 <- feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year_group), allegiance_1861, ref="1855", ref2 = "Veneto") | year_group,
+                data=final |> filter(!is.na(year_group)),
+                vcov='hc1')
+
+model5 <- feols(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year_group), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year_group + as.factor(PRO_COM),
+              data=final |> filter(!is.na(year_group)),
+              vcov='hc1')
+
+model6 <- fepois(patents_together_verz_italy_pc*1e6 ~  i(as.factor(year_group), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year_group,
+                data=final |> filter(!is.na(year_group)),
+                vcov='hc1')
 
 
-
-# Poisson
-exhibitions1855poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1855)),
-                                vcov='hc1')
-exhibitions1867poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1867)),
-                                vcov='hc1')
-exhibitions1878poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1878)),
-                                vcov='hc1')
-exhibitions1889poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1889)),
-                                vcov='hc1')
-exhibitions1900poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1900)),
-                                vcov='hc1')
-exhibitions1911poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1911)),
-                                vcov='hc1')
-
-panel_a <- list('1855'=exhibitions1855cv, '1867'=exhibitions1867cv, '1878'=exhibitions1878cv, 
-                '1889'=exhibitions1889cv, '1900'=exhibitions1900cv, '1911'=exhibitions1911cv)
-
-panel_b <- list('1855'=exhibitions1855poiscv, '1867'=exhibitions1867poiscv, '1878'=exhibitions1878poiscv, 
-                '1889'=exhibitions1889poiscv, '1900'=exhibitions1900poiscv, '1911'=exhibitions1911poiscv)
-
-n2 <- "Table reports estimates of the difference in exhibition count per 100,000 inhabitants in Lombardy relative to Veneto. 
-Panel A reports OLS estimates, Panel B reports Poisson estimates in various exhibition years from 1855 to 1911. 
+panel_a <- list(model1, model2, model3, model4, model5, model6)
+n2 <- "Table reports estimates of the difference in patent count per 100,000 inhabitants in Lombardy relative to Veneto. 
+Equations 1,2, 4 and 5 report OLS estimates unconditional (1 and 4), and with municipal fixed effects (2 and 5). 
+Additionally, Models 2 and 5 control for population. Equations 3 and 6 report Poisson estimates without municipal FE.
 The estimates are conducted at the \\textit{Comune} level. 
-The estimates control for area, distance to the border, and population. 
-Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
+Heteroskedasticity-robust standard errors in parentheses. $*: p<0.1, **: p<0.05, ***: p<0.01$."
 
 coef_map <- c("allegiance_1861Veneto"="Veneto",
               "allegiance_1861Lombardia" = "Lombardia")
@@ -99,35 +54,11 @@ tt1 <- modelsummary(panel_a,
                     gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
                                      clean=c("Adj. $R^2$", "N"),
                                      fmt=c(3, 0)),
-                    title="Estimates of Unification on Exhibition Activity\\label{tab:exhibition_long_term}",
+                    title="Estimates of Unification on Patenting Activity\\label{tab:patents_long_term}",
                     estimate = "{estimate}{stars}",
                     #notes = n, 
                     output = "tinytable",
                     width=c(0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 
                     add_rows = as_tibble_row(c("Controls", rep("Yes", 6)), .name_repair = "unique")
 )
-
-tt2 <-  modelsummary(panel_b,
-                     coef_map=coef_map,
-                     stars=c("*"=0.1, "**"=0.05, "***"=0.01),
-                     gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
-                                      clean=c("Adj. $R^2$", "N"),
-                                      fmt=c(3, 0)),
-                     title="Testimates of Unification on Exhibition Activity\\label{tab:exhibition_long_term}",
-                     estimate = "{estimate}{stars}",
-                     notes = n2, 
-                     output = "tinytable",
-                     width=c(0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 
-                     add_rows = as_tibble_row(c("Controls", rep("Yes", 6)), .name_repair = "unique")
-) 
-
-
-rbind2(tt1, tt2) |>
-  group_tt(i=list("Panel A: OLS"=1, "Panel B: Poisson"=6)) |>
-  style_tt(
-    i=c(1, 7, 8), bold=T) |>
-  style_tt(i = 6, line = "b") |>
-  style_tt(i = 8, line = "b") |>
-  style_tt(i = 13, line = "b") |>
-  save_tt("./tables/exhibitions_long_term.tex", overwrite = T)
 
