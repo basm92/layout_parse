@@ -1,0 +1,42 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Estimates of Unification on Long-Run Patenting Activity\label{tab:patents_long_term}},
+note{}={Table reports estimates of the difference in patent count per 100,000 inhabitants in Lombardy relative to Veneto. 
+Equations 1,2, 4 and 5 report OLS estimates unconditional (1 and 4), and with municipal fixed effects (2 and 5). 
+Additionally, Models 2 and 5 control for population. Equations 3 and 6 report Poisson estimates without municipal FE.
+The estimates are conducted at the \textit{Comune} level. 
+Heteroskedasticity-robust standard errors in parentheses. $*: p<0.1, **: p<0.05, ***: p<0.01$.},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+width={0.9\linewidth},
+colspec={X[0.3]X[0.1]X[0.1]X[0.1]X[0.1]X[0.1]X[0.1]},
+column{2,3,4,5,6,7}={}{halign=c,},
+column{1}={}{halign=l,},
+hline{18}={1,2,3,4,5,6,7}{solid, black, 0.05em},
+}                     %% tabularray inner close
+\toprule
+& (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule %% TinyTableHeader
+Lombardia x 1822 & 1.677 & -0.853 & 1.659 & 0.396 & -1.211 & 0.651 \\
+& (1.917) & (2.377) & (1.167) & (0.681) & (0.869) & (0.853) \\
+Lombardia x 1833 & -0.056 & -2.252 & -0.702 & -0.005 & -1.330** & -0.016 \\
+& (0.071) & (1.572) & (0.932) & (0.037) & (0.569) & (0.616) \\
+Lombardia x 1844 & 0.093 & -1.739 & 0.480 & 0.111 & -0.906 & 0.585 \\
+& (0.237) & (1.582) & (0.924) & (0.166) & (0.583) & (0.680) \\
+Lombardia x 1867 & 1.245 & 0.310 & 1.939*** & -0.087 & -0.381 & 0.017 \\
+& (0.828) & (1.744) & (0.730) & (0.913) & (1.044) & (0.960) \\
+Lombardia x 1878 & 1.453 & 1.032 & 1.155 & 1.453 & 1.629 & 1.162 \\
+& (1.572) & (2.128) & (1.084) & (1.571) & (1.642) & (1.084) \\
+Lombardia x 1889 & 1.327 & 1.284 & 0.440 & 1.327 & 1.823 & 0.448 \\
+& (2.207) & (2.581) & (0.497) & (2.207) & (2.224) & (0.497) \\
+Lombardia x 1902 & 4.036** & 4.483* & 0.904** & 4.036** & 4.946** & 0.915** \\
+& (1.973) & (2.382) & (0.366) & (1.973) & (1.976) & (0.367) \\
+Lombardia x 1911 & 3.877 & 5.647* & 0.635* & 3.877 & 5.905** & 0.652* \\
+& (2.911) & (3.110) & (0.336) & (2.910) & (2.884) & (0.338) \\
+Adj. $R^2$ & 0.005 & 0.029 & 0.142 & 0.006 & 0.032 & 0.180 \\
+N & 18441 & 18441 & 18441 & 38931 & 38931 & 38931 \\
+Controls & Yes & Yes & Yes & Yes & Yes & Yes \\
+Comune FE & No & Yes & No & No & Yes & No \\
+\bottomrule
+\end{talltblr}
+\end{table}

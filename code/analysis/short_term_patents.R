@@ -3,39 +3,7 @@ library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 
 # Set the global bandwidth
-bw <- 150000
-
-# Mutate
-final <- final |>
-  mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
-         patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
-
-# Potentially Compute optimal RDD bandwidth
-compute_optimal_bw <- function(dv, 
-                               iv, 
-                               control_eq, # of the form "dv ~ x | fe"
-                               dataset,
-                               bwselect='msetwo'){
-  dataset <- dataset |>
-    mutate(dv = eval(parse(text = dv)),
-           iv = eval(parse(text = iv))) |>
-    filter(!is.na(dv), !is.na(iv))
-  
-  if(!is.null(control_eq)){
-    result <- feols(as.formula(control_eq), data = dataset)
-    dataset <- modelr::add_residuals(dataset, result, var = "resid")
-    dataset <- dataset |>
-      select(-dv) |>
-      rename(dv = resid)
-  }
-  
-  out <- rdrobust::rdbwselect(y=dataset$dv, x=dataset$iv, c=0, bwselect=bwselect)
-  left_bw <- out$bws[1]
-  right_bw <- out$bws[2]
-  fr <- c(left_bw, right_bw)
-  return(fr)
-}
-
+bw <- 100000
 ## Placebo's: before 1859 Annexation of Lombardy
 patents1858 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
                      data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
@@ -150,3 +118,4 @@ rbind2(tt1, tt2) |>
   style_tt(i = 11, line = "b") |>
   style_tt(i = 15, line = "b") |>
   save_tt("./tables/patents_short_term.tex", overwrite = T)
+

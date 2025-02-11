@@ -177,3 +177,29 @@ make_table <- function(list_of_columns,
   datasummary_df(out, ...)
 }
 
+
+# Potentially Compute optimal RDD bandwidth
+compute_optimal_bw <- function(dv, 
+                               iv, 
+                               control_eq, # of the form "dv ~ x | fe"
+                               dataset,
+                               bwselect='msetwo'){
+  dataset <- dataset |>
+    mutate(dv = eval(parse(text = dv)),
+           iv = eval(parse(text = iv))) |>
+    filter(!is.na(dv), !is.na(iv))
+  
+  if(!is.null(control_eq)){
+    result <- feols(as.formula(control_eq), data = dataset)
+    dataset <- modelr::add_residuals(dataset, result, var = "resid")
+    dataset <- dataset |>
+      select(-dv) |>
+      rename(dv = resid)
+  }
+  
+  out <- rdrobust::rdbwselect(y=dataset$dv, x=dataset$iv, c=0, bwselect=bwselect)
+  left_bw <- out$bws[1]
+  right_bw <- out$bws[2]
+  fr <- c(left_bw, right_bw)
+  return(fr)
+}
