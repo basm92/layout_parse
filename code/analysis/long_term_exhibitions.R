@@ -4,61 +4,39 @@
 library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 bw <- 150000
+final_filtered <- final |>
+  filter(is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1900, 1911)),
+         abs(running) < bw)
 
-test <- feols(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto")+ area_of_intersection + abs_distance_to_border + interpolated_population | year,
-              data=final |>
-                filter(
-                  # str_detect(DEN_PROV, "Mantova"),
-                  is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1902, 1911)),
-                  abs(running) < bw),
-              vcov='hc1')
+final_filtered |>
+  group_by(allegiance_1861, year) |>
+  summarize(cpc = sum(count, na.rm=T)) |>
+  filter(is.element(year, c(1855, 1867, 1878, 1889, 1900, 1911)))
 
 # OLS
-exhibitions1855cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                           data = final |> filter(abs(running) < bw, is.element(year, 1855)),
-                           vcov='hc1')
-exhibitions1867cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                           data = final |> filter(abs(running) < bw, is.element(year, 1867)),
-                           vcov='hc1')
-exhibitions1878cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                           data = final |> filter(abs(running) < bw, is.element(year, 1878)),
-                           vcov='hc1')
-exhibitions1889cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                           data = final |> filter(abs(running) < bw, is.element(year, 1889)),
-                           vcov='hc1')
-exhibitions1900cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                           data = final |> filter(abs(running) < bw, is.element(year, 1900)),
-                           vcov='hc1')
-exhibitions1911cv <- feols(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border | DEN_CIRC, 
-                           data = final |> filter(abs(running) < bw, is.element(year, 1911)),
-                           vcov='hc1')
-
+model1 <- feols(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") | year,
+                data=final_filtered,
+                vcov=~PRO_COM)
+model2 <- feols(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + area_of_intersection + abs_distance_to_border + interpolated_population | year,
+              data=final_filtered,
+              vcov=~PRO_COM)
+model3 <- feols(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + area_of_intersection + abs_distance_to_border + interpolated_population | as.factor(PRO_COM) + year,
+                data=final_filtered,
+                vcov=~year)
 
 # Poisson
-exhibitions1855poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1855)),
-                                vcov='hc1')
-exhibitions1867poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1867)),
-                                vcov='hc1')
-exhibitions1878poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1878)),
-                                vcov='hc1')
-exhibitions1889poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1889)),
-                                vcov='hc1')
-exhibitions1900poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1900)),
-                                vcov='hc1')
-exhibitions1911poiscv <- fepois(count_pc*1e6 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1911)),
-                                vcov='hc1')
+model4 <- fepois(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") | year,
+                data=final_filtered,
+                vcov=~PRO_COM)
+model5 <- fepois(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + interpolated_population | year,
+                data=final_filtered,
+                vcov=~PRO_COM)
+model6 <- fepois(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855", ref2 = "Veneto") + area_of_intersection + abs_distance_to_border + interpolated_population | year,
+                data=final_filtered,
+                vcov=~year)
 
-panel_a <- list('1855'=exhibitions1855cv, '1867'=exhibitions1867cv, '1878'=exhibitions1878cv, 
-                '1889'=exhibitions1889cv, '1900'=exhibitions1900cv, '1911'=exhibitions1911cv)
 
-panel_b <- list('1855'=exhibitions1855poiscv, '1867'=exhibitions1867poiscv, '1878'=exhibitions1878poiscv, 
-                '1889'=exhibitions1889poiscv, '1900'=exhibitions1900poiscv, '1911'=exhibitions1911poiscv)
+panel_a <- list(model1, model2, model3, model4, model5, model6)
 
 n2 <- "Table reports estimates of the difference in exhibition count per 100,000 inhabitants in Lombardy relative to Veneto. 
 Panel A reports OLS estimates, Panel B reports Poisson estimates in various exhibition years from 1855 to 1911. 
