@@ -2,7 +2,6 @@
 \centering
 \begin{talltblr}[         %% tabularray outer open
 caption={Estimates of Unification on Exhibition Activity\label{tab:exhibition}},
-entry=none,label=none,
 note{}={Table reports estimates of the difference in exhibition count per 100,000 inhabitants in Lombardy relative to Veneto. 
 Panel A focuses on the pre-unification period (the 1855 Exhibition), and 
 Panel B on the unification period for Lombardy but not for Veneto (the 1867 Exhibition).  
@@ -15,40 +14,41 @@ Heteroskedasticity-robust standard errors are clustered at the province-level. $
 width={0.7\linewidth},
 colspec={X[0.3]X[0.1]X[0.1]X[0.1]X[0.1]},
 cell{2}{1}={c=5}{},cell{8}{1}={c=5}{},
-cell{3}{1}={preto={\hspace{1em}}},
-cell{4}{1}={preto={\hspace{1em}}},
-cell{5}{1}={preto={\hspace{1em}}},
-cell{6}{1}={preto={\hspace{1em}}},
-cell{7}{1}={preto={\hspace{1em}}},
-cell{9}{1}={preto={\hspace{1em}}},
-cell{10}{1}={preto={\hspace{1em}}},
-cell{11}{1}={preto={\hspace{1em}}},
-cell{12}{1}={preto={\hspace{1em}}},
-cell{13}{1}={preto={\hspace{1em}}},
-cell{14}{1}={preto={\hspace{1em}}},
-cell{15}{1}={preto={\hspace{1em}}},
-row{2}={,cmd=\bfseries,},
-row{8}={,cmd=\bfseries,},
-row{9}={,cmd=\bfseries,},
-hline{8}={1,2,3,4,5}{solid, 0.1em, black},
-hline{10}={1,2,3,4,5}{solid, 0.1em, black},
-hline{15}={1,2,3,4,5}{solid, 0.1em, black},
+row{2,8}={}{cmd=\bfseries,},
+cell{9}{2}={}{cmd=\bfseries,},
+cell{9}{3}={}{cmd=\bfseries,},
+cell{9}{4}={}{cmd=\bfseries,},
+cell{9}{5}={}{cmd=\bfseries,},
+cell{3}{1}={}{preto={\hspace{1em}},},
+cell{4}{1}={}{preto={\hspace{1em}},},
+cell{5}{1}={}{preto={\hspace{1em}},},
+cell{6}{1}={}{preto={\hspace{1em}},},
+cell{7}{1}={}{preto={\hspace{1em}},},
+cell{10}{1}={}{preto={\hspace{1em}},},
+cell{11}{1}={}{preto={\hspace{1em}},},
+cell{12}{1}={}{preto={\hspace{1em}},},
+cell{13}{1}={}{preto={\hspace{1em}},},
+cell{14}{1}={}{preto={\hspace{1em}},},
+cell{9}{1}={}{preto={\hspace{1em}}, cmd=\bfseries,},
+hline{8}={1,2,3,4,5}{solid, black, 0.1em},
+hline{10}={1,2,3,4,5}{solid, black, 0.1em},
+hline{15}={1,2,3,4,5}{solid, black, 0.1em},
 }                     %% tabularray inner close
 \toprule
 & OLS & Poisson & OLS  & Poisson  \\ \midrule %% TinyTableHeader
 Panel A: Pre-Unification &&&& \\
-Lombardia  & 3.183    & 0.541   & 4.557     & 0.477    \\
-& (3.395)  & (0.609) & (3.228)   & (0.712)  \\
-Adj. $R^2$ & 0.000    & 0.005   & 0.012     & 0.061    \\
-N          & 1916     & 1916    & 1916      & 1916     \\
-Controls   & No       & No      & Yes       & Yes      \\
+Lombardia & 3.419 & 0.571 & 4.873 & 0.502 \\
+& (3.454) & (0.609) & (3.230) & (0.706) \\
+Adj. $R^2$ & -0.000 & 0.006 & 0.012 & 0.061 \\
+N & 1876 & 1876 & 1876 & 1876 \\
+Controls & No & No & Yes & Yes \\
 Panel B: Post-Lombardy, Pre-Veneto Unification &&&& \\
-& OLS      & Poisson & OLS       & Poisson  \\
-Lombardia  & 13.441** & 0.772** & 21.710*** & 0.927*** \\
-& (6.423)  & (0.376) & (5.862)   & (0.318)  \\
-Adj. $R^2$ & 0.001    & 0.013   & 0.082     & 0.184    \\
-N          & 1917     & 1917    & 1917      & 1917     \\
-Controls   & No       & No      & Yes       & Yes      \\
+& OLS & Poisson & OLS & Poisson \\
+Lombardia & 14.195** & 0.801** & 22.666*** & 0.939*** \\
+& (6.563) & (0.376) & (6.080) & (0.319) \\
+Adj. $R^2$ & 0.001 & 0.014 & 0.082 & 0.183 \\
+N & 1876 & 1876 & 1876 & 1876 \\
+Controls & No & No & Yes & Yes \\
 \bottomrule
 \end{talltblr}
 \end{table}

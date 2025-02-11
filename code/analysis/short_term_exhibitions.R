@@ -4,6 +4,11 @@ library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 bw <- 150000
 
+# Raw count
+final |>
+  group_by(allegiance_1861, year) |>
+  summarize(cpc = sum(count, na.rm=T)) |>
+  filter(is.element(year, c(1855, 1867)))
 
 # Pre-Unification (1855)
 exhibitions1855 <- feols(count_pc*1e6 ~ allegiance_1861, 
