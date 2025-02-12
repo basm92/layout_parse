@@ -2,10 +2,6 @@
 library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 
-final <- final |>
-  mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
-         patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
-
 avg_pop_time <- final |>
   filter(pop != 0) |>
   group_by(year, allegiance_1861) |>

@@ -1,4 +1,6 @@
 # Descr Stats
+library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
+source("./code/data_wrangling/data_wrangling_final_ds.R")
 
 ## Number of Patents in the Database {Italy, Austra}
 table_no_patents <- final |> 
@@ -64,10 +66,10 @@ table_no_exh |>
 ## Number of Exhibitions 
 ## Geographical Distribution {1855, 1867}
 exh_1855 <- left_join(geofile |>  select(PRO_COM),
-                      final |> select(PRO_COM, count, year) |> filter(year==1855))
+                      final |> select(PRO_COM, count, year, allegiance_1861) |> filter(year==1855))
 
 p1 <- exh_1855 |>
-  ggplot(aes(fill=log(1+count))) + 
+  ggplot(aes(fill=log(1+count), color=allegiance_1861)) + 
   geom_sf() + 
   scale_fill_viridis_c() +
   ggtitle("Exhibition Count 1855 Exhibition") +
@@ -80,10 +82,10 @@ p1 <- exh_1855 |>
 
 
 exh_1867 <- left_join(geofile |>  select(PRO_COM),
-                      final |> select(PRO_COM, count, year) |> filter(year==1867))
+                      final |> select(PRO_COM, count, year, allegiance_1861) |> filter(year==1867))
 
 p2 <- exh_1867 |>
-  ggplot(aes(fill=log(1+count))) +
+  ggplot(aes(fill=log(1+count), color=allegiance_1861)) +
   geom_sf() + 
   scale_fill_viridis_c()  + 
   ggtitle("Exhibition Count 1867 Exhibition") +
@@ -95,7 +97,7 @@ p2 <- exh_1867 |>
   )
 
 plot2 <- p1+p2
-ggsave("./pics/exhibition_count.pdf")
+ggsave("./pics/graph_exhibition_count.pdf")
 
 ## Map of Complexity of Various Locations {1855}
 
