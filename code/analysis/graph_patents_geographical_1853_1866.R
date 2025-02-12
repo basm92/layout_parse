@@ -11,10 +11,6 @@ geofile <- geofile |>
   filter(!is.element(COMUNE, blacklist))
 
 # Mutate
-final <- final |>
-  mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
-         patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
-
 data_to_be_plotted <- final |>
   group_by(PRO_COM, year) |>
   summarize(sum_pat = sum(patents_together_verz_italy)) |>
@@ -55,4 +51,4 @@ p2 <- plot_data |>
   )
 
 final <- p1 / p2
-ggsave("./pics/graph_patents_geographical_1855_1866.png", width=10, height=6)
+ggsave("./pics/graph_patents_geographical_1855_1866.pdf", width=10, height=6)

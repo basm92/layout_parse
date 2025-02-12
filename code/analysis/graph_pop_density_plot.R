@@ -19,4 +19,4 @@ plot <- final |>
   guides(color=guide_legend(title="Region"))
 
 plot |>
-  ggsave(filename="./pics/graph_pop_density_plot.png", width=10, height=8)
+  ggsave(filename="./pics/graph_pop_density_plot.pdf", width=10, height=8)

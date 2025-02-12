@@ -5,11 +5,6 @@ source("./code/data_wrangling/data_wrangling_final_ds.R")
 # Set the global bandwidth
 bw <- 150000
 
-# Mutate
-final <- final |>
-  mutate(patents_together_verz_italy = if_else(is.na(patents_together_verz_italy), 0, patents_together_verz_italy),
-         patents_together_verz_italy_pc = if_else(is.na(patents_together_verz_italy_pc), 0, patents_together_verz_italy_pc))
-
 # Graph Data
 gd <- final |>
   filter(is.element(year, 1855:1866)) |> 
@@ -26,4 +21,4 @@ plot <- gd |>
   guides(color=guide_legend(title="Region"))
 
 plot |>
-  ggsave(filename="./pics/graph_patents_over_time_1853_1866.png", width=10, height=8)
+  ggsave(filename="./pics/graph_patents_over_time_1853_1866.pdf", width=10, height=8)
