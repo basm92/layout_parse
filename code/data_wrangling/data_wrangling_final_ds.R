@@ -38,7 +38,6 @@ final <- left_join(base, geofile, by = c("PRO_COM" = "PRO_COM"))
 # Add zero's for observations we observe, but not for "gap years" in the exhibition
 exhibition_years <- c(1855, 1867, 1878, 1889, 1900, 1911)
 final <- final |> 
- # mutate(across(contains("patents"), ~ if_else(is.na(.x), 0, .x))) |>
   mutate(count = if_else(is.element(year, exhibition_years) & is.na(count), 0, count))
 
 coords <- geofile |>
