@@ -11,44 +11,59 @@ Heteroskedasticity-robust standard errors are clustered at the province-level. $
 {                     %% tabularray inner open
 width={0.9\linewidth},
 colspec={X[0.3]X[0.1]X[0.1]X[0.1]X[0.1]X[0.1]X[0.1]},
-cell{2}{1}={c=7}{},cell{8}{1}={c=7}{},
-row{2,8}={}{cmd=\bfseries,},
-cell{9}{2}={}{cmd=\bfseries,},
-cell{9}{3}={}{cmd=\bfseries,},
-cell{9}{4}={}{cmd=\bfseries,},
-cell{9}{5}={}{cmd=\bfseries,},
-cell{9}{6}={}{cmd=\bfseries,},
-cell{9}{7}={}{cmd=\bfseries,},
-cell{3}{1}={}{preto={\hspace{1em}},},
-cell{4}{1}={}{preto={\hspace{1em}},},
-cell{5}{1}={}{preto={\hspace{1em}},},
-cell{6}{1}={}{preto={\hspace{1em}},},
-cell{7}{1}={}{preto={\hspace{1em}},},
-cell{10}{1}={}{preto={\hspace{1em}},},
-cell{11}{1}={}{preto={\hspace{1em}},},
-cell{12}{1}={}{preto={\hspace{1em}},},
-cell{13}{1}={}{preto={\hspace{1em}},},
-cell{14}{1}={}{preto={\hspace{1em}},},
-cell{9}{1}={}{preto={\hspace{1em}}, cmd=\bfseries,},
-hline{8}={1,2,3,4,5,6,7}{solid, black, 0.1em},
-hline{10}={1,2,3,4,5,6,7}{solid, black, 0.1em},
-hline{15}={1,2,3,4,5,6,7}{solid, black, 0.1em},
+column{3,4,6,7}={}{halign=c,},
+column{1}={}{halign=l,},
+cell{2}{2}={}{halign=c,},
+cell{2}{5}={}{halign=c,},
+cell{3}{2}={}{halign=c,},
+cell{3}{5}={}{halign=c,},
+cell{4}{2}={}{halign=c,},
+cell{4}{5}={}{halign=c,},
+cell{5}{2}={}{halign=c,},
+cell{5}{5}={}{halign=c,},
+cell{6}{2}={}{halign=c,},
+cell{6}{5}={}{halign=c,},
+cell{7}{2}={}{halign=c,},
+cell{7}{5}={}{halign=c,},
+cell{8}{2}={}{halign=c,},
+cell{8}{5}={}{halign=c,},
+cell{9}{2}={}{halign=c,},
+cell{9}{5}={}{halign=c,},
+cell{10}{2}={}{halign=c,},
+cell{10}{5}={}{halign=c,},
+cell{11}{2}={}{halign=c,},
+cell{11}{5}={}{halign=c,},
+cell{12}{2}={}{halign=c,},
+cell{12}{5}={}{halign=c,},
+cell{13}{2}={}{halign=c,},
+cell{13}{5}={}{halign=c,},
+cell{14}{2}={}{halign=c,},
+cell{14}{5}={}{halign=c,},
+cell{15}{2}={}{halign=c,},
+cell{15}{5}={}{halign=c,},
+cell{16}{2}={}{halign=c,},
+cell{16}{5}={}{halign=c,},
+cell{1}{2}={c=3,}{halign=c, halign=c,},
+cell{1}{5}={c=3,}{halign=c, halign=c,},
+hline{13}={1,2,3,4,5,6,7}{solid, black, 0.05em},
 }                     %% tabularray inner close
 \toprule
-& 1855 & 1867 & 1878 & 1889 & 1900 & 1911 \\ \midrule %% TinyTableHeader
-Panel A: OLS &&&&&& \\
-Lombardia  & 4.873   & 22.630*** & 10.857*** & 1.237   & 6.226   & -2.180  \\
-& (3.230) & (6.071)   & (3.705)   & (1.141) & (5.702) & (6.948) \\
-Adj. $R^2$ & 0.012   & 0.082     & 0.037     & 0.033   & 0.013   & 0.030   \\
-N          & 1876    & 1877      & 1877      & 1877    & 1877    & 1877    \\
-Controls   & Yes     & Yes       & Yes       & Yes     & Yes     & Yes     \\
-Panel B: Poisson &&&&&& \\
-& 1855    & 1867      & 1878      & 1889    & 1900    & 1911    \\
-Lombardia  & 0.502   & 0.940***  & 0.714*    & 0.229   & 0.123   & 0.379   \\
-& (0.706) & (0.319)   & (0.383)   & (0.992) & (0.297) & (0.292) \\
-Adj. $R^2$ & 0.061   & 0.183     & 0.099     & 0.115   & 0.048   & 0.132   \\
-N          & 1876    & 1877      & 1877      & 1877    & 1877    & 1877    \\
-Controls   & Yes     & Yes       & Yes       & Yes     & Yes     & Yes     \\
+& OLS &  &  & Poisson &  &  \\ \cmidrule[lr]{2-4}\cmidrule[lr]{5-7}
+& (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule %% TinyTableHeader
+Lombardia x 1867 & 14.195** & 15.937** & 10.608*** & 0.801** & 0.992*** & 0.625*** \\
+& (6.565) & (6.262) & (1.072) & (0.376) & (0.367) & (0.080) \\
+Lombardia x 1878 & 6.935* & 9.365** & 3.178 & 0.628* & 0.829** & 0.482*** \\
+& (4.110) & (4.036) & (2.150) & (0.369) & (0.364) & (0.091) \\
+Lombardia x 1889 & 0.254 & 3.129* & -3.612 & 0.183 & 0.426 & 0.087 \\
+& (1.028) & (1.693) & (2.846) & (0.769) & (0.776) & (0.122) \\
+Lombardia x 1900 & 4.799 & 8.012 & 0.849 & 0.236 & 0.547* & 0.236 \\
+& (5.914) & (5.893) & (3.376) & (0.283) & (0.305) & (0.193) \\
+Lombardia x 1911 & 9.451** & 14.463*** & 5.059 & 0.637** & 1.111*** & 1.049** \\
+& (4.134) & (4.149) & (6.194) & (0.276) & (0.326) & (0.441) \\
+Adj. $R^2$ & 0.004 & 0.032 & 0.073 & 0.056 & 0.102 & 0.127 \\
+N & 11256 & 11256 & 11256 & 11256 & 11256 & 11256 \\
+Controls & No & Full & Full & No & Partial & Full \\
+Municipal FE & No & No & Yes & No & No & No \\
 \bottomrule
 \end{talltblr}
 \end{table}

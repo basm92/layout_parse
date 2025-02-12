@@ -203,3 +203,23 @@ compute_optimal_bw <- function(dv,
   fr <- c(left_bw, right_bw)
   return(fr)
 }
+
+
+coef_map_lt <- c("as.factor(year)::1822:allegiance_1861::Lombardia" = "Lombardia x 1822",
+                 "as.factor(year)::1833:allegiance_1861::Lombardia" = "Lombardia x 1833",
+                 "as.factor(year)::1844:allegiance_1861::Lombardia" = "Lombardia x 1844",
+                 "as.factor(year)::1867:allegiance_1861::Lombardia" = "Lombardia x 1867",
+                 "as.factor(year)::1878:allegiance_1861::Lombardia" = "Lombardia x 1878",
+                 "as.factor(year)::1889:allegiance_1861::Lombardia" = "Lombardia x 1889",
+                 "as.factor(year)::1900:allegiance_1861::Lombardia" = "Lombardia x 1900",
+                 "as.factor(year)::1902:allegiance_1861::Lombardia" = "Lombardia x 1902",
+                 "as.factor(year)::1911:allegiance_1861::Lombardia" = "Lombardia x 1911", 
+                 "as.factor(year_group)::1822:allegiance_1861::Lombardia" = "Lombardia x 1822",
+                 "as.factor(year_group)::1833:allegiance_1861::Lombardia" = "Lombardia x 1833",
+                 "as.factor(year_group)::1844:allegiance_1861::Lombardia" = "Lombardia x 1844",
+                 "as.factor(year_group)::1867:allegiance_1861::Lombardia" = "Lombardia x 1867",
+                 "as.factor(year_group)::1878:allegiance_1861::Lombardia" = "Lombardia x 1878",
+                 "as.factor(year_group)::1889:allegiance_1861::Lombardia" = "Lombardia x 1889",
+                 "as.factor(year_group)::1902:allegiance_1861::Lombardia" = "Lombardia x 1902",
+                 "as.factor(year_group)::1911:allegiance_1861::Lombardia" = "Lombardia x 1911")
+

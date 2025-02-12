@@ -3,6 +3,8 @@
 # Patents 1855-1866 
 library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
+source('code/analysis/regression_settings.R')
+
 bw <- 150000
 final_filtered <- final |>
   filter(is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1900, 1911)),
@@ -39,49 +41,28 @@ model6 <- fepois(count_pc*1e6 ~  i(as.factor(year), allegiance_1861, ref="1855",
 panel_a <- list(model1, model2, model3, model4, model5, model6)
 
 n2 <- "Table reports estimates of the difference in exhibition count per 100,000 inhabitants in Lombardy relative to Veneto. 
-Panel A reports OLS estimates, Panel B reports Poisson estimates in various exhibition years from 1855 to 1911. 
+The first 3 models report OLS estimates, the last three models report Poisson estimates. 
 The estimates are conducted at the \\textit{Comune} level. 
-The estimates control for area, distance to the border, and population. 
-Heteroskedasticity-robust standard errors are clustered at the province-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
-
-coef_map <- c("allegiance_1861Veneto"="Veneto",
-              "allegiance_1861Lombardia" = "Lombardia")
+The estimates control for population(Partial), in addition to area, distance to the border (Full). 
+Heteroskedasticity-robust standard errors are clustered at the Comune-level. $*: p<0.1, **: p<0.05, ***: p<0.01$."
 
 tt1 <- modelsummary(panel_a,
-                    coef_map=coef_map,
+                    coef_map=coef_map_lt,
                     stars=c("*"=0.1, "**"=0.05, "***"=0.01),
                     gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
                                      clean=c("Adj. $R^2$", "N"),
                                      fmt=c(3, 0)),
                     title="Estimates of Unification on Exhibition Activity\\label{tab:exhibition_long_term}",
                     estimate = "{estimate}{stars}",
-                    #notes = n, 
+                    notes = n2, 
                     output = "tinytable",
                     width=c(0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 
-                    add_rows = as_tibble_row(c("Controls", rep("Yes", 6)), .name_repair = "unique")
-)
-
-tt2 <-  modelsummary(panel_b,
-                     coef_map=coef_map,
-                     stars=c("*"=0.1, "**"=0.05, "***"=0.01),
-                     gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
-                                      clean=c("Adj. $R^2$", "N"),
-                                      fmt=c(3, 0)),
-                     title="Testimates of Unification on Exhibition Activity\\label{tab:exhibition_long_term}",
-                     estimate = "{estimate}{stars}",
-                     notes = n2, 
-                     output = "tinytable",
-                     width=c(0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 
-                     add_rows = as_tibble_row(c("Controls", rep("Yes", 6)), .name_repair = "unique")
-) 
-
-
-rbind2(tt1, tt2) |>
-  group_tt(i=list("Panel A: OLS"=1, "Panel B: Poisson"=6)) |>
-  style_tt(
-    i=c(1, 7, 8), bold=T) |>
-  style_tt(i = 6, line = "b") |>
-  style_tt(i = 8, line = "b") |>
-  style_tt(i = 13, line = "b") |>
+                    add_rows = bind_rows(
+                      as_tibble_row(c("Controls", "No", "Full", "Full", "No", "Partial", "Full"), .name_repair = "unique"),
+                      as_tibble_row(c("Municipal FE", rep("No", 2), "Yes", rep("No", 3)), .name_repair = "unique")
+                    )
+                    ) |>
+  group_tt(j=list("OLS"=2:4, "Poisson"=5:7)) |>
   save_tt("./tables/exhibitions_long_term.tex", overwrite = T)
+
 

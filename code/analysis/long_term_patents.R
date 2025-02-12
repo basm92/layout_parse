@@ -4,6 +4,7 @@
 # Patents 1855-1866 
 library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
+source('code/analysis/regression_settings.R')
 #bw <- 150000
 
 # How many patents do we have in total in each year?
@@ -45,25 +46,8 @@ Additionally, Models 2 and 5 control for population. Equations 3 and 6 report Po
 The estimates are conducted at the \\textit{Comune} level. 
 Heteroskedasticity-robust standard errors in parentheses. $*: p<0.1, **: p<0.05, ***: p<0.01$."
 
-coef_map <- c("as.factor(year)::1822:allegiance_1861::Lombardia" = "Lombardia x 1822",
-              "as.factor(year)::1833:allegiance_1861::Lombardia" = "Lombardia x 1833",
-              "as.factor(year)::1844:allegiance_1861::Lombardia" = "Lombardia x 1844",
-              "as.factor(year)::1867:allegiance_1861::Lombardia" = "Lombardia x 1867",
-              "as.factor(year)::1878:allegiance_1861::Lombardia" = "Lombardia x 1878",
-              "as.factor(year)::1889:allegiance_1861::Lombardia" = "Lombardia x 1889",
-              "as.factor(year)::1902:allegiance_1861::Lombardia" = "Lombardia x 1902",
-              "as.factor(year)::1911:allegiance_1861::Lombardia" = "Lombardia x 1911", 
-              "as.factor(year_group)::1822:allegiance_1861::Lombardia" = "Lombardia x 1822",
-              "as.factor(year_group)::1833:allegiance_1861::Lombardia" = "Lombardia x 1833",
-              "as.factor(year_group)::1844:allegiance_1861::Lombardia" = "Lombardia x 1844",
-              "as.factor(year_group)::1867:allegiance_1861::Lombardia" = "Lombardia x 1867",
-              "as.factor(year_group)::1878:allegiance_1861::Lombardia" = "Lombardia x 1878",
-              "as.factor(year_group)::1889:allegiance_1861::Lombardia" = "Lombardia x 1889",
-              "as.factor(year_group)::1902:allegiance_1861::Lombardia" = "Lombardia x 1902",
-              "as.factor(year_group)::1911:allegiance_1861::Lombardia" = "Lombardia x 1911")
-
 tt1 <- modelsummary(panel_a,
-                    coef_map=coef_map,
+                    coef_map=coef_map_lt,
                     stars=c("*"=0.1, "**"=0.05, "***"=0.01),
                     gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
                                      clean=c("Adj. $R^2$", "N"),
