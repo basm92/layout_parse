@@ -60,8 +60,8 @@ individual_with_class <- read_csv2('./data/intermediate_exhibition_data/individu
 
 # Geocode this data
 ## Make a list of possible municipalities to be matched to
-municipalities <- read_sf("./shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp")
-compartimenti <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1871/Compartimenti_1871/Compartimenti_1871.shp')
+municipalities <- read_sf("./data/shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp")
+compartimenti <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti_1871/Compartimenti_1871/Compartimenti_1871.shp')
 municipalities_with_compartimenti <- st_intersection(municipalities, compartimenti) |>
   mutate(area=st_area(geometry),
          overlap = as.numeric(area / Shape_Area)) |>

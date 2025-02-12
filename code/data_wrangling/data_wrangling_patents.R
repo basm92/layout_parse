@@ -86,7 +86,7 @@ austrian_geocoded_patents_italy <- left_join(austrian_geocoded_google, austrian_
 
 # Use the municipalities data.frame to put this inside a polygon
 sf::sf_use_s2(FALSE)
-municipalities <- read_sf('./shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp') |>
+municipalities <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp') |>
   st_transform("wgs84") 
 
 geocode_place <- function(row){
@@ -160,7 +160,7 @@ italy_together <- bind_rows(italy1863_1867, italy_1878) |>
 
 # Geomatch these data as well
 sf::sf_use_s2(FALSE)
-municipalities <- read_sf('./shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp') |>
+municipalities <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp') |>
   st_transform("wgs84") 
 
 # Use 2 different API's: for google, use usethis::edit_r_environ() and set GOOGLEGEOCODE_API_KEY variable

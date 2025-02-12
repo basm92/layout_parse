@@ -3,14 +3,14 @@ library(sf); library(tidyverse); library(tidygeocoder); library(jsonlite)
 run_geocoding <- FALSE
 
 ## Part 1: Create the border
-compartimenti_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Compartimenti_1861/Compartimenti_1861.shp')
-compartimenti_1871 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1871/Compartimenti_1871/Compartimenti_1871.shp')
-province_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Province_1861/Province_1861.shp')
-province_1871 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1871/Province_1871/Province_1871.shp')
-circondari_1861 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1861/Circondari_1861/Circondari_1861.shp')
-circondari_1871 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1871/Circondari_ 1871/Circondari_1871.shp')
-circondari_1911 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti_1911/Circondari_1911/Circondari_1911.shp') 
-communi_1991 <- read_sf('./shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp')
+compartimenti_1861 <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti_1861/Compartimenti_1861/Compartimenti_1861.shp')
+compartimenti_1871 <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti_1871/Compartimenti_1871/Compartimenti_1871.shp')
+province_1861 <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti_1861/Province_1861/Province_1861.shp')
+province_1871 <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti_1871/Province_1871/Province_1871.shp')
+circondari_1861 <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti_1861/Circondari_1861/Circondari_1861.shp')
+circondari_1871 <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti_1871/Circondari_ 1871/Circondari_1871.shp')
+circondari_1911 <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti_1911/Circondari_1911/Circondari_1911.shp') 
+communi_1991 <- read_sf('./data/shapefiles_images/italy_admin_borders/Limiti1991/Com1991/Com1991_WGS84.shp')
 
 # Border in two ways: North of Mantova, rely on intersection between Veneto and Lombardia
 north_border <- st_intersection(compartimenti_1861 |>
