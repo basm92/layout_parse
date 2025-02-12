@@ -6,47 +6,51 @@ source('code/analysis/regression_settings.R')
 bw <- 100000
 
 final <- final |>
-  mutate(patents_dummy = if_else(patents_together_verz_italy > 0, 1, 0))
+  mutate(patents_im = if_else(patents_together_verz_italy > 0, patents_together_verz_italy, NA))
+
+total_places_per_year <- final |>
+  group_by(year) |>
+  summarize(unique_places = length(unique(PRO_COM[patents_im > 0])))
 
 ## Placebo's: before 1859 Annexation of Lombardy
-patents1858 <- feols(patents_dummy ~ allegiance_1861, 
+patents1858 <- feols(patents_im ~ allegiance_1861, 
                      data = final |> filter(abs(running) < bw, is.element(year, 1804:1858)),
                      vcov=~PRO_COM)
-patents1858pois <- fepois(patents_dummy ~ allegiance_1861, 
+patents1858pois <- fepois(patents_im ~ allegiance_1861, 
                           data = final |> filter(abs(running) < bw, is.element(year, 1804:1858)),
                           vcov=~PRO_COM)
-patents1858cv <- feols(patents_dummy ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
+patents1858cv <- feols(patents_im ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
                        data = final |> filter(abs(running) < bw, is.element(year, 1804:1858)),
                        vcov=~PRO_COM)
-patents1858poiscv <- fepois(patents_dummy ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+patents1858poiscv <- fepois(patents_im ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
                             data = final |> filter(abs(running) < bw, is.element(year, 1804:1858)),
                             vcov=~PRO_COM)
-patents1858cvfe <- feols(patents_dummy ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border | year, 
+patents1858cvfe <- feols(patents_im ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border | year, 
                          data = final |> filter(abs(running) < bw, is.element(year, 1804:1858)),
                          vcov=~PRO_COM)
-patents1858poiscvfe <- fepois(patents_dummy ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+patents1858poiscvfe <- fepois(patents_im ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
                               data = final |> filter(abs(running) < bw, is.element(year, 1804:1858)),
                               vcov=~PRO_COM)
 #modelsummary(list(patents1858, patents1858pois, patents1858cv, patents1858poiscv, patents1858cvfe, patents1858poiscvfe), stars=T)
 
 ## Real tests: After the 1859 Annexation of Lombardy
-patents1867 <- feols(patents_dummy ~ allegiance_1861, 
-                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+patents1867 <- feols(patents_im ~ allegiance_1861, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1911)),
                      vcov=~PRO_COM)
-patents1867pois <- fepois(patents_dummy ~ allegiance_1861, 
-                          data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+patents1867pois <- fepois(patents_im ~ allegiance_1861, 
+                          data = final |> filter(abs(running) < bw, is.element(year, 1860:1911)),
                           vcov=~PRO_COM)
-patents1867cv <- feols(patents_dummy ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
-                       data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+patents1867cv <- feols(patents_im ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+                       data = final |> filter(abs(running) < bw, is.element(year, 1860:1911)),
                        vcov=~PRO_COM)
-patents1867poiscv <- fepois(patents_dummy ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
-                            data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+patents1867poiscv <- fepois(patents_im ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+                            data = final |> filter(abs(running) < bw, is.element(year, 1860:1911)),
                             vcov=~PRO_COM)
-patents1867cvfe <- feols(patents_dummy ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
-                         data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+patents1867cvfe <- feols(patents_im ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+                         data = final |> filter(abs(running) < bw, is.element(year, 1860:1911)),
                          vcov=~PRO_COM)
-patents1867poiscvfe <- fepois(patents_dummy ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
-                              data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+patents1867poiscvfe <- fepois(patents_im ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+                              data = final |> filter(abs(running) < bw, is.element(year, 1860:1911)),
                               vcov=~PRO_COM)
 
 #modelsummary(list(patents1867, patents1867pois, patents1867cv, patents1867poiscv, patents1867cvfe, patents1867poiscvfe), stars=T)
@@ -89,7 +93,7 @@ tt1 <- modelsummary(panel_a,
                     gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
                                      clean=c("Adj. $R^2$", "N"),
                                      fmt=c(3, 0)),
-                    title="Estimates of Unification on Patenting Activity\\label{tab:patents_short_term_extensive_margin}",
+                    title="Estimates of Unification on Patenting Activity\\label{tab:patents_intensive_margin}",
                     estimate = "{estimate}{stars}",
                     #notes = n, 
                     output = "tinytable",
@@ -104,7 +108,7 @@ tt2 <-  modelsummary(panel_b,
                      gof_map = tibble(raw=c("adj.r.squared", "nobs"), 
                                       clean=c("Adj. $R^2$", "N"),
                                       fmt=c(3, 0)),
-                     title="Testimates of Unification on Patenting Activity\\label{tab:patents_short_term_extensive_margin}",
+                     title="Testimates of Unification on Patenting Activity\\label{tab:patents_intensive_margin}",
                      estimate = "{estimate}{stars}",
                      notes = n, 
                      output = "tinytable",
@@ -121,5 +125,5 @@ rbind2(tt1, tt2) |>
   style_tt(i = 7, line = "b") |>
   style_tt(i = 11, line = "b") |>
   style_tt(i = 15, line = "b") |>
-  save_tt("./tables/patents_short_term_extensive_margin.tex", overwrite = T)
+  save_tt("./tables/patents_intensive_margin.tex", overwrite = T)
 
