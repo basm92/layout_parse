@@ -2,8 +2,7 @@
 \centering
 \begin{talltblr}[         %% tabularray outer open
 caption={Estimates of Unification on Patenting Activity\label{tab:patent}},
-entry=none,label=none,
-note{}={Table reports estimates of an indicator whether Patents > 0 in municipalities in Lombardy relative to Veneto.  
+note{}={Table reports estimates of the difference in patent count in Veneto relative to Lombardy. 
 The dependent variable is patents per 100,000 population. 
 Panel A focuses on the pre-unification period (1855 to 1858), and 
 Panel B on the unification period for Lombardy (1860-1866), but not for Veneto. 
@@ -16,45 +15,48 @@ The estimates control for area, distance to the border and population
 width={0.9\linewidth},
 colspec={X[0.3]X[0.1]X[0.1]X[0.1]X[0.1]X[0.1]X[0.1]},
 cell{2}{1}={c=7}{},cell{9}{1}={c=7}{},
-cell{3}{1}={preto={\hspace{1em}}},
-cell{4}{1}={preto={\hspace{1em}}},
-cell{5}{1}={preto={\hspace{1em}}},
-cell{6}{1}={preto={\hspace{1em}}},
-cell{7}{1}={preto={\hspace{1em}}},
-cell{8}{1}={preto={\hspace{1em}}},
-cell{10}{1}={preto={\hspace{1em}}},
-cell{11}{1}={preto={\hspace{1em}}},
-cell{12}{1}={preto={\hspace{1em}}},
-cell{13}{1}={preto={\hspace{1em}}},
-cell{14}{1}={preto={\hspace{1em}}},
-cell{15}{1}={preto={\hspace{1em}}},
-cell{16}{1}={preto={\hspace{1em}}},
-cell{17}{1}={preto={\hspace{1em}}},
-row{2}={,cmd=\bfseries,},
-row{9}={,cmd=\bfseries,},
-row{10}={,cmd=\bfseries,},
-hline{5}={1,2,3,4,5,6,7}{solid, 0.1em, black},
-hline{9}={1,2,3,4,5,6,7}{solid, 0.1em, black},
-hline{13}={1,2,3,4,5,6,7}{solid, 0.1em, black},
-hline{17}={1,2,3,4,5,6,7}{solid, 0.1em, black},
+row{2,9}={}{cmd=\bfseries,},
+cell{10}{2}={}{cmd=\bfseries,},
+cell{10}{3}={}{cmd=\bfseries,},
+cell{10}{4}={}{cmd=\bfseries,},
+cell{10}{5}={}{cmd=\bfseries,},
+cell{10}{6}={}{cmd=\bfseries,},
+cell{10}{7}={}{cmd=\bfseries,},
+cell{3}{1}={}{preto={\hspace{1em}},},
+cell{4}{1}={}{preto={\hspace{1em}},},
+cell{5}{1}={}{preto={\hspace{1em}},},
+cell{6}{1}={}{preto={\hspace{1em}},},
+cell{7}{1}={}{preto={\hspace{1em}},},
+cell{8}{1}={}{preto={\hspace{1em}},},
+cell{11}{1}={}{preto={\hspace{1em}},},
+cell{12}{1}={}{preto={\hspace{1em}},},
+cell{13}{1}={}{preto={\hspace{1em}},},
+cell{14}{1}={}{preto={\hspace{1em}},},
+cell{15}{1}={}{preto={\hspace{1em}},},
+cell{16}{1}={}{preto={\hspace{1em}},},
+cell{10}{1}={}{preto={\hspace{1em}}, cmd=\bfseries,},
+hline{5}={1,2,3,4,5,6,7}{solid, black, 0.1em},
+hline{9}={1,2,3,4,5,6,7}{solid, black, 0.1em},
+hline{13}={1,2,3,4,5,6,7}{solid, black, 0.1em},
+hline{17}={1,2,3,4,5,6,7}{solid, black, 0.1em},
 }                     %% tabularray inner close
 \toprule
 & OLS & Poisson & OLS  & Poisson  & OLS   & Poisson   \\ \midrule %% TinyTableHeader
 Panel A: Pre-Unification &&&&&& \\
-Lombardia  & -0.001  & -0.256  & 0.006*** & -0.282   & 0.006*** & -0.273    \\
-& (0.003) & (0.508) & (0.002)  & (0.397)  & (0.002)  & (0.396)   \\
-Adj. $R^2$ & 0.000   & -0.003  & 0.356    & 0.407    & 0.356    & 0.397     \\
-N          & 8032    & 8032    & 7664     & 7664     & 7664     & 7664      \\
-Year FE    & No      & No      & No       & No       & Yes      & Yes       \\
-Controls   & No      & No      & Yes      & Yes      & Yes      & Yes       \\
+Lombardia & 0.000 & 0.346 & 0.002 & -0.471 & 0.002 & -0.471 \\
+& (0.001) & (1.009) & (0.002) & (0.830) & (0.002) & (0.829) \\
+Adj. $R^2$ & -0.000 & -0.017 & 0.046 & 0.235 & 0.046 & 0.183 \\
+N & 5160 & 5160 & 4904 & 4904 & 4904 & 4904 \\
+Year FE & No & No & No & No & Yes & Yes \\
+Controls & No & No & Yes & Yes & Yes & Yes \\
 Panel B: Post-Lombardy, Pre-Veneto Unification &&&&&& \\
-& OLS     & Poisson & OLS      & Poisson  & OLS      & Poisson   \\
-Lombardia  & 0.000   & -0.022  & 0.006*** & 0.428    & 0.006*** & 0.457     \\
-& (0.002) & (0.570) & (0.001)  & (0.707)  & (0.001)  & (0.718)   \\
-Adj. $R^2$ & 0.000   & -0.003  & 0.271    & 0.418    & 0.271    & 0.405     \\
-N          & 16064   & 16064   & 15334    & 15334    & 15334    & 15334     \\
-Year FE    & No      & No      & No       & No       & Yes      & Yes       \\
-Controls   & No      & No      & Yes      & Yes      & Yes      & Yes       \\
+& OLS & Poisson & OLS & Poisson & OLS & Poisson \\
+Lombardia & 0.001 & 1.039 & 0.005*** & 2.564* & 0.005*** & 2.645* \\
+& (0.001) & (0.852) & (0.002) & (1.549) & (0.002) & (1.546) \\
+Adj. $R^2$ & 0.000 & 0.005 & 0.097 & 0.388 & 0.097 & 0.360 \\
+N & 10320 & 10320 & 9808 & 9808 & 9808 & 9808 \\
+Year FE & No & No & No & No & Yes & Yes \\
+Controls & No & No & Yes & Yes & Yes & Yes \\
 \bottomrule
 \end{talltblr}
 \end{table}
