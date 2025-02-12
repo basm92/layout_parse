@@ -1,7 +1,7 @@
 # Patents 1855-1866 
 library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
-
+source('code/analysis/regression_settings.R')
 # Set the global bandwidth
 bw <- 100000
 ## Placebo's: before 1859 Annexation of Lombardy

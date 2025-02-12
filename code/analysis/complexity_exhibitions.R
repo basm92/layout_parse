@@ -4,34 +4,55 @@ library(fixest); library(tidyverse); library(modelsummary); library(tinytable)
 source("./code/data_wrangling/data_wrangling_final_ds.R")
 bw <- 150000
 
+final_filtered <- final |>
+  filter(is.element(year, c(1822, 1833, 1844, 1855, 1867, 1878, 1889, 1900, 1911)),
+         abs(running) < bw)
 
-# Pre-Unification (1855)
-exhibitions1855 <- feols(average_complexity ~ allegiance_1861, 
-                         data = final |> filter(abs(running) < bw, is.element(year, 1855)),
-                         vcov='hc1')
-exhibitions1855top <- feols(top_complexity ~ allegiance_1861, 
-                              data = final |> filter(abs(running) < bw, is.element(year, 1855)),
-                              vcov='hc1')
-exhibitions1855cv <- feols(average_complexity~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                           data = final |> filter(abs(running) < bw, is.element(year, 1855)),
-                           vcov='hc1')
-exhibitions1855topcv <- feols(top_complexity ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1855)),
-                                vcov='hc1')
+final_filtered |>
+  group_by(allegiance_1861, year) |>
+  summarize(cpc = sum(count, na.rm=T)) |>
+  filter(is.element(year, c(1855, 1867, 1878, 1889, 1900, 1911)))
 
-## After the 1859 Annexation of Lombardy (1867)
-exhibitions1867 <- feols(average_complexity ~ allegiance_1861, 
-                         data = final |> filter(abs(running) < bw, is.element(year, 1867)),
-                         vcov='hc1')
-exhibitions1867top <- feols(top_complexity ~ allegiance_1861, 
-                              data = final |> filter(abs(running) < bw, is.element(year, 1867)),
-                              vcov='hc1')
-exhibitions1867cv <- feols(average_complexity ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                           data = final |> filter(abs(running) < bw, is.element(year, 1867)),
-                           vcov='hc1')
-exhibitions1867topcv <- feols(top_complexity ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
-                                data = final |> filter(abs(running) < bw, is.element(year, 1867)),
-                                vcov='hc1')
+## Placebo's: before 1859 Annexation of Lombardy
+patents1858 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                     vcov=~PRO_COM)
+patents1858pois <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
+                          data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                          vcov=~PRO_COM)
+patents1858cv <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border, 
+                       data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                       vcov=~PRO_COM)
+patents1858poiscv <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+                            data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                            vcov=~PRO_COM)
+patents1858cvfe <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + interpolated_population + area_of_intersection + abs_distance_to_border | year, 
+                         data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                         vcov=~PRO_COM)
+patents1858poiscvfe <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+                              data = final |> filter(abs(running) < bw, is.element(year, 1855:1858)),
+                              vcov=~PRO_COM)
+#modelsummary(list(patents1858, patents1858pois, patents1858cv, patents1858poiscv, patents1858cvfe, patents1858poiscvfe), stars=T)
+
+## Real tests: After the 1859 Annexation of Lombardy
+patents1867 <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
+                     data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                     vcov=~PRO_COM)
+patents1867pois <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861, 
+                          data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                          vcov=~PRO_COM)
+patents1867cv <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+                       data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                       vcov=~PRO_COM)
+patents1867poiscv <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population, 
+                            data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                            vcov=~PRO_COM)
+patents1867cvfe <- feols(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+                         data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                         vcov=~PRO_COM)
+patents1867poiscvfe <- fepois(patents_together_verz_italy_pc*1e7 ~ allegiance_1861 + area_of_intersection + abs_distance_to_border + interpolated_population | year, 
+                              data = final |> filter(abs(running) < bw, is.element(year, 1860:1867)),
+                              vcov=~PRO_COM)
 
 
 panel_a <- list('OLS'=exhibitions1855, 'Poisson'=exhibitions1855pois, 'OLS'=exhibitions1855cv, 'Poisson'=exhibitions1855poiscv)
