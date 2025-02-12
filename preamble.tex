@@ -1,0 +1,71 @@
+\documentclass[12pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+
+\usepackage{placeins}   % Fot \FloatBarrier
+
+\usepackage[cmintegrals,cmbraces]{newtxmath}
+%\usepackage{ebgaramond}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+%\usepackage{amssymb}
+
+%table numbers within section
+\usepackage{chngcntr}
+\counterwithin{table}{section}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{caption}
+
+%\frenchspacing
+\usepackage{setspace}
+\setstretch{1.1}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[colorlinks=true, urlcolor = orange, linkcolor=blue, citecolor=purple]{hyperref}
+
+\usepackage{xcolor}
+%\usepackage{sectsty}
+\usepackage{appendix}
+
+%\subsectionfont{\color{cyan!70!blue}}  % sets colour of chapters
+%\sectionfont{\color{blue!60!black}}  % sets colour of sections
+
+%Tables:
+\usepackage{dcolumn}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{tabularx}
+
+% Landscape mode
+\usepackage{lscape}
+
+% Modelsummary
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+%\newcolumntype{d}{S[input-symbols = ()]}
+\newcolumntype{d}{S[
+    input-open-uncertainty=,
+    input-close-uncertainty=,
+    parse-numbers = false,
+    table-align-text-pre=false,
+    table-align-text-post=false
+ ]}
+
+%% Regression tables
+\usepackage{tabularray}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\UseTblrLibrary{booktabs}
+\UseTblrLibrary{siunitx}
+\newcommand{\tinytableTabularrayUnderline}[1]{\underline{#1}}
+\newcommand{\tinytableTabularrayStrikeout}[1]{\sout{#1}}
+\NewTableCommand{\tinytableDefineColor}[3]{\definecolor{#1}{#2}{#3}}
